@@ -2341,7 +2341,14 @@ body.no-mascot .cmd-in img{display:none}
 .tb-r1{flex-wrap:wrap;gap:8px}.tb-r1 .top-status{margin-left:0;gap:6px;flex-wrap:nowrap}
 .tb-r1 .crumb{max-width:200px;overflow:hidden;text-overflow:ellipsis;margin-right:0}.tb-r1 #unitChip select{max-width:150px}.tb-r1 .chip{padding:0 10px}
 @media (max-width:1380px){body:not(.nav-hide) .tb-r1 .crumb{display:none}}
-.tb-tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tb-tools{display:flex;align-items:center;gap:8px}
+.tb-r1 .top-status{margin-left:auto} /* 17/11 19:41 anh: 3 ô đơn vị, công ty, ngày dồn sát cụm tài khoản + nút công cụ bên phải */
+.ref-l{font-style:normal}
+/* dòng 1 gọn để không tràn: tài khoản 1 dòng tên, nút công cụ nhỏ hơn; màn hẹp bỏ chữ "Tính đến", "Đơn vị" và đường dẫn trang */
+.tb-tools .pq-nm i{display:none}.tb-tools .pq-chip{max-width:170px}.tb-tools .icon-btn{width:32px;height:32px}
+@media (max-width:1600px){body:not(.nav-hide) .tb-r1 .crumb{display:none}}
+@media (max-width:1400px){.tb-r1 .ref-l{display:none}body:not(.nav-hide) #unitChip .muted{display:none}}
+@media (min-width:1101px){.tb-r1{flex-wrap:nowrap}.tb-r1 .crumb{flex:0 1 auto;min-width:0;white-space:nowrap}.tb-r1 .top-status,.tb-tools{flex:0 0 auto}}
 .tb-tools .icon-btn{width:34px;height:34px;border-radius:9px}.tb-tools .icon-btn svg{width:17px;height:17px}.tb-tools .chip{height:38px}
 .tb-r2{justify-content:space-between;gap:12px}.tb-r2 .find{flex:1;max-width:460px}
 .tb-r2 .tb-r3{margin-left:auto}
@@ -2355,7 +2362,7 @@ body.nav-hide .nav-hide-btn{background:var(--pri-soft);border-color:var(--pri);c
   body.nav-hide .container,body.nav-hide .topbar-inner{max-width:none}
 }
 @media (max-width:980px){.nav-hide-btn{display:none}}
-@media (max-width:760px){.tb-tools{margin-left:0;width:100%;justify-content:flex-end}.tb-r2 .find{max-width:none}}
+@media (max-width:760px){.tb-r1 .top-status{margin-left:0}.tb-tools{margin-left:0;width:100%;justify-content:flex-end}.tb-r2 .find{max-width:none}}
 </style>
 </head>
 <body>
@@ -2377,7 +2384,7 @@ body.nav-hide .nav-hide-btn{background:var(--pri-soft);border-color:var(--pri);c
       <span class="crumb" id="crumb"></span>
       <div class="top-status">
         <label class="chip" id="unitChip" hidden><span class="muted">Đơn vị</span><select id="unitSel" aria-label="Chọn đơn vị"></select></label><button class="chip" id="pickBtn" type="button" hidden title="Chọn các công ty gộp dữ liệu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m8 12 3 3 5-6"/></svg><span><b id="pickN">2/2</b> công ty</span></button>
-        <button class="chip" id="refChip" type="button" title="Đổi ngày tham chiếu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg><span>Tính đến <b id="refTxt"></b></span></button>
+        <button class="chip" id="refChip" type="button" title="Đổi ngày tham chiếu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg><span><i class="ref-l">Tính đến </i><b id="refTxt"></b></span></button>
       </div>
       <div class="tb-tools">
         <span class="top-tools">
