@@ -91,6 +91,7 @@ Dữ liệu nằm trong cơ sở dữ liệu D1, tách khỏi mã phần mềm. 
 - Hẹn giờ gửi báo cáo định kỳ trên gói miễn phí của Cloudflare (giới hạn thời gian xử lý mỗi lần chạy).
 - Dữ liệu rất lớn (nhiều file đính kèm) trên gói miễn phí.
 - Nút **Cập nhật từ bản gốc** (GitHub Actions) đang được chạy thử lần đầu.
+- **Dán link Google Drive**: đã thử với máy chủ mô phỏng; chưa thử với Google Drive thật (file lớn có trang xác nhận quét virus, Google Sheets nhiều trang tính).
 - **Gửi email tự động qua Resend**: đã thử với máy chủ mô phỏng, chưa thử gửi thật bằng tài khoản Resend và tên miền thật (tên hiển thị tiếng Việt có dấu, thư vào hộp Spam hay không).
 
 Giới hạn và giá các gói xem tại trang giá của Cloudflare (Workers, D1).

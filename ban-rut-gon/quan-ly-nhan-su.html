@@ -2363,6 +2363,10 @@ body.nav-hide .nav-hide-btn{background:var(--pri-soft);border-color:var(--pri);c
 }
 @media (max-width:980px){.nav-hide-btn{display:none}}
 @media (max-width:760px){.tb-r1 .top-status{margin-left:0}.tb-tools{margin-left:0;width:100%;justify-content:flex-end}.tb-r2 .find{max-width:none}}
+
+/* 17/11 21:09: Google Drive */
+.gd-st{margin:0 0 0 18px;padding:0;display:grid;gap:8px;line-height:1.55;font-size:13.5px}
+.gd-warn ul{margin:6px 0 0 16px;padding:0;display:grid;gap:5px;font-size:13px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -21437,8 +21441,55 @@ var cur = ndSnap(u), out = cur, sd = { n: 0, kept: 0 };
         '<button class="btn btn-sm" data-act="nd-go" data-id="' + sp.go + '"' + (lock ? ' disabled' : '') + '>Nhập tay trên phần mềm</button></div></div></div>';
     });
     h += '</div><div class="nd-auto"><b>Các mục không cần nhập riêng</b><div class="tbl-wrap"><table class="tbl"><thead><tr><th class="l">Mục</th><th>Lấy dữ liệu từ</th><th class="l">Cách phần mềm lấy</th><th></th></tr></thead><tbody>' + ND_AUTO.map(function (r) { return '<tr><td class="l"><b>' + r[0] + '</b></td><td><span class="tag tag-info">' + r[1] + '</span></td><td class="l">' + r[2] + '</td><td><button class="btn btn-sm" data-act="nd-go" data-id="' + r[3] + '"' + (u ? '' : ' disabled') + '>Mở mục</button></td></tr>'; }).join('') + '</tbody></table></div>';
-    return h + '</div><div class="nd-any"><span>Có file nhưng chưa rõ thuộc bước nào?</span><button class="btn btn-sm" data-act="nd-pick" data-id="' + (u ? u.id : '') + '">' + ic('files', 14) + 'Tải 1 file lên, phần mềm tự nhận diện</button><button class="btn btn-sm btn-primary" data-act="nd-many" data-id="' + (u ? u.id : '') + '">' + ic('files', 14) + 'Tải nhiều file cùng lúc</button><button class="btn btn-sm btn-primary" data-act="nd-dir" data-id="' + (u ? u.id : '') + '">' + ic('folder', 14) + 'Tải cả thư mục</button><span class="faint">Nhận Excel (.xlsx, .xls), CSV, và PDF hoặc ảnh (CV ứng viên). File gốc không bị sửa.</span></div><div class="nd-any"><span>Nhập nhầm hoặc muốn xem lại?</span><button class="btn btn-sm" data-act="nd-hist">Lịch sử nhập dữ liệu và hoàn tác</button><span class="faint">Mỗi lần nhập, thay thế dữ liệu đều được ghi lại. Hoàn tác cần mật khẩu quản trị.</span></div></div>';
+    return h + '</div><div class="nd-any"><span>Có file nhưng chưa rõ thuộc bước nào?</span><button class="btn btn-sm" data-act="nd-pick" data-id="' + (u ? u.id : '') + '">' + ic('files', 14) + 'Tải 1 file lên, phần mềm tự nhận diện</button><button class="btn btn-sm btn-primary" data-act="nd-many" data-id="' + (u ? u.id : '') + '">' + ic('files', 14) + 'Tải nhiều file cùng lúc</button><button class="btn btn-sm btn-primary" data-act="nd-dir" data-id="' + (u ? u.id : '') + '">' + ic('folder', 14) + 'Tải cả thư mục</button><span class="faint">Nhận Excel (.xlsx, .xls), CSV, và PDF hoặc ảnh (CV ứng viên). File gốc không bị sửa.</span></div><div class="nd-any"><span>Dữ liệu đang để trên Google Drive?</span><button class="btn btn-sm" data-act="nd-gdhelp">' + ic('folder', 14) + 'Dùng ổ Google Drive trên máy (khuyên dùng)</button><button class="btn btn-sm" data-act="nd-gdrive" data-id="' + (u ? u.id : '') + '">' + ic('files', 14) + 'Dán link Google Drive / Google Sheets</button><span class="faint">Dán link cần bật chia sẻ công khai – đọc cảnh báo bảo mật trước khi dùng.</span></div><div class="nd-any"><span>Nhập nhầm hoặc muốn xem lại?</span><button class="btn btn-sm" data-act="nd-hist">Lịch sử nhập dữ liệu và hoàn tác</button><span class="faint">Mỗi lần nhập, thay thế dữ liệu đều được ghi lại. Hoàn tác cần mật khẩu quản trị.</span></div></div>';
   }
+
+  /* ===== 17/11/2026 21:09 anh duyệt: DỮ LIỆU TRÊN GOOGLE DRIVE =====
+     Cách A (khuyên dùng): Google Drive cho máy tính – Drive hiện như ổ đĩa, chọn thư mục như bình thường (không cần lập trình, không phải chia sẻ công khai).
+     Cách C: dán link file Drive / Google Sheets – bản đầy đủ, máy chủ tải hộ (/api/qt/tai-link); file phải bật "Bất kỳ ai có đường liên kết" → cảnh báo bảo mật, bắt buộc tích đã hiểu. */
+  ACTS['nd-gdhelp'] = function () {
+    modal('Dùng dữ liệu trên Google Drive – cách an toàn', 'Không cần chia sẻ công khai file nhân sự', '<ol class="gd-st">' +
+      '<li><b>Cài Google Drive cho máy tính</b> (Google Drive for desktop) tại <a href="https://www.google.com/drive/download/" target="_blank" rel="noopener">google.com/drive/download</a>, đăng nhập tài khoản Google của công ty.</li>' +
+      '<li>Cài xong, Google Drive hiện như một <b>ổ đĩa</b>: trên Windows là ổ "Google Drive" trong File Explorer (thường là ổ G:), trên máy Mac ở mục Locations của Finder.</li>' +
+      '<li>Trong phần mềm bấm <b>Tải cả thư mục</b> (hoặc <b>Chọn thư mục</b> ở màn hình đầu) → mở ổ Google Drive → Drive của tôi (My Drive) → thư mục dữ liệu nhân sự.</li>' +
+      '<li>Nên đặt thư mục dữ liệu ở chế độ <b>có sẵn ngoại tuyến</b> (chuột phải thư mục → Truy cập ngoại tuyến / Offline access) để file luôn có trên máy, đọc nhanh hơn.</li>' +
+      '<li>File trên Drive thay đổi: bấm <b>Quét lại</b> (nếu đã chọn thư mục ở màn hình đầu bằng Chrome hoặc Edge) hoặc tải lại thư mục.</li></ol>' +
+      '<p class="faint" style="font-size:12.5px;margin:10px 0 0">Cách này không đưa file lên mạng công khai: chỉ máy đã đăng nhập tài khoản Google của công ty mới thấy file.</p><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" data-close>Đã hiểu</button></div>', true);
+  };
+  ACTS['nd-gdrive'] = function (a, id) {
+    var full = typeof SV !== 'undefined' && SV;
+    if (!full) { modal('Dán link Google Drive có ở bản đầy đủ', '', '<p>Bản này chạy trên trình duyệt nên không tải trực tiếp được file từ Google Drive (Google chặn). Bản đầy đủ tải hộ qua máy chủ riêng của đơn vị.</p><p>Trong lúc này, dùng cách an toàn hơn: <b>Google Drive cho máy tính</b> – Drive hiện như một ổ đĩa, chọn thư mục như bình thường.</p><div class="link-row" style="justify-content:flex-end;margin-top:12px"><button class="btn" data-close>Đóng</button><button class="btn btn-primary" id="gdA">Xem cách dùng Google Drive cho máy tính</button></div>', true); var bA = $('#gdA'); if (bA) bA.addEventListener('click', function () { $$('.modal-bg').forEach(function (x) { x.remove(); }); ACTS['nd-gdhelp'](); }); return; }
+    var body = '<div class="notice bad gd-warn">' + ic('info') + '<div><b>Cảnh báo bảo mật – đọc trước khi dùng</b><ul>' +
+      '<li>Phần mềm chỉ tải được file đang để chế độ chia sẻ <b>"Bất kỳ ai có đường liên kết"</b>. Ở chế độ này, <b>bất kỳ ai có link</b> – do gửi nhầm, lộ qua tin nhắn, email, lịch sử trình duyệt – đều mở và tải được file, không cần đăng nhập.</li>' +
+      '<li>File nhân sự thường chứa <b>dữ liệu cá nhân</b> (họ tên, CCCD, ngày sinh, địa chỉ, số điện thoại, lương, tài khoản ngân hàng, bảo hiểm, sức khỏe…), có loại là dữ liệu cá nhân nhạy cảm. Theo Luật Bảo vệ dữ liệu cá nhân (Luật 91/2025), <b>công ty là bên kiểm soát dữ liệu</b> và chịu trách nhiệm nếu để lộ.</li>' +
+      '<li><b>Nếu vẫn dùng</b>: chỉ bật chia sẻ ngay trước khi tải; tải xong <b>chuyển ngay về "Bị hạn chế"</b> (Restricted); không gửi link qua nhóm chat; không dùng cho file có CCCD, lương, tài khoản ngân hàng nếu không thật cần.</li></ul>' +
+      '<p style="margin:6px 0 0">Cách an toàn hơn, không phải chia sẻ công khai: <a href="#" id="gdHelp">dùng Google Drive cho máy tính</a>.</p></div></div>' +
+      '<div class="field" style="margin-top:12px"><label for="gdUrl">Link file trên Google Drive hoặc Google Sheets</label><input class="input" id="gdUrl" placeholder="https://drive.google.com/file/d/… hoặc https://docs.google.com/spreadsheets/d/…" autocomplete="off"><small class="faint">Nhận Excel, CSV, PDF, ảnh trên Drive và Google Sheets (tự chuyển sang Excel). Tối đa 15 MB.</small></div>' +
+      '<label class="tl-ro"><input type="checkbox" id="gdOk"><span>Tôi đã đọc cảnh báo, hiểu rủi ro và sẽ <b>tắt chia sẻ công khai</b> ngay sau khi tải xong</span></label>' +
+      '<p id="gdMsg" class="tl-msg"></p><div class="link-row" style="justify-content:flex-end"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="gdGo" disabled>Tải file</button></div>';
+    var m = modal('Tải file từ link Google Drive', 'Bản đầy đủ · máy chủ của đơn vị tải hộ file', body, true), ok = $('#gdOk', m), go = $('#gdGo', m), msg = $('#gdMsg', m);
+    $('#gdHelp', m).addEventListener('click', function (ev) { ev.preventDefault(); m.close(); ACTS['nd-gdhelp'](); });
+    ok.addEventListener('change', function () { go.disabled = !ok.checked; });
+    go.addEventListener('click', function () {
+      var url = $('#gdUrl', m).value.trim(); if (!/^https:\/\/(drive|docs)\.google\.com\//i.test(url)) { msg.textContent = 'Dán link bắt đầu bằng https://drive.google.com/ hoặc https://docs.google.com/spreadsheets/'; return; }
+      if (!ok.checked) return; msg.textContent = ''; go.disabled = true; go.textContent = 'Đang tải…';
+      fetch(SV.api + 'tai-link', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ url: url }) }).then(function (r) {
+        if (!r.ok || /json/.test(r.headers.get('content-type') || '')) return r.json().catch(function () { return { loi: 'Máy chủ trả lời không đúng (mã ' + r.status + ').' }; }).then(function (j) { throw new Error(j.loi || 'Chưa tải được file.'); });
+        var nm = decodeURIComponent(r.headers.get('x-ten-file') || 'Google-Drive'); return r.blob().then(function (b) { return { b: b, nm: nm }; });
+      }).then(function (x) {
+        return x.b.slice(0, 4).arrayBuffer().then(function (h) {
+          var u8 = new Uint8Array(h), nm = x.nm;
+          if (!/\.(xlsx|xlsm|xls|csv|txt|pdf|jpe?g|png|webp)$/i.test(nm)) nm += u8[0] === 0x50 && u8[1] === 0x4B ? '.xlsx' : u8[0] === 0xD0 && u8[1] === 0xCF ? '.xls' : u8[0] === 0x25 && u8[1] === 0x50 ? '.pdf' : '';
+          if (!/\.(xlsx|xlsm|xls|csv|txt|pdf|jpe?g|png|webp)$/i.test(nm)) throw new Error('File tải về không phải Excel, CSV, PDF hay ảnh.');
+          var f; try { f = new File([x.b], nm, { type: x.b.type || '' }); } catch (e) { f = x.b; f.name = nm; }
+          m.close(); log('Nhập dữ liệu: tải file "' + nm + '" từ link Google Drive');
+          var r2 = modal('Nhớ tắt chia sẻ công khai', '', '<div class="notice warn">' + ic('info') + '<div>Đã tải xong <b>' + esc(nm) + '</b>. Mở file trên Google Drive → <b>Chia sẻ</b> → Quyền truy cập chung → chọn <b>"Bị hạn chế"</b> (Restricted) để không ai khác mở được bằng link.</div></div><div class="link-row" style="justify-content:flex-end;margin-top:12px"><a class="btn" href="' + esc(url) + '" target="_blank" rel="noopener">Mở file trên Google Drive</a><button class="btn btn-primary" data-close>Đã tắt / tiếp tục</button></div>', true);
+          ndBatch([f], id || null);
+        });
+      }).catch(function (e) { go.disabled = !ok.checked; go.textContent = 'Tải file'; msg.textContent = (e && e.message) || 'Chưa tải được file.'; });
+    });
+    setTimeout(function () { try { $('#gdUrl', m).focus(); } catch (e) { } }, 60);
+  };
   function ndStartHtml() {
     return '<button class="nd-startbar" data-act="nd-go" data-id="nhap"><span class="ic">' + ic('nhap', 22) + '</span><span><b>Nhập dữ liệu theo từng bước</b><small>File chưa theo mẫu, file CSV, file máy chấm công, hoặc chưa có file nào: vào mục Nhập dữ liệu để làm lần lượt 5 bước, có file mẫu và nhập tay.</small></span><span class="go">Mở Nhập dữ liệu →</span></button>';
   }

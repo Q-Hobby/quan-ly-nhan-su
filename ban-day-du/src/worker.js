@@ -994,6 +994,26 @@ async function api(req, env, url) {
       if (await checkPw(moi, nv.mk_salt, nv.mk)) return bad('Mật khẩu mới cần khác mật khẩu đang dùng.');
       const salt = randHex(16); await db.prepare('UPDATE nv SET mk = ?, mk_salt = ?, mk_doi = NULL WHERE ma = ?').bind(await hashPw(moi, salt), salt, U.ma).run(); return json({ ok: true });
     }
+    // 17/11/2026 21:09 anh duyệt: TẢI FILE TỪ ĐƯỜNG LINK GOOGLE DRIVE / GOOGLE SHEETS (file phải bật "Bất kỳ ai có đường liên kết") – máy chủ tải hộ vì trình duyệt bị chặn tải trực tiếp
+    if (r === 'tai-link' && req.method === 'POST') {
+      let u0; try { u0 = new URL(String(body.url || '').trim()); } catch (e) { return bad('Đường link chưa đúng.'); }
+      const host = u0.hostname.toLowerCase(); if (u0.protocol !== 'https:' || !/^(drive|docs)\.google\.com$/.test(host)) return bad('Chỉ nhận link Google Drive hoặc Google Sheets (drive.google.com, docs.google.com).');
+      const id = (u0.pathname.match(/\/d\/([A-Za-z0-9_-]{10,})/) || [])[1] || u0.searchParams.get('id') || ''; if (!/^[A-Za-z0-9_-]{10,}$/.test(id)) return bad('Không tìm thấy mã file trong link – mở file trên Google Drive, bấm Chia sẻ → Sao chép đường liên kết rồi dán lại.');
+      if (/\/drive\/folders\//.test(u0.pathname)) return bad('Đây là link thư mục. Phần mềm tải từng file – dán link của file; cả thư mục thì dùng Google Drive cho máy tính.');
+      const sheet = host === 'docs.google.com' && /\/spreadsheets\//.test(u0.pathname);
+      if (host === 'docs.google.com' && !sheet) return bad('Link Google Docs / Slides không phải bảng tính – chỉ nhận Google Sheets hoặc file Excel, CSV, PDF trên Drive.');
+      const src = sheet ? 'https://docs.google.com/spreadsheets/d/' + id + '/export?format=xlsx' : 'https://drive.usercontent.google.com/download?id=' + id + '&export=download&confirm=t';
+      let rs; try { rs = await fetch(src, { redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0 (phan-mem-nhan-su)' } }); } catch (e) { return bad('Không kết nối được Google Drive. Thử lại sau ít phút.', 502); }
+      const ct = rs.headers.get('content-type') || '';
+      if (!rs.ok || /text\/html/i.test(ct)) return bad('Google không cho tải file này. Kiểm tra: file đã bật chia sẻ "Bất kỳ ai có đường liên kết" chưa; file còn tồn tại; file không quá lớn.', 400);
+      const len = +(rs.headers.get('content-length') || 0); if (len > 15 * 1048576) return bad('File lớn hơn 15 MB – tải về máy rồi chọn file.');
+      const buf = await rs.arrayBuffer(); if (buf.byteLength > 15 * 1048576) return bad('File lớn hơn 15 MB – tải về máy rồi chọn file.');
+      const cdp = rs.headers.get('content-disposition') || ''; let name = '';
+      const m1 = /filename\*=UTF-8''([^;]+)/i.exec(cdp), m2 = /filename="([^"]+)"/i.exec(cdp);
+      try { name = m1 ? decodeURIComponent(m1[1]) : m2 ? m2[1] : ''; } catch (e) { name = m2 ? m2[1] : ''; }
+      if (!name) name = (sheet ? 'Google-Sheets-' : 'Google-Drive-') + id.slice(0, 8) + (sheet ? '.xlsx' : '');
+      return new Response(buf, { status: 200, headers: { 'content-type': 'application/octet-stream', 'x-ten-file': encodeURIComponent(name.replace(/[\r\n"]/g, '').slice(0, 180)), 'cache-control': 'no-store' } });
+    }
     // 17/11/2026 đợt 2 (anh duyệt): GỬI EMAIL TỰ ĐỘNG QUA RESEND – khóa API lưu trong cfg (chỉ Quản trị hệ thống thiết lập, trả về dạng che), gửi từ máy chủ, không lộ khóa ra trình duyệt
     if (r === 'email-cfg') {
       if (req.method === 'POST') {
