@@ -1,6 +1,20 @@
 # Lịch sử phiên bản
 
-## 1.0.0 – bản chính thức (18/11/2026)
+## 1.0.1 – sửa lỗi, cải thiện sau thử nghiệm thực tế (17/11/2026)
+- **Thêm công ty** (đổi tên từ "Thêm đơn vị"): tạo công ty trống không cần chọn file; chọn file / thư mục từ nút này thì dữ liệu vào một công ty mới, không lẫn vào công ty đang xem; thêm xong vẫn ở trang Cài đặt.
+- **Thương hiệu riêng từng công ty**: logo, tên, màu. Xem một công ty: cả phần mềm theo thương hiệu công ty đó; xem Tổng các công ty: khung theo thương hiệu chung, mỗi nhân sự có chấm màu và logo nhỏ của công ty mình (danh sách, hồ sơ, sơ đồ tổ chức).
+- **Hồ sơ nhân sự → Tài khoản app nhân viên**: tên đăng nhập, tình trạng, ngày cấp, đăng nhập lần cuối; chưa có thì nút **Tạo tài khoản**.
+- **Sửa Mã NV**: mọi dữ liệu liên quan đổi theo (hồ sơ, hợp đồng, chấm công, lương, đơn, hội nhập, đào tạo, tài sản, file đính kèm, dữ liệu trên máy chủ); không cho đổi sang mã đang có hoặc đã từng có; tài khoản app đăng nhập lại bằng mã mới, mã PIN giữ nguyên.
+- **Mã NV trùng giữa các công ty dùng chung máy chủ**: cảnh báo ở Danh sách nhân sự, Ứng dụng nhân viên, hồ sơ; chặn cấp tài khoản app cho người trùng mã (tránh lẫn chấm công, phiếu lương); mã tự sinh khi nhập file không trùng công ty khác.
+- **Sơ đồ tổ chức**: kéo người vào ô Trưởng bộ phận đang trống (hoặc bấm ô để chọn); Ban Giám đốc có nút chọn người trong toàn hệ thống, người ở vị trí / công ty khác hiện "kiêm nhiệm", hồ sơ gốc giữ nguyên.
+- **Lịch sử điều chuyển có ngày hiệu lực**: chuyển phòng ban (kéo thả trên sơ đồ) hoặc đổi phòng ban, chức danh ở Sửa thông tin đều hỏi ngày hiệu lực, số quyết định. Hồ sơ có tab **Quá trình công tác** (từ ngày, đến ngày, phòng ban, chức danh, căn cứ), thêm được các lần điều chuyển trước khi dùng phần mềm. Cơ cấu nhân sự, bảng lương, bảng công theo tháng xếp người vào đúng phòng ban của tháng đó.
+- **Nhập chấm công từ máy vân tay**: chọn **tháng chấm công** (ngày ngoài tháng tự bỏ qua, có báo); bảng **Khớp người trên máy chấm công** – mã và tên trên máy khớp với nhân viên nào, theo cách nào (Mã NV, mã chấm công, họ tên, tên gần giống), chọn tay người chưa khớp; mã máy được lưu vào ô Mã chấm công trong hồ sơ, tháng sau tự khớp theo mã. File nhiều trang tính (mỗi trang một đơn vị): chọn công ty cho từng trang tính, tự gợi ý theo tên trang tính. Ngày thiếu giờ vào hoặc giờ ra hiện "?" chờ người phụ trách xác nhận.
+- **Chấm công Wi‑Fi cho công ty thứ 2 trở đi** (trước đây không kết nối được): chọn **Dùng chung máy chủ này** (cùng văn phòng, cùng Wi‑Fi – chung Wi‑Fi văn phòng, app nhân viên, trang quản lý máy chủ; trang quản lý có ô chọn xem từng công ty) hoặc **Máy chủ riêng của công ty** (công ty độc lập – dán địa chỉ và mã kết nối của máy chủ riêng). Khi dùng chung, mỗi công ty chỉ nhận lượt chấm, đơn từ của nhân viên mình.
+- Sửa lỗi cấp tài khoản hàng loạt có thể mất mã PIN trên máy chủ (báo "chưa có PIN trên máy chủ").
+- **Nhập file**: cột tiền (Lương cơ bản, Phụ cấp điện thoại…) không còn bị ghép nhầm vào Phòng ban, Số điện thoại; danh sách nhân sự kèm mức lương (có CCCD) được nhận là Hồ sơ nhân viên.
+- Bản đầy đủ ghi đúng nơi lưu dữ liệu (máy chủ riêng của công ty) thay cho câu "xử lý ngay trên máy"; hồ sơ hiện "Thâm niên: —" khi chưa có ngày vào làm.
+
+## 1.0.0 – bản chính thức đầu tiên (16/11/2026)
 - Phát hành mã nguồn mở theo giấy phép GNU AGPL-3.0.
 - Hai phiên bản: **bản rút gọn** (1 người dùng, chạy trên trình duyệt, không cần máy chủ) và **bản đầy đủ** (máy chủ Cloudflare riêng của đơn vị, app cho nhân viên, nhiều tài khoản).
 - Dữ liệu trống hoàn toàn, màn hình khởi tạo lần đầu: tạo công ty, tải logo, nạp file hoặc khôi phục bản sao lưu.

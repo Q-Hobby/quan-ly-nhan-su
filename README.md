@@ -2,7 +2,7 @@
 
 Phần mềm quản lý nhân sự miễn phí, mã nguồn mở, viết bằng tiếng Việt cho doanh nghiệp nhỏ và vừa: hồ sơ, hợp đồng, chấm công, nghỉ phép, lương, bảo hiểm xã hội, tuyển dụng, hội nhập, đào tạo nội bộ, tài sản, thông tin chung.
 
-- Bản hiện tại: **1.0.0** (phát hành 18/11/2026) – xem [CHANGELOG.md](CHANGELOG.md)
+- Bản hiện tại: **1.0.1** (phát hành 17/11/2026) – xem [CHANGELOG.md](CHANGELOG.md)
 - Trang giới thiệu, so sánh 2 bản: https://quantritute.com/quan-ly-nhan-su/so-sanh/
 - Tác giả: [Quản trị tử tế](https://quantritute.com) · Giấy phép: [AGPL-3.0](LICENSE)
 
@@ -58,10 +58,14 @@ Chạy trên tài khoản Cloudflare **của chính đơn vị** (Worker + cơ s
 
 1. Bấm nút trên, đăng nhập Cloudflare và GitHub.
 2. Đặt tên Worker, tên cơ sở dữ liệu (giữ mặc định cũng được). Cloudflare tự tạo một kho GitHub của anh/chị, tự tạo cơ sở dữ liệu và đưa phần mềm lên.
-3. Ô **MA_CAI_DAT**: tự đặt một mã từ 8 ký tự, ghi lại – chỉ dùng một lần ở bước 5. Nếu màn hình không hỏi: Cloudflare → Workers & Pages → chọn Worker → **Settings → Variables and Secrets → Add** → loại *Secret*, tên `MA_CAI_DAT`.
+3. **Đặt mã cài đặt** (nút Deploy không hỏi bước này): Cloudflare → Workers & Pages → chọn Worker vừa tạo → **Settings → Variables and Secrets → Add** → loại *Secret*, tên `MA_CAI_DAT`, giá trị là một mã tự đặt từ 8 ký tự → **Deploy**. Ghi lại mã – chỉ dùng một lần ở bước 5. Cơ sở dữ liệu D1 được tạo tự động, không phải làm gì thêm.
 4. Xong, Cloudflare cho địa chỉ dạng `https://quan-ly-nhan-su.<tên-tài-khoản>.workers.dev`.
-5. Mở `<địa chỉ>/quan-ly` → nhập **mã cài đặt**, tên công ty, mật khẩu quản trị → tạo tài khoản quản trị đầu tiên.
-6. Mở `<địa chỉ>/quan-tri` để dùng phần mềm. Thêm nhân viên, cấp tài khoản ở **Ứng dụng nhân viên**; nhân viên mở `<địa chỉ>/` trên điện thoại.
+5. Mở `<địa chỉ>/quan-ly` → nhập **mã cài đặt** (MA_CAI_DAT), tên công ty, **mật khẩu quản trị** (từ 8 ký tự, có cả chữ và số – tự đặt, ghi lại) → tạo tài khoản quản trị đầu tiên.
+6. Mở `<địa chỉ>/quan-tri`, đăng nhập: **Mã nhân viên** `quantri`, **Mật khẩu** là mật khẩu quản trị vừa đặt ở bước 5 (không phải mã cài đặt). Thêm nhân viên, cấp tài khoản ở **Ứng dụng nhân viên**; nhân viên mở `<địa chỉ>/` trên điện thoại.
+
+> **Thêm công ty thứ 2 trở đi:** vào **Chấm công Wi‑Fi**, chọn *Dùng chung máy chủ này* (các công ty cùng văn phòng, cùng Wi‑Fi) hoặc *Máy chủ riêng của công ty* (công ty độc lập: cài thêm một bản đầy đủ trên tài khoản Cloudflare của công ty đó, tạo mã kết nối ở trang quản lý máy chủ đó, dán vào phần mềm).
+>
+> **Nhiều công ty dùng chung một máy chủ:** app nhân viên nhận diện người dùng bằng **Mã NV**, nên Mã NV phải khác nhau giữa các công ty (mỗi công ty một tiền tố, ví dụ `HD001`, `AC001`). Phần mềm báo khi có mã trùng và chưa cho cấp tài khoản app cho người trùng mã; đổi mã ở hồ sơ → **Sửa thông tin** (mọi dữ liệu đổi theo, mã PIN giữ nguyên).
 
 ### Cách 2 – Tải về và cài bằng lệnh (Windows)
 1. Cài [Node.js](https://nodejs.org) bản LTS.
@@ -74,7 +78,8 @@ Tên miền phải đang dùng DNS của Cloudflare. Cloudflare → Workers & Pa
 
 ### Nhận bản cập nhật – dữ liệu giữ nguyên
 Dữ liệu nằm trong cơ sở dữ liệu D1, tách khỏi mã phần mềm. Máy chủ tự nâng cấp cấu trúc dữ liệu (chỉ thêm bảng, thêm cột – không xóa) ở lần chạy đầu sau cập nhật. Trước khi cập nhật vẫn nên tải bản sao lưu.
-- **Cài bằng nút Deploy:** vào kho GitHub của đơn vị → tab **Actions → Cập nhật từ bản gốc → Run workflow**. Cloudflare tự đưa bản mới lên.
+- **Cài bằng nút Deploy:** vào kho GitHub của đơn vị → tab **Actions → Cập nhật từ bản gốc → Run workflow**. Cloudflare tự đưa bản mới lên. Lần đầu nếu tab Actions báo đang tắt, bấm nút bật Actions rồi làm lại.
+- Không tự sửa mã trong kho của đơn vị: lần cập nhật sau sẽ ghi đè phần đã sửa.
 - **Cài bằng lệnh:** tải bản mới, chép đè thư mục `ban-day-du` (giữ nguyên thư mục cũ nếu đã sửa gì), bấm đúp **`cap-nhat.cmd`**.
 
 ### Sao lưu
@@ -85,7 +90,7 @@ Dữ liệu nằm trong cơ sở dữ liệu D1, tách khỏi mã phần mềm. 
 - Thông báo đẩy trên điện thoại thật (Android, iPhone ghim màn hình chính).
 - Hẹn giờ gửi báo cáo định kỳ trên gói miễn phí của Cloudflare (giới hạn thời gian xử lý mỗi lần chạy).
 - Dữ liệu rất lớn (nhiều file đính kèm) trên gói miễn phí.
-- Nút Deploy: bước hỏi `MA_CAI_DAT` và nút **Cập nhật từ bản gốc** đang được cài thử trên tài khoản mới.
+- Nút **Cập nhật từ bản gốc** (GitHub Actions) đang được chạy thử lần đầu.
 
 Giới hạn và giá các gói xem tại trang giá của Cloudflare (Workers, D1).
 

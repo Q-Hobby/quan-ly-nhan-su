@@ -14,7 +14,7 @@ import { TAY_LATIN, TAY_VI } from './font-tay.js'; // 12/11: phông viết tay c
 import { OG_QL_B64, OG_NV_B64 } from './og-anh.js'; // 08/11: ảnh chia sẻ Facebook/Zalo cho bản chạy thử
 import HRM_HTML from './phan-mem.html'; // 08/11: Phần mềm quản lý nhân sự bản xem trước (build/index.html chép sang khi node build.js)
 
-const VER = '1.0.0';  // 13/11/2026 18:30 (bản 0.8.1 phần mềm): một tài khoản chung – tài khoản có quyền quản trị dùng mật khẩu, trang /quan-tri, dữ liệu phần mềm quản trị lưu trên máy chủ, mã cài đặt lần đầu. Trước: '0.4.6';  // 13/11/2026 14:55: nhiều người có quyền duyệt đơn (ai duyệt trước thì đơn chuyển trạng thái, ghi tên người duyệt) + màn Bộ phận của tôi. Trước: '0.4.5';  // 12/11/2026 22:54: ca có yêu cầu có mặt sớm (som, som_ngay) hiện trên app. Trước: '0.4.4';  // 12/11/2026: hành trình hội nhập trên app nhân viên (đi cùng phần mềm 0.6.1)
+const VER = '1.0.1';  // 13/11/2026 18:30 (bản 0.8.1 phần mềm): một tài khoản chung – tài khoản có quyền quản trị dùng mật khẩu, trang /quan-tri, dữ liệu phần mềm quản trị lưu trên máy chủ, mã cài đặt lần đầu. Trước: '0.4.6';  // 13/11/2026 14:55: nhiều người có quyền duyệt đơn (ai duyệt trước thì đơn chuyển trạng thái, ghi tên người duyệt) + màn Bộ phận của tôi. Trước: '0.4.5';  // 12/11/2026 22:54: ca có yêu cầu có mặt sớm (som, som_ngay) hiện trên app. Trước: '0.4.4';  // 12/11/2026: hành trình hội nhập trên app nhân viên (đi cùng phần mềm 0.6.1)
 // trước: VER '0.4.1'  // 07/11/2026: nối Phần mềm quản lý nhân sự (đồng bộ nhân viên, lượt chấm, đơn nghỉ, xác nhận công)
 /* 07/11/2026 17:42 – CHẾ ĐỘ BẢN THỬ (để mọi người trải nghiệm, góp ý): bật khi chạy ở tên miền chamcong-thu.* hoặc biến môi trường DEMO=1.
    Không cần mật khẩu trang Quản lý và trang Mã QR chấm công; có sẵn tài khoản nhân viên mẫu (PIN chung DEMO_PIN); khóa các thao tác làm hỏng dữ liệu dùng chung;
@@ -537,6 +537,7 @@ const MIGRATE_V3 = ['ALTER TABLE nv ADD COLUMN pb TEXT', 'ALTER TABLE nv ADD COL
 const MIGRATE_V5 = ['ALTER TABLE nv ADD COLUMN login_at INTEGER', 'ALTER TABLE nv ADD COLUMN pin_doi INTEGER']; // 12/11/2026: trang Ứng dụng nhân viên – đăng nhập lần cuối, nhân viên đã tự đổi PIN
 const MIGRATE_V4 = ['ALTER TABLE don ADD COLUMN duyet_ma TEXT', 'ALTER TABLE don ADD COLUMN ban_giao TEXT']; // 11/11 15:32: đơn – quản lý trực tiếp duyệt trên app, người nhận bàn giao
 const MIGRATE_V6 = ['ALTER TABLE nv ADD COLUMN qt TEXT', 'ALTER TABLE nv ADD COLUMN mk TEXT', 'ALTER TABLE nv ADD COLUMN mk_salt TEXT', 'ALTER TABLE nv ADD COLUMN mk_doi INTEGER']; // 13/11/2026: một tài khoản – quyền quản trị (qt = {r, t, sys}), mật khẩu, bắt đổi mật khẩu lần đầu
+const MIGRATE_V7 = ['ALTER TABLE nv ADD COLUMN cty TEXT']; // 17/11/2026: nhiều công ty dùng chung một máy chủ – mỗi nhân viên thuộc công ty nào (trang quản lý lọc theo công ty)
 let schemaOk = false;
 async function ensureSchema(db) {
   if (schemaOk) return;
@@ -546,6 +547,10 @@ async function ensureSchema(db) {
   if (sv < 6) {
     for (const sql of (sv < 2 ? MIGRATE_V2 : []).concat(sv < 3 ? MIGRATE_V3 : [], sv < 4 ? MIGRATE_V4 : [], sv < 5 ? MIGRATE_V5 : [], MIGRATE_V6)) { try { await db.prepare(sql).run(); } catch (e) { if (!/duplicate column/i.test(String(e && e.message))) throw e; } }
     await db.prepare("INSERT INTO cfg (k, v) VALUES ('schema_v', '6') ON CONFLICT(k) DO UPDATE SET v = '6'").run();
+  }
+  if ((v ? Number(v.v) : 0) < 7) {
+    for (const sql of MIGRATE_V7) { try { await db.prepare(sql).run(); } catch (e) { if (!/duplicate column/i.test(String(e && e.message))) throw e; } }
+    await db.prepare("INSERT INTO cfg (k, v) VALUES ('schema_v', '7') ON CONFLICT(k) DO UPDATE SET v = '7'").run();
   }
   schemaOk = true;
 }
@@ -817,19 +822,39 @@ async function api(req, env, url) {
         const ma = String(x.ma || '').trim().toUpperCase(), ten = String(x.ten || '').trim().slice(0, 120);
         if (!/^[A-Z0-9._-]{1,20}$/.test(ma) || !ten) continue;
         const old = await db.prepare('SELECT ma, pin FROM nv WHERE ma = ?').bind(ma).first();
-        if (!old) { st.push(db.prepare("INSERT INTO nv (ma, ten, active, created, pb, ncc, nguon) VALUES (?, ?, ?, ?, ?, ?, 'phan-mem')").bind(ma, ten, x.active ? 1 : 0, now, String(x.pb || '').slice(0, 120), x.ncc ? 1 : 0)); out.them++; out.chua_pin.push(ma); }
-        else { st.push(db.prepare("UPDATE nv SET ten = ?, active = ?, pb = ?, ncc = ?, nguon = 'phan-mem' WHERE ma = ?").bind(ten, x.active ? 1 : 0, String(x.pb || '').slice(0, 120), x.ncc ? 1 : 0, ma)); out.sua++; if (!old.pin) out.chua_pin.push(ma); }
+        const cty = String(x.cty || '').slice(0, 120);
+        if (!old) { st.push(db.prepare("INSERT INTO nv (ma, ten, active, created, pb, ncc, nguon, cty) VALUES (?, ?, ?, ?, ?, ?, 'phan-mem', ?) ON CONFLICT(ma) DO UPDATE SET ten = excluded.ten, active = excluded.active, pb = excluded.pb, ncc = excluded.ncc, nguon = 'phan-mem', cty = excluded.cty").bind(ma, ten, x.active ? 1 : 0, now, String(x.pb || '').slice(0, 120), x.ncc ? 1 : 0, cty)); out.them++; out.chua_pin.push(ma); }
+        else { st.push(db.prepare("UPDATE nv SET ten = ?, active = ?, pb = ?, ncc = ?, nguon = 'phan-mem', cty = ? WHERE ma = ?").bind(ten, x.active ? 1 : 0, String(x.pb || '').slice(0, 120), x.ncc ? 1 : 0, cty, ma)); out.sua++; if (!old.pin) out.chua_pin.push(ma); }
         if (!x.active) st.push(db.prepare("DELETE FROM phien WHERE vai = 'nv' AND ma = ?").bind(ma));
       }
       if (st.length) await db.batch(st);
       return jc({ ok: true, ...out });
     }
+    // 17/11/2026 (thử nghiệm hadu.vn, góp ý mục 4): ĐỔI MÃ NV – chuyển mọi dữ liệu trên máy chủ từ mã cũ sang mã mới.
+    // Mã mới không được trùng mã đang có / đã từng có trên máy chủ. PIN giữ nguyên; phiên đăng nhập cũ bị hủy → nhân viên đăng nhập lại bằng mã mới.
+    if (r === 'doi-ma' && req.method === 'POST') {
+      const cu = String(body.cu || '').trim().toUpperCase(), moi = String(body.moi || '').trim().toUpperCase(), RX = /^[A-Z0-9._-]{1,20}$/;
+      if (!RX.test(cu) || !RX.test(moi) || cu === moi) return jc({ ok: false, loi: 'Mã NV không hợp lệ (chữ, số, dấu . _ -, tối đa 20 ký tự).' }, 400);
+      const T = ['nv', 'phien', 'cham', 'tu_choi', 'may_nv', 'don', 'cong', 'phieu', 'lich', 'dk_ca', 'ho_so', 'kho_file', 'anh', 'bao_sai', 'hn_xong', 'dt_kq', 'xin_muon', 'push_sub', 'tb_doc'];
+      for (const t of T) { try { const x = await db.prepare('SELECT 1 AS c FROM ' + t + ' WHERE ma = ? LIMIT 1').bind(moi).first(); if (x && t !== 'phien') return jc({ ok: false, loi: 'Mã ' + moi + ' đã có hoặc đã từng có dữ liệu trên máy chủ – chọn mã khác.' }, 409); } catch (e) { } }
+      const st = [db.prepare("DELETE FROM phien WHERE vai = 'nv' AND ma = ?").bind(cu)];
+      for (const t of T) if (t !== 'phien') st.push(db.prepare('UPDATE ' + t + ' SET ma = ? WHERE ma = ?').bind(moi, cu));
+      for (const t of ['don', 'xin_muon']) st.push(db.prepare('UPDATE ' + t + ' SET duyet_ma = ? WHERE duyet_ma = ?').bind(moi, cu));
+      st.push(db.prepare('UPDATE phien SET ma = ? WHERE ma = ? AND vai <> ?').bind(moi, cu, 'nv'));
+      const sv = []; for (const q of st) sv.push(q); let n = 0;
+      for (const q of sv) { try { const x = await q.run(); n += (x.meta && x.meta.changes) || 0; } catch (e) { /* bảng chưa có ở máy chủ cũ thì bỏ qua */ } }
+      try { // người nhận thông báo theo danh sách mã
+        const L = (await db.prepare("SELECT id, den FROM tb WHERE den LIKE ?").bind('%"' + cu + '"%').all()).results;
+        for (const x of L) { const d = tbDen(x); if (Array.isArray(d.ma)) { d.ma = d.ma.map(v => String(v).toUpperCase() === cu ? moi : v); await db.prepare('UPDATE tb SET den = ? WHERE id = ?').bind(JSON.stringify(d), x.id).run(); } }
+      } catch (e) { }
+      return jc({ ok: true, n });
+    }
     if (r === 'pin' && req.method === 'POST') {
       const ma = String(body.ma || '').trim().toUpperCase(), pin = String(body.pin || '');
       if (!/^\d{4,8}$/.test(pin)) return jc({ ok: false, loi: 'Mã PIN 4–8 chữ số.' }, 400);
       const old = await db.prepare('SELECT ma FROM nv WHERE ma = ?').bind(ma).first(), salt = randHex(16), h = await hashPin(pin, salt);
-      if (old) await db.prepare('UPDATE nv SET pin = ?, salt = ?, fail = 0, lock_until = 0, active = 1, pin_doi = NULL WHERE ma = ?').bind(h, salt, ma).run();
-      else { const ten = String(body.ten || '').trim().slice(0, 120); if (!ten) return jc({ ok: false, loi: 'Thiếu họ tên.' }, 400); await db.prepare("INSERT INTO nv (ma, ten, pin, salt, active, created, pb, nguon) VALUES (?, ?, ?, ?, 1, ?, ?, 'phan-mem')").bind(ma, ten, h, salt, now, String(body.pb || '').slice(0, 120)).run(); }
+      if (old) await db.prepare('UPDATE nv SET pin = ?, salt = ?, fail = 0, lock_until = 0, active = 1, pin_doi = NULL' + (body.cty ? ', cty = ?' : '') + ' WHERE ma = ?').bind(...(body.cty ? [h, salt, String(body.cty).slice(0, 120), ma] : [h, salt, ma])).run();
+      else { const ten = String(body.ten || '').trim().slice(0, 120); if (!ten) return jc({ ok: false, loi: 'Thiếu họ tên.' }, 400); await db.prepare("INSERT INTO nv (ma, ten, pin, salt, active, created, pb, nguon, cty) VALUES (?, ?, ?, ?, 1, ?, ?, 'phan-mem', ?) ON CONFLICT(ma) DO UPDATE SET pin = excluded.pin, salt = excluded.salt, fail = 0, lock_until = 0, active = 1, pin_doi = NULL").bind(ma, ten, h, salt, now, String(body.pb || '').slice(0, 120), String(body.cty || '').slice(0, 120)).run(); } // 17/11: chạy song song với "nhan-vien" (cấp hàng loạt) không còn mất PIN
       await db.prepare("DELETE FROM phien WHERE vai = 'nv' AND ma = ?").bind(ma).run();
       return jc({ ok: true });
     }
@@ -1143,7 +1168,7 @@ async function api(req, env, url) {
     if (isSetup) return bad('Đã cài đặt rồi.', 409);
     // 13/11/2026 (rà soát mục 4): phải có MÃ CÀI ĐẶT do người triển khai đặt (biến bí mật MA_CAI_DAT trên Cloudflare) – người lạ mở trang trước cũng không chiếm được quyền quản trị
     const mcd = String(env.MA_CAI_DAT || '');
-    if (!mcd) return bad('Máy chủ chưa có mã cài đặt. Người triển khai chạy lệnh: npx wrangler secret put MA_CAI_DAT (nhập một mã bất kỳ, từ 8 ký tự), rồi mở lại trang này.', 409);
+    if (!mcd) return bad('Máy chủ chưa có mã cài đặt. Vào Cloudflare → Workers & Pages → chọn Worker này → Settings → Variables and Secrets → Add: loại Secret, tên MA_CAI_DAT, giá trị là một mã tự đặt từ 8 ký tự → Deploy (hoặc chạy lệnh: npx wrangler secret put MA_CAI_DAT), rồi mở lại trang này.', 409);
     const gm = String(body.ma_cai_dat || ''); if (gm.length !== mcd.length || await sha256(gm) !== await sha256(mcd)) { await logReject(db, null, ip, 'Cài đặt lần đầu: sai mã cài đặt', req); return bad('Mã cài đặt chưa đúng.', 403); }
     const pin = String(body.pin || ''), ten = String(body.ten_cty || '').trim().slice(0, 120);
     { const e = pwBad(pin); if (e) return bad(e); }
@@ -1451,7 +1476,7 @@ async function api(req, env, url) {
       const mm = ngay.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
       if (mm) d0 = Date.UTC(+mm[3], +mm[2] - 1, +mm[1]) - VN;
       const [nv, cham, tc, ph] = await Promise.all([
-        db.prepare('SELECT ma, ten, active, lock_until, pb, ncc, nguon, (pin IS NOT NULL) AS co_pin FROM nv ORDER BY ma').all(),
+        db.prepare('SELECT ma, ten, active, lock_until, pb, ncc, nguon, cty, (pin IS NOT NULL) AS co_pin FROM nv ORDER BY cty, ma').all(),
         punchesBetween(db, d0, d0 + 864e5),
         db.prepare('SELECT * FROM tu_choi ORDER BY t DESC LIMIT 100').all(),
         db.prepare("SELECT ma, tb, last FROM phien WHERE vai = 'nv'").all()

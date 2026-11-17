@@ -2313,20 +2313,25 @@ function qlRender(msg) {
        'Quay lại tab <b>Tổng hợp lượt chấm</b> (bấm Hôm nay để tải lại) xem lượt vừa chấm; tab <b>Bị từ chối</b> xem lượt chấm bằng 4G bị chặn; tab <b>Máy dùng chung</b> cảnh báo một điện thoại chấm cho nhiều người.']) +
     '<div class="card" style="padding:12px 16px"><div class="row"><span class="pill ' + (d.wifi ? 'ok' : 'no') + '"><span class="dot"></span>' + (d.wifi ? 'Máy này đang ở mạng văn phòng' : 'Máy này chưa ở mạng văn phòng') + '</span><span class="ipbox">IP máy này (' + esc(d.ip_loai) + '): ' + esc(d.ip) + '</span></div></div>' +
     (mc.length && QL.tab !== 'mc' ? '<div class="alert"><b>Cảnh báo chấm hộ:</b> ' + mc.length + ' điện thoại đã dùng cho từ 2 nhân viên trở lên. <button class="btn sm" id="go-mc">Xem chi tiết</button></div>' : '') +
-    '<div class="tabs">' + TABS.map(function (t) { return '<button class="tab' + (QL.tab === t[0] ? ' on' : '') + (t[0] === 'mc' && mc.length ? ' warn' : '') + '" data-t="' + t[0] + '">' + esc(t[1]) + '</button>'; }).join('') + '</div><div id="qmsg">' + (msg || '') + '</div><div id="body"></div>' + foot() + '</div>';
+    qlCtyBar() + '<div class="tabs">' + TABS.map(function (t) { return '<button class="tab' + (QL.tab === t[0] ? ' on' : '') + (t[0] === 'mc' && mc.length ? ' warn' : '') + '" data-t="' + t[0] + '">' + esc(t[1]) + '</button>'; }).join('') + '</div><div id="qmsg">' + (msg || '') + '</div><div id="body"></div>' + foot() + '</div>';
   app.innerHTML = h;
   app.querySelectorAll('.tab').forEach(function (b) { b.onclick = function () { QL.tab = b.getAttribute('data-t'); qlRender(); }; });
+  if ($('#q-cty')) $('#q-cty').onchange = function () { QL.cty = this.value; qlRender(); };
   guideBind();
   if ($('#lo')) $('#lo').onclick = function () { api('/api/dang-xuat', { vai: 'ql' }).then(qlLogin); };
   if ($('#go-mc')) $('#go-mc').onclick = function () { QL.tab = 'mc'; qlRender(); };
   ({ ngay: tabNgay, mc: tabMc, nv: tabNv, ip: tabIp, tc: tabTc, cd: tabCd })[QL.tab]();
 }
+/* 17/11/2026: nhiều công ty dùng chung một máy chủ (cùng văn phòng, cùng Wi‑Fi) – lọc theo công ty; Wi‑Fi văn phòng dùng chung */
+function qlCtys() { var o = {}; (QL.d.nv || []).forEach(function (x) { if (x.cty) o[x.cty] = 1; }); return Object.keys(o).sort(); }
+function qlCtyBar() { var L = qlCtys(); if (L.length < 2) { QL.cty = ''; return ''; } return '<div class="card" style="padding:10px 16px"><div class="row"><label class="lbl" for="q-cty" style="margin:0">Công ty</label><select id="q-cty" style="max-width:340px"><option value="">Tất cả ' + L.length + ' công ty</option>' + L.map(function (c) { return '<option' + (QL.cty === c ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select><span class="muted small">Các công ty dùng chung máy chủ và Wi‑Fi văn phòng này</span></div></div>'; }
+function qlInCty(ma) { if (!QL.cty) return true; var x = (QL.d.nv || []).filter(function (n) { return n.ma === ma; })[0]; return !!x && x.cty === QL.cty; }
 function say(html, cls) { $('#qmsg').innerHTML = '<div class="msg ' + (cls || 'ok') + '" style="margin:0 0 12px">' + html + '</div>'; }
 function after(j, okText) { if (j.ok) { qlLoad('<div class="msg ok" style="margin:0 0 12px">' + esc(okText) + '</div>'); } else say(esc(j.loi), 'err'); return j; }
 function parseDMY(s) { var m = String(s).match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m ? Date.UTC(+m[3], +m[2] - 1, +m[1]) : null; }
 function shiftDay(s, n) { var t = parseDMY(s); if (t === null) return s; var d = new Date(t + n * 864e5); return pad(d.getUTCDate()) + '/' + pad(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear(); }
 function tabNgay() {
-  var d = QL.d, rows = d.cham, by = {}, sh = sharedMap();
+  var d0 = QL.d, d = Object.assign({}, d0, { cham: d0.cham.filter(function (r) { return qlInCty(r.ma); }), nv: d0.nv.filter(function (x) { return qlInCty(x.ma); }) }), rows = d.cham, by = {}, sh = sharedMap();
   rows.forEach(function (r) { if (r.huy) return; var o = by[r.ma] || (by[r.ma] = { ma: r.ma, ten: r.ten || r.ma, vao: null, ra: null, n: 0, cach: {} }); o.n++; o.cach[CACH[r.cach]] = 1; if (r.loai === 'vao' && !o.vao) o.vao = r.t; if (r.loai === 'ra') o.ra = r.t; });
   var sum = Object.values(by);
   var q = vp(d.ngay0);
@@ -2372,12 +2377,12 @@ function tabMc() {
   $('#body').querySelectorAll('[data-bl]').forEach(function (b) { b.onclick = function () { api('/api/ql/may', { may: b.getAttribute('data-bl'), bat_lai: true }).then(function (j) { after(j, 'Đã theo dõi lại máy này.'); }); }; });
 }
 function tabNv() {
-  var d = QL.d;
+  var d = Object.assign({}, QL.d, { nv: QL.d.nv.filter(function (x) { return qlInCty(x.ma); }) }), multi = qlCtys().length > 1;
   var h = '<div class="card"><h3 style="font-size:16px">Thêm nhân viên</h3><div class="grid2" style="margin-top:4px"><div><label class="lbl">Mã nhân viên</label><input id="n-ma" type="text" autocapitalize="characters" placeholder="NV001"></div><div><label class="lbl">Họ tên</label><input id="n-ten" type="text"></div></div>' +
     '<label class="lbl">Mã PIN ban đầu (4–8 chữ số) – báo riêng cho nhân viên</label><input id="n-pin" type="tel" inputmode="numeric" style="max-width:220px"><div style="margin-top:10px"><button class="btn pri" id="n-go">Thêm</button></div></div>';
   h += '<div class="card"><h3 style="font-size:16px;margin-bottom:6px">Danh sách (' + d.nv.length + ')</h3><div class="tblw"><table><thead><tr><th>Mã</th><th>Họ tên</th><th>Trạng thái</th><th>Đang đăng nhập trên</th><th></th></tr></thead><tbody>' +
     (d.nv.length ? d.nv.map(function (x) {
-      return '<tr><td>' + esc(x.ma) + '</td><td>' + esc(x.ten) + '</td><td>' + (x.active ? (x.khoa ? '<span class="badge err">Tạm khóa (sai PIN)</span>' : '<span class="badge ok">Đang dùng</span>') : '<span class="badge">Đã ngừng</span>') + '</td><td class="small">' + (x.thiet_bi.length ? x.thiet_bi.map(esc).join('<br>') : '<span class="faint">Chưa đăng nhập</span>') + '</td>' +
+      return '<tr><td>' + esc(x.ma) + '</td><td>' + esc(x.ten) + (multi && x.cty ? '<div class="muted small">' + esc(x.cty) + '</div>' : '') + '</td><td>' + (x.active ? (x.khoa ? '<span class="badge err">Tạm khóa (sai PIN)</span>' : '<span class="badge ok">Đang dùng</span>') : '<span class="badge">Đã ngừng</span>') + '</td><td class="small">' + (x.thiet_bi.length ? x.thiet_bi.map(esc).join('<br>') : '<span class="faint">Chưa đăng nhập</span>') + '</td>' +
         '<td><div class="row" style="gap:6px"><button class="btn sm" data-a="pin" data-m="' + esc(x.ma) + '">Đặt lại PIN</button><button class="btn sm" data-a="go" data-m="' + esc(x.ma) + '">Gỡ đăng nhập</button>' + (x.khoa ? '<button class="btn sm" data-a="mo" data-m="' + esc(x.ma) + '">Mở khóa</button>' : '') + '<button class="btn sm ' + (x.active ? 'dan' : '') + '" data-a="act" data-v="' + (x.active ? 0 : 1) + '" data-m="' + esc(x.ma) + '">' + (x.active ? 'Ngừng' : 'Dùng lại') + '</button></div></td></tr>';
     }).join('') : '<tr><td colspan="5" class="empty">Chưa có nhân viên</td></tr>') + '</tbody></table></div><p class="hint">Mỗi điện thoại/trình duyệt đăng nhập là một dòng. Trên iPhone, ứng dụng ghim ở màn hình chính và Safari tính là 2 nơi đăng nhập riêng.</p></div>';
   $('#body').innerHTML = h;
