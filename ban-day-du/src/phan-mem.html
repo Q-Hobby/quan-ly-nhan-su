@@ -2273,6 +2273,65 @@ body.no-mascot .cmd-in img{display:none}
 .bk-nag b{color:var(--danger,#B42318)}
 .bk-nag .bk-act{display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:640px){.br-card .br-grid{grid-template-columns:1fr}}
+
+/* 17/11 đợt 2: sơ đồ tổ chức cân đối – tên phòng, số người, nhân sự căn giữa ô; kiêm nhiệm mọi bộ phận */
+.od-h{display:flex;flex-direction:column;align-items:center;text-align:center;gap:1px;padding:10px 12px 9px}
+.od-h .od-c{padding-top:0;align-self:center}.od-h .od-bar{width:100%;margin-top:6px}
+.od-b{display:flex;flex-direction:column;align-items:center;padding:8px 8px 10px}
+.od-lead{padding-bottom:4px;display:flex;flex-direction:column;align-items:center;width:100%}
+.od-m{border-left:0;margin-left:0;padding-left:0;align-items:center;width:100%}
+.od .op{width:auto;max-width:100%;min-width:0}
+.od-more{display:flex;justify-content:center;padding:0 8px 8px}
+.od-plus{border:1px dashed var(--line-2);background:none;border-radius:99px;padding:3px 12px;font:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;opacity:.0;transition:opacity .15s}
+.od:hover .od-plus,.od-plus:focus-visible{opacity:1}.od-plus:hover{border-color:var(--pri);color:var(--pri-ink)}
+@media (hover:none){.od-plus{opacity:1}}
+.op-vac.op-add{cursor:pointer}
+.od-notes{justify-content:center}
+.kn-dd{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.kn-it{display:inline-flex;align-items:center;gap:4px;background:var(--pri-soft);color:var(--pri-ink);border-radius:99px;padding:2px 4px 2px 10px;font-size:12.5px;font-weight:600}
+.kn-it .op-kiem{margin-left:2px;background:var(--surface)}
+.kn-x{border:0;background:none;color:inherit;font-size:15px;line-height:1;width:20px;height:20px;border-radius:50%;cursor:pointer}.kn-x:hover{background:var(--surface)}
+.kn-ch{display:flex;flex-direction:column;gap:6px;margin:4px 0 10px}
+@media print{.od-plus{display:none!important}}
+
+/* 17/11 đợt 2: thanh đầu trang 3 dòng – (1) vị trí + tìm kiếm | đơn vị, công ty, ngày, tài khoản; (2) nút công cụ căn phải; (3) ghi chú lưu máy chủ */
+.topbar-inner{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding-top:10px;padding-bottom:6px}
+.tb-r1{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap}
+.tb-r1 .top-status{margin-left:auto}
+.tb-acc:empty{display:none}.tb-acc{display:inline-flex}
+.tb-r2{display:flex;justify-content:flex-end;align-items:center;gap:8px}
+.tb-r2 .icon-btn{width:32px;height:32px;border-radius:9px}.tb-r2 .chip{height:32px}.tb-r1 .find{max-width:380px}.tb-r2 .icon-btn svg{width:16px;height:16px}
+.tb-r3{display:flex;justify-content:flex-end;font-size:12px;line-height:1.3;min-height:0}.tb-r3:empty{display:none}
+.sv-note{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:0;font:inherit;font-weight:600;color:var(--pri-ink);cursor:pointer}
+.sv-note i{width:7px;height:7px;border-radius:50%;background:var(--ok,#3F8F4A)}
+.sv-note.busy{color:var(--muted)}.sv-note.busy i{background:var(--warn)}.sv-note.err{color:var(--danger)}.sv-note.err i{background:var(--danger)}
+.sv-note:hover span{text-decoration:underline}
+@media (max-width:760px){.tb-r1 .top-status{margin-left:0;width:100%}.tb-r2{justify-content:flex-start}.tb-r3{justify-content:flex-start}}
+@media print{.tb-r2,.tb-r3{display:none!important}}
+
+/* 17/11 đợt 2: tab chọn công ty nổi bật, dễ nhận biết đang chọn công ty nào (mọi trang có tab công ty: data-act kết thúc bằng -u) */
+.seg:has(>button[data-act$="-u"]){background:none;padding:0;gap:6px;flex-wrap:wrap;border-radius:0}
+.seg>button[data-act$="-u"]{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px 0 12px;border:1.5px solid var(--line-2);background:var(--surface);color:var(--ink-2);border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:none;cursor:pointer}
+.seg>button[data-act$="-u"]::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid var(--line-2);box-sizing:border-box;flex:0 0 auto}
+.seg>button[data-act$="-u"]:hover{border-color:var(--pri);color:var(--pri-ink)}
+.seg>button[data-act$="-u"].on{background:var(--pri);border-color:var(--pri);color:#fff;box-shadow:0 2px 8px -2px color-mix(in srgb,var(--pri) 60%,transparent)}
+.seg>button[data-act$="-u"].on::before{border-color:#fff;background:#fff;box-shadow:inset 0 0 0 3px var(--pri)}
+/* 17/11 đợt 2: Tổng hợp công – thanh lọc gọn, tab báo cáo, dải số liệu */
+.bc-tool{padding:12px 16px;margin:0 0 12px;display:flex;flex-direction:column;gap:10px}
+.bc-trow{display:flex;align-items:flex-end;gap:10px 14px;flex-wrap:wrap}
+.bc-tf .field{margin:0}.bc-tf .field>label{font-size:12px}
+.bc-kseg{height:auto}.bc-kseg button small{font-weight:500;color:var(--faint);margin-left:2px}.bc-kseg button.on small{color:var(--pri-ink)}
+.bc-tool .seg:not(:has(>button[data-act$="-u"])) button{height:36px}
+.bc-vt{display:flex;gap:2px;border-bottom:1px solid var(--line-2);margin:4px 0 0;overflow-x:auto;scrollbar-width:thin}
+.bc-vt button{border:0;background:none;font:inherit;font-size:13.5px;font-weight:600;color:var(--muted);padding:9px 14px;border-bottom:2.5px solid transparent;margin-bottom:-1px;white-space:nowrap;cursor:pointer}
+.bc-vt button:hover{color:var(--ink)}.bc-vt button.on{color:var(--pri-ink);border-bottom-color:var(--pri)}.bc-vt button.bad:not(.on){color:var(--danger)}
+.bc-kp{display:flex;flex-wrap:wrap;gap:4px 18px;padding:10px 2px 12px;font-size:12.5px;color:var(--muted)}
+.bc-kp b{color:var(--ink);font-size:14px;font-weight:700;margin-left:3px;font-variant-numeric:tabular-nums}.bc-kp .k-bad b{color:var(--danger)}.bc-kp .k-warn b{color:var(--warn)}
+
+/* 17/11 đợt 2: Cài đặt → Gửi email tự động */
+.ml-st{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-size:13px;color:var(--ink-2)}.ml-st.on{background:color-mix(in srgb,var(--ok,#3F8F4A) 12%,var(--surface));color:var(--ink)}
+.ml-guide{margin:12px 0;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}.ml-guide summary{cursor:pointer;font-weight:600;color:var(--pri-ink)}.ml-guide ol{margin:8px 0 0 18px;padding:0;display:grid;gap:6px;line-height:1.5}
+.ml-form{margin-top:4px}.ml-btns{margin-top:10px;gap:8px;flex-wrap:wrap;align-items:center}.ml-test{display:inline-flex;gap:6px;align-items:center}.ml-test .input{width:220px;height:32px}
 </style>
 </head>
 <body>
@@ -2288,13 +2347,15 @@ body.no-mascot .cmd-in img{display:none}
     </div>
   </aside>
   <div class="main">
-    <header class="topbar"><div class="topbar-inner">
+    <header class="topbar"><div class="topbar-inner"><div class="tb-r1">
       <button class="menu-btn" id="menuBtn" aria-label="Mở danh sách chức năng"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
       <span class="crumb" id="crumb"></span>
       <button class="find" data-act="cmd" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></svg><span>Tìm nhân viên, chức năng…</span><kbd>Ctrl K</kbd></button>
       <div class="top-status">
         <label class="chip" id="unitChip" hidden><span class="muted">Đơn vị</span><select id="unitSel" aria-label="Chọn đơn vị"></select></label><button class="chip" id="pickBtn" type="button" hidden title="Chọn các công ty gộp dữ liệu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m8 12 3 3 5-6"/></svg><span><b id="pickN">2/2</b> công ty</span></button>
         <button class="chip" id="refChip" type="button" title="Đổi ngày tham chiếu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg><span>Tính đến <b id="refTxt"></b></span></button>
+      </div></div>
+      <div class="tb-r2">
         <span class="top-tools">
           <button class="icon-btn" id="rescanBtn" hidden title="Quét lại thư mục"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button>
           <button class="icon-btn" data-act="palette" title="Đổi màu giao diện" aria-label="Đổi màu giao diện"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.8-1.7 1.7-1.7H16a5 5 0 0 0 5-5c0-4-4-7.2-9-7.2Z"/><circle cx="7.5" cy="11.5" r="1.1"/><circle cx="10.5" cy="7.5" r="1.1"/><circle cx="15" cy="7.8" r="1.1"/></svg></button>
@@ -2302,6 +2363,7 @@ body.no-mascot .cmd-in img{display:none}
           <button class="icon-btn" data-act="video" title="Video demo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></button>
         </span>
       </div>
+      <div class="tb-r3" id="tbNote"></div>
     </div><div class="scan-line" id="scanTxt"></div></header>
     <main class="container" id="page"></main>
   </div>
@@ -4470,7 +4532,12 @@ if (typeof module !== 'undefined') module.exports = XW;
       return '<button type="button" class="seat ' + c + (dots ? ' dot' : '') + '" title="' + esc(tip) + ' · bấm để xem thông tin"' + (uo ? ' data-act="profile" data-u="' + uo.id + '" data-id="' + esc(e['Mã NV']) + '"' : '') + '><i>' + (src && !dots ? '<img src="' + src + '" alt="">' : esc(g.charAt(0).toUpperCase())) + '</i>' + (isNew[k] && !left ? '<em class="nw">Mới</em>' : '') + '<b>' + esc(shortName(e['Họ và tên'])) + '</b></button>';
     }
     var prevU = null;
-    var rows = d.depts.map(function (x, di) {
+    // 17/11 đợt 2: Ban Giám đốc (hoặc bộ phận có lãnh đạo) lên đầu mỗi công ty, các bộ phận khác giữ thứ tự danh mục
+    var uOrd = {}, ROOTD = /^(ban\s+(tổng\s+)?giám\s+đốc|ban\s+lãnh\s+đạo|ban\s+điều\s+hành|hội\s+đồng\s+quản\s+trị)/i;
+    d.depts.forEach(function (x, i) { if (!(x.unit in uOrd)) uOrd[x.unit] = i; });
+    var dRank = function (x) { if (ROOTD.test(x.name || '')) return 0; return d.people.some(function (p) { return p.unit === x.unit && (p.e['Phòng ban'] || '(Chưa ghi phòng ban)') === x.name && roleOf(p) === 'lead'; }) ? 1 : 2; };
+    var DEP = d.depts.map(function (x, i) { return [x, i, dRank(x)]; }).sort(function (a, b) { return uOrd[a[0].unit] - uOrd[b[0].unit] || a[2] - b[2] || a[1] - b[1]; }).map(function (a) { return a[0]; });
+    var rows = DEP.map(function (x, di) {
       var ps = d.people.filter(function (p) { return p.unit === x.unit && (p.e['Phòng ban'] || '(Chưa ghi phòng ban)') === x.name; });
       var lf = d.moves.left.filter(function (p) { return p.unit === x.unit && p.e['Phòng ban'] === x.name; });
       var empty = x.plan !== null ? Math.max(0, x.plan - ps.length) : 0, over = x.plan !== null && ps.length > x.plan;
@@ -4880,7 +4947,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     h += '<div class="card card-pad"><div class="card-head"><div><h3>Ngày tham chiếu &amp; giao diện</h3><p>Ngày dùng để tính mọi cảnh báo và số liệu; màu giao diện của phần mềm.</p></div></div>' +
       '<dl class="kv"><dt>Tính số liệu đến</dt><dd><b>' + HR.vnDate(refDate()) + '</b> ' + (st.refMode === 'today' ? '(hôm nay)' : '(ngày cố định)') + ' <button class="btn btn-sm" id="refEdit" style="margin-left:6px">Đổi</button></dd>' +
       '<dt>Màu giao diện</dt><dd><div class="pal-row">' + palOpts() + '</div>' + palWhoHtml() + palAutoHtml() + '</dd></dl></div>';
-    h += brCardHtml() + stCardHtml();
+    h += brCardHtml() + stCardHtml() + mailCardHtml(); // 17/11 đợt 2: gửi email tự động (Resend)
     h += '</div>' + navSetHtml() + '<h3 class="sec-h set-sec">Ngưỡng cảnh báo</h3>' + settingsRulesHtml();
     // 12/11 góp ý: nhật ký, sao lưu, xóa dữ liệu thu gọn thành nút nhỏ ở cuối trang
     h += '<div class="set-foot"><div class="set-meta"><span>Phiên bản <b>' + APP_VER + '</b></span><span>Lưu trên trình duyệt: <b>' + (DB_OK ? 'Có' : 'Không dùng được') + '</b></span><span>Ghi nhớ thư mục: <b>' + (CAN_PICK ? 'Có' : 'Không (dùng Chrome hoặc Edge)') + '</b></span></div>' +
@@ -5676,7 +5743,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       h += miss.length ? '<div class="notice warn">' + ic('info') + '<div><b>Hồ sơ còn thiếu ' + miss.length + '/' + NEED.length + ' thông tin:</b> ' + esc(miss.join(', ')) + '.<div class="link-row" style="margin-top:8px"><button class="btn btn-sm btn-primary" data-act="nv-edit" data-u="' + u.id + '" data-id="' + esc(id) + '">Bổ sung ngay</button></div></div></div>' : '<div class="notice">' + ic('check') + '<div>Hồ sơ đủ ' + NEED.length + ' thông tin cơ bản (cần cho hợp đồng, BHXH, trả lương).</div></div>';
       h += '<div class="dr-sec"><h4>Thông tin cá nhân</h4><dl class="kv2">' + kvRows(e, [['Mã NV'], ['Họ và tên'], ['Giới tính'], ['Ngày sinh'], ['Dân tộc'], ['Quê quán'], ['Địa chỉ thường trú'], ['Số điện thoại'], ['Email công ty'], ['Trình độ'], ['Tình trạng hôn nhân'], ['Số người phụ thuộc']]) + '</dl></div>' +
         '<div class="dr-sec"><h4>Giấy tờ, bảo hiểm, ngân hàng <button class="btn btn-sm" data-sens style="margin-left:8px">' + (S.showSens ? 'Ẩn số' : 'Hiện số') + '</button></h4><dl class="kv2">' + kvRows(e, [['Số CCCD/Mã số thuế', 'Số CCCD / MST', 1], ['Ngày cấp CCCD'], ['Số sổ BHXH', 'Số sổ BHXH', 1], ['Ngân hàng'], ['Số tài khoản', 'Số tài khoản', 1]]) + '</dl></div>' +
-        '<div class="dr-sec"><h4>Công việc</h4><dl class="kv2">' + kvRows(e, [['Phòng ban'], ['Chức vụ'], ['Chức danh công việc'], ['Tổ/Ca'], ['Ngày vào làm'], ['Trạng thái', 'Trạng thái (theo file)'], ['Ngày nghỉ việc']]) + '<dt>Thâm niên</dt><dd>' + (seniority(e, R) === '' ? '<span class="faint">— (chưa có ngày vào làm)</span>' : String(seniority(e, R)).replace('.', ',') + ' năm') + '</dd><dt>Hợp đồng hiện tại</dt><dd>' + (cur ? esc(cur['Loại hợp đồng'] + ' · ' + HRR.contractState(cur, r) + (cur['Ngày hết hạn'] ? ' · hết hạn ' + vn(cur['Ngày hết hạn']) : '')) : '<span class="faint">—</span>') + '</dd><dt>Lương cơ bản hiện tại</dt><dd>' + (function () { var s = HRR.salaryAt(id, r, byHd, byLs); return s ? fmtInt(s.amount) + ' <span class="faint">(' + esc(s.src) + ')</span>' : '—'; })() + '</dd></dl></div>' + accSecHtml(u, e, id, st);
+        '<div class="dr-sec"><h4>Công việc</h4><dl class="kv2">' + kvRows(e, [['Phòng ban'], ['Chức vụ'], ['Chức danh công việc']]) + '<dt>Kiêm nhiệm</dt><dd class="kn-dd">' + knProfileHtml(u, id) + '</dd>' + kvRows(e, [['Tổ/Ca'], ['Ngày vào làm'], ['Trạng thái', 'Trạng thái (theo file)'], ['Ngày nghỉ việc']]) + '<dt>Thâm niên</dt><dd>' + (seniority(e, R) === '' ? '<span class="faint">— (chưa có ngày vào làm)</span>' : String(seniority(e, R)).replace('.', ',') + ' năm') + '</dd><dt>Hợp đồng hiện tại</dt><dd>' + (cur ? esc(cur['Loại hợp đồng'] + ' · ' + HRR.contractState(cur, r) + (cur['Ngày hết hạn'] ? ' · hết hạn ' + vn(cur['Ngày hết hạn']) : '')) : '<span class="faint">—</span>') + '</dd><dt>Lương cơ bản hiện tại</dt><dd>' + (function () { var s = HRR.salaryAt(id, r, byHd, byLs); return s ? fmtInt(s.amount) + ' <span class="faint">(' + esc(s.src) + ')</span>' : '—'; })() + '</dd></dl></div>' + accSecHtml(u, e, id, st);
     } else if (tab === 'ct') {
       h += dcTabHtml(u, e, id);
     } else if (tab === 'time') {
@@ -6166,6 +6233,7 @@ if (typeof module !== 'undefined') module.exports = XW;
 
   // Dải báo "có thay đổi chưa ghi ra Excel" – đặt đầu các trang nhóm Nhân sự
   function editBar() {
+    if (window.QTT_SV && window.QTT_SV.api) return ''; // 17/11 đợt 2: bản máy chủ tự lưu mọi thay đổi lên máy chủ – không nhắc ghi ra Excel gốc
     var us = selUnits().filter(function (u) { return ovrCount(u); });
     if (!us.length) return '';
     var n = 0; us.forEach(function (u) { n += ovrCount(u); });
@@ -6249,17 +6317,20 @@ if (typeof module !== 'undefined') module.exports = XW;
       x.headOut = h && x.members.indexOf(h) < 0 && !hLead;   // trưởng bộ phận không còn trong phòng (đã nghỉ / chuyển phòng); lãnh đạo kiêm phụ trách phòng khác thì không tính
       x.headKiem = hLead && (x.members.length > 1 || x.members.indexOf(h) < 0); // lãnh đạo kiêm phụ trách
       x.working = x.members.filter(function (p) { return p.st === 'working'; }).length;
-      x.vac = x.plan !== null ? Math.max(0, x.plan - x.members.length) : 0;
-      x.over = x.plan !== null && x.members.length > x.plan;
+      // 17/11 đợt 2: người kiêm nhiệm (cùng hoặc khác công ty) lấp vị trí theo định biên, không tính vào số người đang làm
+      x.kn = knPeople(u, R, function (r) { return r.pb && r.pb === x.name; }).filter(function (p) { return !(p.u === u && x.members.some(function (m) { return m.id === p.id; })); });
+      x.nShow = x.members.length + x.kn.length;
+      x.vac = x.plan !== null ? Math.max(0, x.plan - x.nShow) : 0;
+      x.over = x.plan !== null && x.nShow > x.plan;
       x.members.sort(function (a, b) { return (a === x.head ? -1 : b === x.head ? 1 : 0) || a.rank - b.rank || cmp(a.e['Ngày vào làm'], b.e['Ngày vào làm']); });
       x.isRoot = (x.members.length > 0 && x.members.every(function (p) { return leaders.indexOf(p) >= 0; })) || (!!x.pb && ROOT_RE.test(x.name));
       var notes = [];
-      if (!x.head && !x.isRoot) notes.push(['warn', 'Chưa có trưởng bộ phận']);
+      if (!x.head && !x.isRoot && !x.kn.length) notes.push(['warn', 'Chưa có trưởng bộ phận']);
       if (x.headOut) notes.push(['warn', 'Trưởng bộ phận ' + shortName(x.head.e['Họ và tên']) + (x.head.st === 'left' ? ' đã nghỉ việc' : ' không còn thuộc phòng này')]);
       if (x.head && x.head.st === 'maternity' && !x.headOut) notes.push(['info', 'Trưởng bộ phận đang nghỉ thai sản']);
       if (x.members.length && x.working < x.members.length) notes.push(['info', x.working + '/' + x.members.length + ' người đang đi làm']);
       if (x.vac) notes.push(['vac', 'Thiếu ' + x.vac + ' so với định biên']);
-      if (x.over) notes.push(['warn', 'Vượt định biên ' + (x.members.length - x.plan)]);
+      if (x.over) notes.push(['warn', 'Vượt định biên ' + (x.nShow - x.plan)]);
       if (x.orphan) notes.push(['warn', 'Chưa có trong Danh mục phòng ban']);
       x.notes = notes;
     });
@@ -6268,11 +6339,13 @@ if (typeof module !== 'undefined') module.exports = XW;
       root.extra = leaders.filter(function (p) { return root.members.indexOf(p) < 0 && p !== root.head; });
       if (!root.head && root.extra.length) { root.head = root.extra.shift(); }
       var nR = root.members.length + root.extra.length + (root.head && root.members.indexOf(root.head) < 0 ? 1 : 0);
+      root.kn = [];
       root.vac = root.plan !== null ? Math.max(0, root.plan - nR) : 0; root.nShow = nR;
       root.notes = root.notes.filter(function (n) { return !/so với định biên|Chưa có trưởng/.test(n[1]); }); if (root.vac) root.notes.push(['vac', 'Thiếu ' + root.vac + ' so với định biên']);
     }
     // 17/11/2026 góp ý mục 7: Ban Giám đốc chọn người trong toàn hệ thống (u.bgd = [{ u, id }]) – không sửa hồ sơ gốc; người ở vị trí / công ty khác hiện "kiêm nhiệm"
-    var bg = bgdPeople(u, R);
+    var bg = knPeople(u, R, function (r) { return !r.pb || (root && r.pb === root.name); });
+    if (root) root.kn = [];
     if (root && bg.length) {
       var have = root.members.concat(root.extra || [], root.head ? [root.head] : []);
       bg.forEach(function (p) { if (!have.some(function (h) { return h.id === p.id && (h.u || u) === p.u; })) root.extra.push(p); });
@@ -6281,21 +6354,54 @@ if (typeof module !== 'undefined') module.exports = XW;
     }
     return { u: u, people: people, depts: depts, leaders: leaders, root: root, bgd: root ? [] : bg.filter(function (p) { return !leaders.some(function (l) { return l.id === p.id && p.u === u; }); }), children: depts.filter(function (x) { return x !== root && (x.members.length || x.pb || x.left.length); }) };
   }
-  function bgdPeople(u, R) {
-    return (u.bgd || []).map(function (r) {
+  /* 17/11 đợt 2 (anh duyệt): KIÊM NHIỆM MỌI BỘ PHẬN – u.kn = [{ u: công ty của người, id: Mã NV, pb: phòng ban ở công ty u ('' = Ban Giám đốc), cd: vị trí kiêm nhiệm }]
+     Thay u.bgd (Ban Giám đốc chọn người, 1.0.1 đợt 1). Không sửa hồ sơ gốc; lấp vị trí theo định biên nhưng không tính đầu người; đồng bộ 2 chiều với trường Kiêm nhiệm trong hồ sơ. */
+  function knOf(u) {
+    if (!u) return [];
+    if (u.bgd) { var k0 = u.kn || []; (u.bgd || []).forEach(function (r) { if (!k0.some(function (k) { return k.u === r.u && k.id === r.id && !k.pb; })) k0.push({ u: r.u, id: r.id, pb: '', cd: '' }); }); u.kn = k0; delete u.bgd; }
+    return u.kn || (u.kn = []);
+  }
+  function knPeople(u, R, match) {
+    return knOf(u).filter(match).map(function (r) {
       var uu = r.u === u.id ? u : unitById(r.u); if (!uu) return null; var e = nvIndex(uu)[r.id]; if (!e) return null;
       var st = HR.staffState(e, R, HR.maternitySet(uu.data, R)); if (st === 'left') return null;
-      var xco = uu !== u; return { e: e, id: r.id, st: st, rank: 1, u: uu, xco: xco, kiemBgd: xco || !ROOT_RE.test(e['Phòng ban'] || ''), bgdRef: 1 };
+      var xco = uu !== u; return { e: e, id: r.id, st: st, rank: 1, u: uu, xco: xco, kiemBgd: xco || r.pb !== '' || !ROOT_RE.test(e['Phòng ban'] || ''), kn: r, cd: r.cd || '' };
     }).filter(Boolean);
   }
-  function bgdAdd(u, pu, id) {
-    var e = nvIndex(pu)[id]; if (!e) return; u.bgd = u.bgd || [];
-    if (u.bgd.some(function (r) { return r.u === pu.id && r.id === id; })) { toast(shortName(e['Họ và tên']) + ' đã ở Ban Giám đốc', 'info'); return; }
-    u.bgd.push({ u: pu.id, id: id }); saveUnits(); log('Ban Giám đốc ' + u.name + ': thêm ' + e['Họ và tên'] + ' (' + id + (pu !== u ? ', ' + pu.name : '') + ')'); ACACHE.key = null; render();
-    var kiem = pu !== u || !ROOT_RE.test(e['Phòng ban'] || '');
-    toast('Đã thêm ' + shortName(e['Họ và tên']) + ' vào Ban Giám đốc ' + shortUnit(u.name), 'ok', kiem ? 'Hiện là kiêm nhiệm – hồ sơ, chức vụ chính giữ nguyên.' : '');
+  function bgdPeople(u, R) { return knPeople(u, R, function (r) { return !r.pb; }); }
+  function knLabel(u, pb) { return (pb ? pb : 'Ban Giám đốc') + (isMulti() || maAllU().length > 1 ? ' · ' + shortUnit(u.name) : ''); }
+  // Mọi vị trí kiêm nhiệm của 1 người (công ty pu, mã id) trên toàn hệ thống – dùng cho hồ sơ
+  function knOfPerson(pu, id) { var L = []; maAllU().forEach(function (x) { knOf(x).forEach(function (r) { if (r.u === pu.id && r.id === id) L.push({ hu: x, r: r }); }); }); return L; }
+  function knAdd(u, pb, pu, id, cd, quiet) {
+    var e = nvIndex(pu)[id]; if (!e) return; pb = pb || '';
+    if (pu === u && pb && (e['Phòng ban'] || '') === pb) { toast(shortName(e['Họ và tên']) + ' đang thuộc ' + pb, 'info'); return; }
+    var L = knOf(u), ex = L.filter(function (r) { return r.u === pu.id && r.id === id && (r.pb || '') === pb; })[0];
+    if (ex) { if (cd != null && cd !== ex.cd) { ex.cd = cd; saveUnits(); render(); } else toast(shortName(e['Họ và tên']) + ' đã kiêm nhiệm ở ' + knLabel(u, pb), 'info'); return; }
+    L.push({ u: pu.id, id: id, pb: pb, cd: cd || '' }); saveUnits(); ACACHE.key = null;
+    log('Kiêm nhiệm: ' + e['Họ và tên'] + ' (' + id + (pu !== u ? ', ' + pu.name : '') + ') → ' + (cd ? cd + ', ' : '') + knLabel(u, pb));
+    render(); knRedraw(pu, id);
+    if (!quiet) toast('Đã thêm ' + shortName(e['Họ và tên']) + ' kiêm nhiệm ' + knLabel(u, pb), 'ok', 'Lấp vị trí theo định biên, không tính vào số người đang làm; hồ sơ, chức vụ chính giữ nguyên.');
   }
-  function bgdDel(u, pu, id) { u.bgd = (u.bgd || []).filter(function (r) { return !(r.u === pu && r.id === id); }); saveUnits(); log('Ban Giám đốc ' + u.name + ': bỏ ' + id); render(); }
+  function knDel(u, puId, id, pb) {
+    var L = knOf(u), n = L.length; u.kn = L.filter(function (r) { return !(r.u === puId && r.id === id && (pb == null || (r.pb || '') === pb)); });
+    if (u.kn.length === n) return; saveUnits(); ACACHE.key = null; log('Bỏ kiêm nhiệm ' + id + ' ở ' + knLabel(u, pb)); render(); var pu = unitById(puId); if (pu) knRedraw(pu, id);
+  }
+  function bgdAdd(u, pu, id) { knAdd(u, '', pu, id); }
+  function bgdDel(u, pu, id) { knDel(u, pu, id, ''); }
+  function knCanEdit() { return true; }
+  function knRedraw(pu, id) { try { if (typeof drawer !== 'undefined' && drawer && drawer._id === id && drawer._u === pu) drawProfile(pu, id, drawer._tab); } catch (e) { } }
+  // Hộp hỏi khi thêm: vị trí kiêm nhiệm; cùng công ty khác phòng thì chọn chuyển hẳn hay kiêm nhiệm
+  function knConfirm(u, pb, pu, id) {
+    var e = nvIndex(pu)[id]; if (!e) return; var same = pu === u && pb && (e['Phòng ban'] || '') !== pb, head = pb && (u.data.PB || []).filter(function (p) { return p['Tên phòng ban'] === pb; })[0];
+    var body = '<p><b>' + esc(e['Họ và tên']) + '</b> · ' + esc(e['Chức danh công việc'] || e['Chức vụ'] || '') + (e['Phòng ban'] ? ' · ' + esc(e['Phòng ban']) : '') + (pu !== u ? ' · ' + uTag(pu) : '') + '</p>' +
+      (same ? '<div class="kn-ch"><label class="radio"><input type="radio" name="knM" value="kn" checked> Kiêm nhiệm – giữ phòng chính ' + esc(e['Phòng ban'] || '') + '</label><label class="radio"><input type="radio" name="knM" value="mv"> Chuyển hẳn sang ' + esc(pb) + '</label></div>' : '') +
+      field('knCd', 'Vị trí kiêm nhiệm', '', ' placeholder="VD: Kế toán trưởng, Phụ trách bộ phận"') +
+      '<p class="muted" style="font-size:12.5px;margin:6px 0 0">Kiêm nhiệm lấp vị trí theo định biên của ' + esc(knLabel(u, pb)) + ' nhưng không tính vào số người đang làm, lương, bảo hiểm' + (pu !== u ? ' – vẫn thuộc định biên ' + esc(shortUnit(pu.name)) : '') + '.</p>' +
+      '<div class="modal-foot"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="knOk">Thêm</button></div>';
+    var m = modal('Thêm vào ' + knLabel(u, pb), '', body, true);
+    setTimeout(function () { try { $('#knCd', m).focus(); } catch (x) { } }, 60);
+    $('#knOk', m).addEventListener('click', function () { var mv = same && ($('input[name="knM"]:checked', m) || {}).value === 'mv', cd = $('#knCd', m).value.trim(); m.close(); if (mv) { moveDept(u, id, pb); return; } knAdd(u, pb, pu, id, cd); });
+  }
   // Hộp chọn người: Ban Giám đốc (mọi công ty) hoặc Trưởng bộ phận (trong công ty)
   function pickPerson(title, sub, us, onPick, mark) {
     var R = refDate(), L = [];
@@ -6308,13 +6414,33 @@ if (typeof module !== 'undefined') module.exports = XW;
     m.addEventListener('click', function (ev) { var b = ev.target.closest('.pp-it'); if (!b) return; var r = L[+b.getAttribute('data-i')]; m.close(); onPick(r.u, r.e['Mã NV'], r.e); });
     return m;
   }
-  ACTS['bgd-pick'] = function (a) {
-    var u = unitById(a.getAttribute('data-u')); if (!u) return; var all = maAllU();
-    var cur = (u.bgd || []).map(function (r) { var uu = unitById(r.u), e = uu && nvIndex(uu)[r.id]; return e ? { uu: uu, e: e, r: r } : null; }).filter(Boolean);
-    var m = pickPerson('Chọn người vào Ban Giám đốc – ' + shortUnit(u.name), 'Chọn trong danh sách nhân sự ' + (all.length > 1 ? 'toàn bộ các công ty' : 'toàn công ty') + '. Hồ sơ, chức vụ chính của người được chọn giữ nguyên; người đang ở vị trí hoặc công ty khác hiện "kiêm nhiệm".', all, function (pu, id) { bgdAdd(u, pu, id); },
-      function (r) { return r.u !== u ? 'kiêm nhiệm · ' + shortUnit(r.u.name) : !ROOT_RE.test(r.e['Phòng ban'] || '') ? 'kiêm nhiệm' : ''; });
-    if (cur.length) { var box = document.createElement('div'); box.className = 'pp-cur'; box.innerHTML = '<h4>Đã chọn thêm vào Ban Giám đốc</h4>' + cur.map(function (c) { return '<div><span>' + esc(c.e['Họ và tên']) + (c.uu !== u ? ' · ' + uTag(c.uu) : '') + '</span><button type="button" class="btn btn-sm btn-danger-ghost" data-bd="' + esc(c.r.u + '|' + c.r.id) + '">Bỏ</button></div>'; }).join(''); var l = $('.pp-l', m); l.parentNode.insertBefore(box, l);
-      box.addEventListener('click', function (ev) { var b = ev.target.closest('[data-bd]'); if (!b) return; var p = b.getAttribute('data-bd').split('|'); m.close(); bgdDel(u, p[0], p.slice(1).join('|')); }); }
+  ACTS['kn-pick'] = function (a) {
+    var k = a.getAttribute('data-k').split('|'), u = unitById(k[0]), pb = k.slice(1).join('|'); if (!u) return; var all = maAllU();
+    var o = orgOf(u, refDate()); if (o.root && pb === o.root.name) pb = ''; // Ban Giám đốc có trong danh mục: lưu '' cho thống nhất
+    var cur = knOf(u).filter(function (r) { return (r.pb || '') === pb; }).map(function (r) { var uu = unitById(r.u), e = uu && nvIndex(uu)[r.id]; return e ? { uu: uu, e: e, r: r } : null; }).filter(Boolean);
+    var m = pickPerson('Chọn người – ' + knLabel(u, pb), 'Chọn trong danh sách nhân sự ' + (all.length > 1 ? 'toàn bộ các công ty' : 'toàn công ty') + '. Người ở phòng hoặc công ty khác vào dưới dạng kiêm nhiệm: lấp vị trí, hồ sơ chính giữ nguyên.', all, function (pu, id) { knConfirm(u, pb, pu, id); },
+      function (r) { var inD = r.u === u && (pb ? (r.e['Phòng ban'] || '') === pb : ROOT_RE.test(r.e['Phòng ban'] || '')); return inD ? 'trong phòng' : r.u !== u ? 'kiêm nhiệm · ' + shortUnit(r.u.name) : 'kiêm nhiệm'; });
+    if (cur.length) { var box = document.createElement('div'); box.className = 'pp-cur'; box.innerHTML = '<h4>Đang kiêm nhiệm ở ' + esc(knLabel(u, pb)) + '</h4>' + cur.map(function (c) { return '<div><span>' + esc(c.e['Họ và tên']) + (c.r.cd ? ' · ' + esc(c.r.cd) : '') + (c.uu !== u ? ' · ' + uTag(c.uu) : '') + '</span><button type="button" class="btn btn-sm btn-danger-ghost" data-bd="' + esc(c.r.u + '|' + c.r.id) + '">Bỏ</button></div>'; }).join(''); var l = $('.pp-l', m); l.parentNode.insertBefore(box, l);
+      box.addEventListener('click', function (ev) { var b = ev.target.closest('[data-bd]'); if (!b) return; var p = b.getAttribute('data-bd').split('|'); m.close(); knDel(u, p[0], p.slice(1).join('|'), pb); }); }
+  };
+  ACTS['bgd-pick'] = function (a) { a.setAttribute('data-k', a.getAttribute('data-u') + '|'); ACTS['kn-pick'](a); };
+  // Trường Kiêm nhiệm trong hồ sơ (phần Công việc) – đồng bộ 2 chiều với sơ đồ tổ chức
+  function knProfileHtml(pu, id) {
+    var L = knOfPerson(pu, id);
+    return (L.length ? L.map(function (x) { return '<span class="kn-it">' + esc((x.r.cd ? x.r.cd + ' – ' : '') + knLabel(x.hu, x.r.pb)) + (knCanEdit() ? '<button type="button" class="kn-x" data-act="kn-del" data-k="' + esc(x.hu.id + '|' + pu.id + '|' + id + '|' + (x.r.pb || '')) + '" title="Bỏ vị trí kiêm nhiệm này" aria-label="Bỏ">×</button>' : '') + '</span>'; }).join('') : '<span class="faint">—</span>') +
+      (knCanEdit() ? ' <button type="button" class="btn btn-sm kn-add" data-act="kn-prof" data-u="' + pu.id + '" data-id="' + esc(id) + '">+ Thêm</button>' : '');
+  }
+  ACTS['kn-del'] = function (a) { var p = a.getAttribute('data-k').split('|'), hu = unitById(p[0]); if (!hu) return; confirmBox('Bỏ vị trí kiêm nhiệm này?', 'Sơ đồ tổ chức cập nhật theo. Hồ sơ chính giữ nguyên.', 'Bỏ', function () { knDel(hu, p[1], p[2], p.slice(3).join('|')); }); };
+  ACTS['kn-prof'] = function (a) {
+    var pu = unitById(a.getAttribute('data-u')), id = a.getAttribute('data-id'), e = pu && nvIndex(pu)[id]; if (!e) return; var all = maAllU();
+    var opts = function (hu) { return ['<option value="">Ban Giám đốc</option>'].concat((hu.data.PB || []).filter(function (p) { return p['Tên phòng ban'] && !ROOT_RE.test(p['Tên phòng ban']) && !(hu === pu && p['Tên phòng ban'] === e['Phòng ban']); }).map(function (p) { return '<option>' + esc(p['Tên phòng ban']) + '</option>'; })).join(''); };
+    var body = '<div class="form-grid">' + (all.length > 1 ? '<div class="field"><label for="kpU">Công ty</label><select class="input" id="kpU">' + all.map(function (x) { return '<option value="' + x.id + '"' + (x === pu ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select></div>' : '') +
+      '<div class="field"><label for="kpPb">Bộ phận</label><select class="input" id="kpPb">' + opts(pu) + '</select></div>' + field('kpCd', 'Vị trí kiêm nhiệm', '', ' placeholder="VD: Kế toán trưởng"') + '</div>' +
+      '<p class="muted" style="font-size:12.5px;margin:8px 0 0">Hiện trên sơ đồ tổ chức của bộ phận đó, lấp vị trí theo định biên; không tính vào số người đang làm, lương, bảo hiểm. Hồ sơ, phòng ban chính giữ nguyên.</p>' +
+      '<div class="modal-foot"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="kpOk">Thêm</button></div>';
+    var m = modal('Thêm kiêm nhiệm – ' + e['Họ và tên'], '', body, true), su = $('#kpU', m);
+    if (su) su.addEventListener('change', function () { $('#kpPb', m).innerHTML = opts(unitById(su.value)); });
+    $('#kpOk', m).addEventListener('click', function () { var hu = su ? unitById(su.value) : pu; m.close(); knAdd(hu, $('#kpPb', m).value, pu, id, $('#kpCd', m).value.trim()); });
   };
   // Ô Trưởng bộ phận đang trống: bấm để chọn, hoặc kéo người vào
   function setHead(u, deptName, id) {
@@ -6331,8 +6457,8 @@ if (typeof module !== 'undefined') module.exports = XW;
   function orgPerson(o, p, opt) {
     opt = opt || {};
     var e = p.e, pu = p.u || o.u, src = avatarOf(e, pu.source === 'sample'), cls = 'op' + (p.st === 'maternity' ? ' mat' : '') + (p.prob ? ' prob' : '') + (p.st === 'left' ? ' left' : '') + (opt.head ? ' head' : '');
-    var tags = (p.isNew && p.st !== 'left' ? '<em class="op-new">Mới</em>' : '') + (p.kiemBgd ? '<em class="op-kiem">kiêm nhiệm</em>' : opt.kiem ? '<em class="op-kiem">kiêm</em>' : '');
-    var sub = (e['Chức danh công việc'] || e['Chức vụ'] || '') + (p.xco ? ' · ' + shortUnit(pu.name) : '');
+    var tags = (p.isNew && p.st !== 'left' ? '<em class="op-new">Mới</em>' : '') + (p.kiemBgd ? '<em class="op-kiem">' + (opt.head ? 'kiêm nhiệm' : 'kiêm') + '</em>' : opt.kiem ? '<em class="op-kiem">kiêm</em>' : '');
+    var sub = (p.cd || e['Chức danh công việc'] || e['Chức vụ'] || '') + (p.xco ? ' · ' + shortUnit(pu.name) : '');
     var stx = p.st === 'maternity' ? 'Nghỉ thai sản' : p.prob ? 'Thử việc' : p.st === 'left' ? 'Đã nghỉ ' + vn(e['Ngày nghỉ việc']) : '';
     return '<button type="button" class="' + cls + '" draggable="' + (p.st !== 'left') + '" data-op="' + esc(pu.id + '|' + p.id) + '" title="' + esc(e['Họ và tên'] + ' · ' + sub + (stx ? ' · ' + stx : '') + ' – bấm để mở hồ sơ, kéo sang phòng khác để chuyển') + '">' +
       '<span class="op-av">' + (src ? '<img src="' + src + '" alt="">' : esc(givenName(e['Họ và tên']).charAt(0).toUpperCase())) + '</span>' +
@@ -6340,7 +6466,7 @@ if (typeof module !== 'undefined') module.exports = XW;
   }
   function orgDept(o, x, f) {
     var fill = x.plan ? Math.min(100, Math.round(x.members.length / x.plan * 100)) : 100;
-    var others = x.members.filter(function (p) { return p !== x.head; }).concat(x.extra || []), nShow = x.nShow != null ? x.nShow : x.members.length;
+    var others = x.members.filter(function (p) { return p !== x.head; }).concat(x.extra || [], x.kn || []), nShow = x.nShow != null ? x.nShow : x.members.length;
     fill = x.plan ? Math.min(100, Math.round(nShow / x.plan * 100)) : 100;
     var isR = x === o.root;
     var h = '<div class="od' + (isR ? ' od-root' : '') + (x.vac ? ' has-vac' : '') + (x.notes.some(function (n) { return n[0] === 'warn'; }) ? ' has-warn' : '') + '" data-od="' + esc(o.u.id + '|' + x.name) + '">' +
@@ -6352,11 +6478,11 @@ if (typeof module !== 'undefined') module.exports = XW;
     else if (!isR) h += '<div class="od-lead"><button type="button" class="op op-empty op-hd" data-act="hd-pick" data-hd="' + esc(o.u.id + '|' + x.name) + '" title="Bấm để chọn, hoặc kéo một người vào ô này"><span class="op-av">?</span><span class="op-tx"><b>Trưởng bộ phận</b><small>Bấm chọn hoặc kéo người vào</small></span></button></div>';
     if (others.length || x.vac || (f.left && x.left.length)) {
       h += '<div class="od-m">' + others.map(function (p) { return orgPerson(o, p); }).join('');
-      for (var i = 0; i < Math.min(x.vac, 8); i++) h += '<span class="op op-vac"><span class="op-av">+</span><span class="op-tx"><b>Còn trống</b><small>Theo định biên</small></span></span>';
+      for (var i = 0; i < Math.min(x.vac, 8); i++) h += '<button type="button" class="op op-vac op-add" data-act="kn-pick" data-k="' + esc(o.u.id + '|' + x.name) + '" title="Bấm để chọn người trong toàn hệ thống (kiêm nhiệm)"><span class="op-av">+</span><span class="op-tx"><b>Còn trống</b><small>Bấm để chọn người</small></span></button>';
       if (f.left) h += x.left.map(function (p) { return orgPerson(o, p); }).join('');
       h += '</div>';
     }
-    if (isR) h += '<div class="od-m"><button type="button" class="op op-empty op-add" data-act="bgd-pick" data-u="' + o.u.id + '"><span class="op-av">+</span><span class="op-tx"><b>Thêm người</b><small>Chọn trong toàn hệ thống</small></span></button></div>';
+    if (x.plan === null || x.vac) h += '<div class="od-more"><button type="button" class="od-plus" data-act="kn-pick" data-k="' + esc(o.u.id + '|' + x.name) + '" title="Thêm người kiêm nhiệm – chọn trong toàn hệ thống">+ Thêm người</button></div>'; // 17/11 đợt 2: đủ định biên thì không hiện nút; còn trống / chưa đặt định biên thì nút nhỏ (ô Còn trống đang tuyển dụng thì bấm sang Tuyển dụng)
     h += '</div>' + (x.notes.length ? '<div class="od-notes">' + x.notes.map(function (n) { return '<span class="on-' + n[0] + '">' + esc(n[1]) + '</span>'; }).join('') + '</div>' : '') + '</div>';
     return h;
   }
@@ -6414,13 +6540,14 @@ if (typeof module !== 'undefined') module.exports = XW;
       el.addEventListener('dragend', function () { el.classList.remove('dragging'); $$('.od.drop').forEach(function (x) { x.classList.remove('drop'); }); });
     });
     $$('.od[data-od]').forEach(function (box) {
-      box.addEventListener('dragover', function (ev) { if (!drag) return; var t = box.getAttribute('data-od').split('|'); if (t[0] !== drag.split('|')[0] && !box.classList.contains('od-root')) return; ev.preventDefault(); box.classList.add('drop'); });
+      box.addEventListener('dragover', function (ev) { if (!drag) return; ev.preventDefault(); box.classList.add('drop'); });
       box.addEventListener('dragleave', function (ev) { if (!box.contains(ev.relatedTarget)) box.classList.remove('drop'); });
       box.addEventListener('drop', function (ev) {
         ev.preventDefault(); box.classList.remove('drop'); if (!drag) return;
         var t = box.getAttribute('data-od').split('|'), p = drag.split('|'); drag = null;
-        if (box.classList.contains('od-root')) { bgdAdd(unitById(t[0]), unitById(p[0]), p.slice(1).join('|')); return; } // 17/11: kéo vào Ban Giám đốc = thêm (kiêm nhiệm), không đổi phòng ban
-        if (t[0] !== p[0]) return; moveDept(unitById(p[0]), p[1], t.slice(1).join('|'));
+        if (box.classList.contains('od-root')) { knConfirm(unitById(t[0]), '', unitById(p[0]), p.slice(1).join('|')); return; } // 17/11: kéo vào Ban Giám đốc = thêm (kiêm nhiệm), không đổi phòng ban
+        if (t[0] !== p[0]) { knConfirm(unitById(t[0]), t.slice(1).join('|'), unitById(p[0]), p.slice(1).join('|')); return; } // 17/11 đợt 2: kéo sang công ty khác = kiêm nhiệm
+        moveDept(unitById(p[0]), p[1], t.slice(1).join('|'));
       });
     });
     $$('.op[data-op]').forEach(function (el) { el.addEventListener('click', function () { var p = el.getAttribute('data-op').split('|'); openProfile(p[0], p[1]); }); });
@@ -6809,8 +6936,8 @@ if (typeof module !== 'undefined') module.exports = XW;
     confirmBox('Đổi Mã NV ' + old + ' → ' + nw + '?', 'Mọi dữ liệu của người này đổi theo mã mới: hồ sơ, hợp đồng, chấm công, lương, đơn từ, hội nhập, đào tạo, tài sản, file đính kèm' + (srv ? ', dữ liệu trên máy chủ' : '') + '. ' + (ac && ac.st !== 'none' && ac.st !== 'off' ? 'Tài khoản app: nhân viên đăng nhập lại bằng mã ' + nw + ', mã PIN giữ nguyên. ' : '') + 'Mã ' + old + ' sẽ không được cấp lại cho người khác.' + (u.source === 'folder' ? ' File Excel gốc vẫn ghi mã cũ – lần quét lại phần mềm tự đổi theo mã mới; nên sửa cả file gốc.' : ''), 'Đổi mã', function () {
       var b = busy('Đang đổi mã ' + old + ' → ' + nw + '…');
       (srv ? wfCall(u, 'doi-ma', { cu: old, moi: nw }) : Promise.resolve({ ok: true })).then(function () {
-        ensureBase(u); var bgd0 = u.bgd; u.bgd = null; maDeep(u, old, nw, 0); u.bgd = bgd0;
-        maAllU().forEach(function (x) { (x.bgd || []).forEach(function (r) { if (r.u === u.id && r.id === old) r.id = nw; }); }); // Ban Giám đốc chọn chéo công ty
+        ensureBase(u); knOf(u); var kn0 = u.kn; u.kn = null; maDeep(u, old, nw, 0); u.kn = kn0;
+        maAllU().forEach(function (x) { knOf(x).forEach(function (r) { if (r.u === u.id && r.id === old) r.id = nw; }); }); // kiêm nhiệm chọn chéo công ty
         u.maCu = (u.maCu || []).concat([old]); u.maDoi = u.maDoi || {}; u.maDoi[old] = nw;
         Object.keys(S.done || {}).forEach(function (k) { var p = k.split('|'); if (p[0] !== u.id || p.indexOf(old) < 1) return; var nk = p.map(function (x, i) { return i > 0 && x === old ? nw : x; }).join('|'); S.done[nk] = S.done[k]; delete S.done[k]; });
         try { NDH.forEach(function (h) { if (h.uid === u.id) maDeep(h.diff, old, nw, 0); }); ndHistSave(); } catch (e) { }
@@ -9918,15 +10045,16 @@ if (typeof module !== 'undefined') module.exports = XW;
     if (fb.length) lockBar += '<div class="notice bad" style="margin:10px 0 0">' + ic('info') + '<div><b>' + fb.length + ' nhân viên báo sai công tháng ' + HR.ymLabel(f.m) + '</b> – kiểm tra ô công, sửa tay nếu sai (ghi lý do), rồi gửi lại công để nhân viên xác nhận:<ul style="margin:6px 0 0 18px;padding:0">' + fb.map(function (x) { return '<li style="margin:3px 0">' + personLink(x.u, x.id, x.name) + (isMulti() ? ' <span class="faint">· ' + esc(shortUnit(x.u.name)) + '</span>' : '') + (x.ph ? ': <i>"' + esc(x.ph) + '"</i>' : '') + (x.at ? ' <span class="faint">· ' + esc(x.at) + '</span>' : '') + ' <button class="btn btn-sm" data-act="al-cc" data-u="' + x.u.id + '" data-id="' + esc(x.id) + '" data-m="' + f.m + '">Xem dòng công</button></li>'; }).join('') + '</ul></div></div>';
     var src = res.some(function (r) { return r.hasFile; }) ? 'Dữ liệu chấm công đến ' + res.map(function (r) { return r.dataEnd ? HR.vnDate(r.dataEnd) : '–'; }).filter(function (x, i, a) { return a.indexOf(x) === i; }).join(', ') : 'Chưa có file chấm công tháng này – bảng chỉ hiện lịch làm việc, lễ tết, đơn nghỉ';
     var otMode = res.some(function (r) { return r.s.rule.otMode === 'confirm'; });
-    var utabs = '<div class="bc-tabs"><div class="seg bc-useg">' + uAll.map(function (x) { return '<button class="' + (x.id === u0.id ? 'on' : '') + '" data-act="bc-u" data-id="' + x.id + '">' + esc(shortUnit(x.name)) + '</button>'; }).join('') + '</div>' +
-      '<div class="bc-ktabs" role="tablist">' + [['vp', 'Khối văn phòng', 'giờ hành chính', NK.vp], ['sx', 'Khối sản xuất, vận hành', 'theo ca làm', NK.sx], ['all', 'Tất cả', '2 bảng tách riêng', NK.vp + NK.sx]].map(function (k) { return '<button role="tab" aria-selected="' + (f.k === k[0]) + '" class="' + (f.k === k[0] ? 'on' : '') + '" data-act="bc-k" data-id="' + k[0] + '"><b>' + k[1] + '</b><small>' + k[2] + ' · ' + k[3] + ' người</small></button>'; }).join('') + '</div></div>';
-    return pageHead('Tổng hợp công', 'Tự tính theo Thiết lập chấm công (<a href="#tlvp">khối văn phòng</a>, <a href="#tlsx">khối sản xuất</a>) · ' + esc(src)) + utabs +
-      '<div class="filters card card-pad">' + selectBox('bM', 'Tháng', ms.slice().reverse().map(function (m) { return [m, 'Tháng ' + HR.ymLabel(m)]; }), f.m) + searchBox('bQ', f.q) +
-      selectBox('bDept', 'Phòng ban', [['', 'Tất cả phòng ban']].concat(res[0].ppl.filter(function (p) { return bcInK(p, f.k); }).map(function (p) { return p.dept; }).filter(function (d, i, A) { return d && A.indexOf(d) === i; }).map(function (d) { return [d, d]; })), f.dept) +
-      '<div class="field"><label>Báo cáo</label><div class="seg">' + [['grid', 'Bảng công'], ['sum', 'Tổng hợp'], ['late', 'Đi muộn' + (T.late ? ' (' + T.late + ')' : '')], ['ot', 'Tăng ca' + (T.otWait ? ' (' + ccNum(T.otWait) + 'h chờ)' : '')], ['issue', 'Cần xử lý' + (T.issues ? ' (' + T.issues + ')' : '')], ['xm', 'Đi muộn, về sớm'], ['log', 'Nhật ký sửa']].map(function (v) { return '<button class="' + (f.view === v[0] ? 'on' : '') + '" data-act="bc-view" data-id="' + v[0] + '">' + v[1] + '</button>'; }).join('') + '</div></div></div>' +
-      lockBar +
-      '<div class="mini-kpis big"><div><span>Số người</span><b>' + T.n + '</b></div><div><span>Ngày công</span><b>' + bcNum(T.work) + '</b></div><div><span>Nghỉ hưởng lương (phép, lễ)</span><b>' + bcNum(T.paid) + '</b></div><div><span>Tăng ca được tính</span><b>' + (T.ot ? bcNum(T.ot) : 0) + ' giờ</b></div>' + (T.hours ? '<div><span>Giờ làm (tính lương theo giờ)</span><b>' + bcNum(T.hours) + ' giờ</b></div>' : '') + (T.night ? '<div><span>Giờ làm đêm</span><b>' + bcNum(T.night) + ' giờ</b></div>' : '') +
-      (otMode || T.otWait ? '<div class="' + (T.otWait ? 'k-warn' : '') + '"><span>Tăng ca chờ xác nhận</span><b>' + (T.otWait ? bcNum(T.otWait) : 0) + ' giờ</b></div>' : '') + '<div class="' + (T.issues ? 'k-bad' : '') + '"><span>Ô cần xử lý</span><b>' + T.issues + '</b></div><div><span>Ô sửa tay</span><b>' + T.manual + '</b></div></div>' +
+    // 17/11 đợt 2 (anh góp ý ảnh 6): gom bộ lọc thành 1 thanh gọn, báo cáo thành hàng tab, số liệu thành dải nhỏ – bảng công lên gần đầu trang
+    var useg = uAll.length > 1 ? '<div class="seg">' + uAll.map(function (x) { return '<button class="' + (x.id === u0.id ? 'on' : '') + '" data-act="bc-u" data-id="' + x.id + '">' + esc(shortUnit(x.name)) + '</button>'; }).join('') + '</div>' : '';
+    var kseg = '<div class="seg bc-kseg" role="tablist" title="Khối văn phòng: giờ hành chính · Khối sản xuất, vận hành: theo ca làm · Tất cả: 2 bảng tách riêng">' + [['vp', 'Văn phòng', NK.vp], ['sx', 'Sản xuất, vận hành', NK.sx], ['all', 'Tất cả', NK.vp + NK.sx]].map(function (k) { return '<button role="tab" aria-selected="' + (f.k === k[0]) + '" class="' + (f.k === k[0] ? 'on' : '') + '" data-act="bc-k" data-id="' + k[0] + '">' + k[1] + ' <small>' + k[2] + '</small></button>'; }).join('') + '</div>';
+    var tool = '<div class="bc-tool card">' + (useg ? '<div class="bc-trow">' + useg + '</div>' : '') +
+      '<div class="bc-trow bc-tf">' + '<div class="field"><label>Khối</label>' + kseg + '</div>' + selectBox('bM', 'Tháng', ms.slice().reverse().map(function (m) { return [m, 'Tháng ' + HR.ymLabel(m)]; }), f.m) +
+      selectBox('bDept', 'Phòng ban', [['', 'Tất cả phòng ban']].concat(res[0].ppl.filter(function (p) { return bcInK(p, f.k); }).map(function (p) { return p.dept; }).filter(function (d, i, A) { return d && A.indexOf(d) === i; }).map(function (d) { return [d, d]; })), f.dept) + searchBox('bQ', f.q) + '</div></div>';
+    var vtabs = '<div class="bc-vt" role="tablist">' + [['grid', 'Bảng công'], ['sum', 'Tổng hợp'], ['late', 'Đi muộn' + (T.late ? ' (' + T.late + ')' : '')], ['ot', 'Tăng ca' + (T.otWait ? ' (' + ccNum(T.otWait) + 'h chờ)' : '')], ['issue', 'Cần xử lý' + (T.issues ? ' (' + T.issues + ')' : '')], ['xm', 'Đi muộn, về sớm'], ['log', 'Nhật ký sửa']].map(function (v) { return '<button role="tab" aria-selected="' + (f.view === v[0]) + '" class="' + (f.view === v[0] ? 'on' : '') + (v[0] === 'issue' && T.issues ? ' bad' : '') + '" data-act="bc-view" data-id="' + v[0] + '">' + v[1] + '</button>'; }).join('') + '</div>';
+    var kpi = '<div class="bc-kp"><span>Số người <b>' + T.n + '</b></span><span>Ngày công <b>' + bcNum(T.work) + '</b></span><span>Nghỉ hưởng lương (phép, lễ) <b>' + bcNum(T.paid) + '</b></span><span>Tăng ca được tính <b>' + (T.ot ? bcNum(T.ot) : 0) + ' giờ</b></span>' + (T.hours ? '<span>Giờ làm (tính lương theo giờ) <b>' + bcNum(T.hours) + ' giờ</b></span>' : '') + (T.night ? '<span>Giờ làm đêm <b>' + bcNum(T.night) + ' giờ</b></span>' : '') +
+      (otMode || T.otWait ? '<span class="' + (T.otWait ? 'k-warn' : '') + '">Tăng ca chờ xác nhận <b>' + (T.otWait ? bcNum(T.otWait) : 0) + ' giờ</b></span>' : '') + '<span class="' + (T.issues ? 'k-bad' : '') + '">Ô cần xử lý <b>' + T.issues + '</b></span><span>Ô sửa tay <b>' + T.manual + '</b></span></div>';
+    return pageHead('Tổng hợp công', 'Tự tính theo Thiết lập chấm công (<a href="#tlvp">khối văn phòng</a>, <a href="#tlsx">khối sản xuất</a>) · ' + esc(src)) + tool + lockBar + vtabs + kpi +
       '<div id="bArea"></div>';
   };
   ACTS['bc-view'] = function (a, id) { PS.bc.view = id; render(); };
@@ -13083,7 +13211,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     });
     $('#pkGo', m).onclick = function () {
       var c = cur(), list = ids(), btn = this; if (!list.length) return;
-      if (mail) { S0.mail = { sub: c.sub, body: c.body }; lgSave(u, 'mẫu email phiếu lương'); modal('Gửi email phiếu lương', '', '<div class="pl-mail"><p>Chưa thiết lập gửi email tự động. Anh/chị sẽ thiết lập tại phần <b>Cài đặt</b> khi bản hoàn thiện phát hành.</p><p class="faint" style="font-size:13px">Đã lưu tiêu đề, nội dung email vừa soạn để dùng cho lần sau (' + list.length + ' người được chọn).</p><div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" data-close>Đã hiểu</button></div></div>', true); return; }
+      if (mail) { S0.mail = { sub: c.sub, body: c.body }; lgSave(u, 'mẫu email phiếu lương'); modal('Gửi email phiếu lương', '', '<div class="pl-mail"><p>Gửi phiếu lương qua email đang hoàn thiện, sẽ có ở bản sau (dùng chung thiết lập <b>Cài đặt → Gửi email tự động</b>).</p><p class="faint" style="font-size:13px">Đã lưu tiêu đề, nội dung email vừa soạn để dùng cho lần sau (' + list.length + ' người được chọn).</p><div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" data-close>Đã hiểu</button></div></div>', true); return; }
       S0.app = c.body; btn.disabled = true; P.sentIso = HR.isoToday();
       var pay = list.map(function (r) { var d = plData(u, ym, r, L); d.loi_nhan = plFill(c.body, plVars(u, ym, r, L)).trim(); return { ma: r.id, du_lieu: d }; });
       plCall(u, 'phieu', { ym: ym, chot: L.at, nguoi: ccUser(), list: pay }).then(function () {
@@ -14909,11 +15037,13 @@ if (typeof module !== 'undefined') module.exports = XW;
     var btns = '<button class="btn btn-primary" id="' + p + 'M"' + (c.email ? '' : ' disabled title="Ứng viên chưa có email"') + '>' + ic('td_mail', 15) + 'Gửi qua email</button><button class="btn" id="' + p + 'C">' + ic('td_copy', 15) + 'Sao chép gửi Zalo / SMS</button><button class="btn" id="' + p + 'P">' + ic('td_print', 15) + 'In / lưu PDF</button>';
     var w = warn.length ? '<div class="notice warn" style="margin-bottom:12px">' + ic('info') + '<div>' + warn.map(esc).join('<br>') + '</div></div>' : '';
     var sent = last ? '<div class="td-sentnote">' + ic('check', 14) + 'Đã gửi ' + TD_LT[t].toLowerCase() + ' ' + tdVnAt(last.at) + (last.ch ? ' · ' + esc(last.ch) : '') + ' – gửi lại nếu cần</div>' : '';
-    if (inline) return w + sent + '<div class="field"><label for="' + p + 'S">Tiêu đề</label><input class="input" id="' + p + 'S" value="' + esc(subj) + '"></div><div class="field"><label for="' + p + 'B">Nội dung thư (sửa trực tiếp được)</label><textarea class="input td-ltb" id="' + p + 'B">' + esc(body) + '</textarea></div><div class="td-lsend">' + btns + '</div><p class="muted" style="font-size:12px;margin:8px 0 0">Gửi email tự động sẽ thiết lập ở Cài đặt khi bản hoàn thiện phát hành. Hiện có thể sao chép gửi Zalo / SMS hoặc in; mỗi lần gửi được ghi vào lịch sử ứng viên.</p>';
+    if (inline) return w + sent + '<div class="field"><label for="' + p + 'S">Tiêu đề</label><input class="input" id="' + p + 'S" value="' + esc(subj) + '"></div><div class="field"><label for="' + p + 'B">Nội dung thư (sửa trực tiếp được)</label><textarea class="input td-ltb" id="' + p + 'B">' + esc(body) + '</textarea></div><div class="td-lsend">' + btns + '</div><p class="muted" style="font-size:12px;margin:8px 0 0">' + tdMailNote() + '</p>';
     return w + sent + '<div class="td-letter"><div><div class="field"><label for="' + p + 'S">Tiêu đề</label><input class="input" id="' + p + 'S" value="' + esc(subj) + '"></div><div class="field"><label for="' + p + 'B">Nội dung (sửa trực tiếp được)</label><textarea class="input td-ltb" id="' + p + 'B" style="width:100%">' + esc(body) + '</textarea></div></div>' +
-      '<div><div class="td-sec"><h3>Gửi thư</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">Gửi email tự động sẽ thiết lập ở Cài đặt khi bản hoàn thiện phát hành. Hiện có thể sao chép gửi Zalo / SMS hoặc in; mỗi lần gửi được ghi vào lịch sử ứng viên.</p><div class="link-row" style="flex-direction:column;align-items:stretch;gap:8px;margin:0">' + btns + '</div></div>' +
+      '<div><div class="td-sec"><h3>Gửi thư</h3><p class="muted" style="font-size:12.5px;margin:0 0 10px">' + tdMailNote() + '</p><div class="link-row" style="flex-direction:column;align-items:stretch;gap:8px;margin:0">' + btns + '</div></div>' +
       '<div class="td-sec"><h3>Mẫu thư</h3><p class="muted" style="font-size:12.5px;margin:0">Sửa mẫu dùng chung ở Tuyển dụng → Kết quả phỏng vấn → Biểu mẫu thư.</p></div></div></div>';
   }
+  // 17/11 đợt 2: gửi email tự động qua Resend (bản đầy đủ, thiết lập ở Cài đặt)
+  function tdMailNote() { return typeof SV !== 'undefined' && SV ? 'Gửi qua email: phần mềm gửi thật bằng email công ty (thiết lập ở Cài đặt → Gửi email tự động). Có thể sao chép gửi Zalo / SMS hoặc in; mỗi lần gửi được ghi vào lịch sử ứng viên.' : 'Gửi email tự động có ở bản đầy đủ. Bản này sao chép gửi Zalo / SMS hoặc in được; mỗi lần gửi được ghi vào lịch sử ứng viên.'; }
   function tdLetterBind(root, u, c, t, p, cb) {
     function mark(ch) {
       (c.letters = c.letters || []).push({ t: t, at: tdNow(), ch: ch }); tdHist(c, 'Gửi ' + TD_LT[t].toLowerCase() + ' – ' + ch);
@@ -14923,8 +15053,8 @@ if (typeof module !== 'undefined') module.exports = XW;
       tdSave(u, 'Gửi ' + TD_LT[t] + ' cho ' + c.id + ' (' + ch + ')'); cb && cb();
     }
     var S = $('#' + p + 'S', root), B = $('#' + p + 'B', root);
-    // 11/11 16:29 anh: giai đoạn này bấm Gửi qua email báo giống nút gửi email ở Phiếu lương – chưa gửi thật, không ghi là đã gửi
-    $('#' + p + 'M', root).addEventListener('click', function () { var c0 = tdOf(u).cfg; c0.lastMail = { t: t, s: S.value }; saveUnits(); modal('Gửi ' + TD_LT[t].toLowerCase() + ' qua email', c.name + (c.email ? ' · ' + c.email : ''), '<div class="pl-mail"><p>Chưa thiết lập gửi email tự động. Anh/chị sẽ thiết lập tại phần <b>Cài đặt</b> khi bản hoàn thiện phát hành.</p><p class="faint" style="font-size:13px">Thư chưa được gửi đi. Trong lúc chờ, có thể bấm <b>Sao chép gửi Zalo / SMS</b> hoặc <b>In / lưu PDF</b> – phần mềm ghi lại vào lịch sử ứng viên.</p><div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" data-close>Đã hiểu</button></div></div>', true); });
+    // 17/11 đợt 2: Gửi qua email = gửi thật qua Resend (bản đầy đủ); chưa thiết lập thì hướng dẫn sang Cài đặt, không ghi là đã gửi
+    $('#' + p + 'M', root).addEventListener('click', function () { var c0 = tdOf(u).cfg; c0.lastMail = { t: t, s: S.value }; saveUnits(); if (!c.email) { toast('Ứng viên chưa có email', 'err'); return; } mailSendUi(c.email, S.value, B.value, function () { mark('Email'); }); });
     $('#' + p + 'C', root).addEventListener('click', function () { tdCopy(B.value, 'nội dung thư'); mark('Zalo / SMS'); });
     $('#' + p + 'P', root).addEventListener('click', function () {
       var cf = tdOf(u).cfg, w = window.open('', '_blank'); if (!w) { toast('Trình duyệt chặn cửa sổ mới', 'err', 'Cho phép cửa sổ bật lên rồi bấm lại.'); return; }
@@ -19672,7 +19802,7 @@ if (typeof module !== 'undefined') module.exports = XW;
   function pqChip() {
     var tools = $('.top-tools'); if (!tools) return; var el = $('#pqChip'), c = pqCtx();
     if (!c || c.none) { if (el) el.remove(); return; }
-    if (!el) { el = document.createElement('button'); el.id = 'pqChip'; el.type = 'button'; el.className = 'chip pq-chip'; el.setAttribute('data-act', 'pq-me'); el.title = 'Tài khoản đang dùng'; tools.parentNode.insertBefore(el, tools); }
+    if (!el) { el = document.createElement('button'); el.id = 'pqChip'; el.type = 'button'; el.className = 'chip pq-chip'; el.setAttribute('data-act', 'pq-me'); el.title = 'Tài khoản đang dùng'; tools.parentNode.insertBefore(el, tools); } // 17/11 đợt 2: tài khoản cùng dòng với các nút công cụ (dòng 2, căn phải)
     var nm = c.pv ? 'Xem thử' : c.name, w = String(nm).replace(/\([^)]*\)/g, '').trim().split(/\s+/), ini = (w.length > 1 ? w[w.length - 2].charAt(0) + w[w.length - 1].charAt(0) : nm.slice(0, 2)).toUpperCase();
     el.innerHTML = '<span class="pq-av">' + esc(ini) + '</span><span class="pq-nm"><b>' + esc(nm) + '</b><i>' + esc(c.role.t) + '</i></span>';
   }
@@ -21416,10 +21546,10 @@ var cur = ndSnap(u), out = cur, sd = { n: 0, kept: 0 };
   /* ---------- Trạng thái lưu (góc trên, cạnh tên tài khoản) ---------- */
   function svState(st, err) { if (!SV) return; SV.st = st; if (err) SV.err = err; svChip(); }
   function svChip() {
-    var tools = $('.top-tools'); if (!SV || !SV.me || !tools) return; var el = $('#svSt');
-    if (!el) { el = document.createElement('button'); el.id = 'svSt'; el.type = 'button'; el.className = 'chip sv-st'; el.setAttribute('data-act', 'sv-st'); tools.parentNode.insertBefore(el, tools); }
+    var tools = $('.top-tools'), slot = $('#tbNote'); if (!SV || !SV.me || !tools) return; var el = $('#svSt'), cls = slot ? 'sv-note' : 'chip sv-st'; // 17/11 đợt 2: thành dòng ghi chú nhỏ dưới thanh công cụ, không khung
+    if (!el) { el = document.createElement('button'); el.id = 'svSt'; el.type = 'button'; el.className = cls; el.setAttribute('data-act', 'sv-st'); if (slot) slot.appendChild(el); else tools.parentNode.insertBefore(el, tools); }
     var t = SV.st === 'busy' ? ['busy', 'Đang lưu lên máy chủ…'] : SV.st === 'err' ? ['err', 'Chưa lưu được – bấm để thử lại'] : SV.st === 'conflict' ? ['err', 'Có xung đột dữ liệu'] : ['ok', SV.at ? 'Đã lưu lên máy chủ ' + svWhen(SV.at).slice(0, 5) : 'Dữ liệu trên máy chủ'];
-    el.className = 'chip sv-st ' + t[0]; el.title = SV.err && t[0] === 'err' ? SV.err : 'Dữ liệu của phần mềm lưu trên máy chủ của đơn vị'; el.innerHTML = '<i></i><span>' + esc(t[1]) + '</span>';
+    el.className = cls + ' ' + t[0]; el.title = SV.err && t[0] === 'err' ? SV.err : 'Dữ liệu của phần mềm lưu trên máy chủ của đơn vị'; el.innerHTML = '<i></i><span>' + esc(t[1]) + '</span>';
     var bar = $('#svNew');
     if (SV.newer && !Object.keys(SV.pend).length) { if (!bar) { bar = document.createElement('div'); bar.id = 'svNew'; bar.className = 'sv-new'; document.body.appendChild(bar); } bar.innerHTML = ic('info', 16) + '<span><b>' + esc(SV.newer.nguoi || 'Người khác') + '</b> vừa cập nhật dữ liệu lúc ' + svWhen(SV.newer.at).slice(0, 5) + '.</span><button class="btn btn-sm btn-primary" data-act="sv-reload">Tải dữ liệu mới</button>'; }
     else if (bar) bar.remove();
@@ -21581,6 +21711,72 @@ var cur = ndSnap(u), out = cur, sd = { n: 0, kept: 0 };
     // 17/11/2026: chỉ tự nối công ty đầu tiên; công ty thêm sau chọn ở trang Chấm công Wi‑Fi: dùng chung máy chủ này hoặc máy chủ riêng
     var ch = false; if (!S.units.some(function (u) { return u.wf && u.wf.url; }) && S.units[0]) { var u0 = S.units[0]; u0.wf = Object.assign(u0.wf || {}, { url: location.origin, key: 'phien', since: Date.now() }); ch = true; }
     if (ch) { saveUnits(); log('Máy chủ: các công ty tự nối với ứng dụng nhân viên trên máy chủ này'); }
+  }
+
+  /* ===== 17/11/2026 đợt 2 (anh duyệt): GỬI EMAIL TỰ ĐỘNG QUA RESEND =====
+     Khóa API lưu trên máy chủ riêng của đơn vị (bảng cfg), chỉ Quản trị hệ thống thiết lập; trình duyệt chỉ thấy dạng che re_…abcd.
+     Máy chủ gửi thư (/api/qt/email-gui). Bản rút gọn (chạy trên trình duyệt) không có – không giữ khóa an toàn được. */
+  var MAIL = { st: '', cfg: null, err: '' };
+  function mailLoad(force) {
+    if (!SV) return Promise.resolve(null);
+    if (MAIL.cfg && !force) return Promise.resolve(MAIL.cfg);
+    MAIL.st = 'load';
+    return svApi('email-cfg').then(function (j) { MAIL.st = ''; if (j.ok) { MAIL.cfg = j; MAIL.err = ''; } else MAIL.err = j.loi || 'Chưa đọc được thiết lập email.'; mailDraw(); return MAIL.cfg; });
+  }
+  function mailOn() { return !!(SV && MAIL.cfg && MAIL.cfg.on); }
+  function mailGuide() {
+    return '<details class="ml-guide"' + (MAIL.cfg && MAIL.cfg.on ? '' : ' open') + '><summary>Hướng dẫn nhanh – 5 bước, khoảng 15 phút</summary><ol>' +
+      '<li><b>Tạo tài khoản Resend</b> tại <a href="https://resend.com/signup" target="_blank" rel="noopener">resend.com</a> bằng email công ty. Gói miễn phí gửi được khoảng 100 thư/ngày, 3.000 thư/tháng cho 1 tên miền <span class="faint">(theo trang giá của Resend – xem lại tại resend.com/pricing)</span>.</li>' +
+      '<li><b>Xác minh tên miền công ty</b>: Domains → Add Domain → nhập tên miền (VD: tencongty.vn). Resend đưa ra vài bản ghi DNS – thêm đúng các bản ghi đó ở nơi quản lý tên miền (VD Cloudflare → DNS → Add record). Chờ tên miền chuyển sang <b>Verified</b> (thường vài phút, có khi đến 1–2 ngày).</li>' +
+      '<li><b>Tạo khóa API</b>: API Keys → Create API Key → quyền <b>Sending access</b> → sao chép khóa bắt đầu bằng <span class="mono">re_</span> (khóa chỉ hiện 1 lần).</li>' +
+      '<li><b>Dán vào ô bên dưới</b>: khóa API, email gửi đi thuộc tên miền vừa xác minh (VD: tuyendung@tencongty.vn), tên hiển thị, email nhận thư trả lời → bấm <b>Lưu</b>.</li>' +
+      '<li><b>Gửi thử</b> đến email của anh/chị. Nhận được thư là xong – nút <b>Gửi qua email</b> ở Tuyển dụng sẽ gửi thật.</li></ol>' +
+      '<p class="faint" style="font-size:12px;margin:6px 0 0">Khóa lưu trên máy chủ riêng của đơn vị, không gửi ra trình duyệt; chỉ tài khoản Quản trị hệ thống thiết lập được. Muốn đổi khóa: tạo khóa mới ở Resend, dán vào, Lưu, rồi xóa khóa cũ trên Resend.</p></details>';
+  }
+  function mailCardHtml() {
+    var h = '<div class="card card-pad ml-card" id="mailCard"><div class="card-head"><div><h3>Gửi email tự động</h3><p>Gửi thư cho ứng viên (mời phỏng vấn, mời nhận việc, thông báo kết quả…) thẳng từ phần mềm, bằng địa chỉ email công ty, qua dịch vụ Resend.</p></div></div>';
+    if (!SV) return h + '<div class="notice"><span class="fo-tag" style="margin:0">Có ở bản đầy đủ</span><div style="font-size:13px">Bản này chạy trên trình duyệt nên không giữ khóa gửi thư an toàn được. Bản đầy đủ (máy chủ riêng của đơn vị) gửi email tự động; ở đây vẫn sao chép thư gửi Zalo / SMS hoặc in được.</div></div></div>';
+    if (!MAIL.cfg && !MAIL.err) { setTimeout(function () { mailLoad(); }, 0); return h + '<p class="muted" id="mlBody">Đang đọc thiết lập…</p></div>'; }
+    return h + '<div id="mlBody">' + mailBody() + '</div></div>';
+  }
+  function mailBody() {
+    if (MAIL.err && !MAIL.cfg) return '<div class="notice warn">' + ic('info') + '<div>' + esc(MAIL.err) + ' <button class="btn btn-sm" data-act="ml-reload">Thử lại</button></div></div>';
+    var c = MAIL.cfg || {}, adm = !!c.admin;
+    var stt = c.on ? '<div class="ml-st on">' + ic('check', 15) + '<span>Đang bật – gửi từ <b>' + esc(c.name ? c.name + ' <' + c.from + '>' : c.from) + '</b>' + (c.reply ? ' · thư trả lời về ' + esc(c.reply) : '') + '</span></div>' : '<div class="ml-st">' + ic('info', 15) + '<span>Chưa thiết lập – nút Gửi qua email ở Tuyển dụng chưa gửi được.</span></div>';
+    if (!adm) return stt + '<p class="faint" style="font-size:12.5px;margin:8px 0 0">Chỉ tài khoản Quản trị hệ thống thiết lập được phần này.</p>';
+    return stt + mailGuide() + '<div class="form-grid ml-form">' +
+      '<div class="field"><label for="mlKey">Khóa API Resend' + (c.key ? ' <span class="faint">(đang dùng ' + esc(c.key) + ')</span>' : '') + '</label><input class="input mono" id="mlKey" type="password" autocomplete="off" placeholder="' + (c.key ? 'Để trống nếu giữ khóa hiện tại' : 're_…') + '"></div>' +
+      '<div class="field"><label for="mlFrom">Email gửi đi</label><input class="input" id="mlFrom" type="email" value="' + esc(c.from || '') + '" placeholder="tuyendung@tencongty.vn"></div>' +
+      '<div class="field"><label for="mlName">Tên hiển thị</label><input class="input" id="mlName" value="' + esc(c.name || '') + '" placeholder="VD: Phòng Nhân sự – Công ty ABC"></div>' +
+      '<div class="field"><label for="mlRep">Email nhận thư trả lời <span class="faint">(không bắt buộc)</span></label><input class="input" id="mlRep" type="email" value="' + esc(c.reply || '') + '" placeholder="nhansu@tencongty.vn"></div></div>' +
+      '<div class="link-row ml-btns"><button class="btn btn-sm btn-primary" data-act="ml-save">Lưu</button>' + (c.on ? '<span class="ml-test"><input class="input" id="mlTo" type="email" placeholder="Email nhận thư thử"><button class="btn btn-sm" data-act="ml-test">Gửi thử</button></span><button class="btn btn-sm btn-danger-ghost" data-act="ml-off">Tắt gửi email</button>' : '') + '</div>';
+  }
+  function mailDraw() { var b = $('#mlBody'); if (b) b.outerHTML = '<div id="mlBody">' + mailBody() + '</div>'; }
+  ACTS['ml-reload'] = function () { MAIL.err = ''; mailLoad(true); };
+  ACTS['ml-save'] = function () {
+    var body = { key: $('#mlKey').value.trim(), from: $('#mlFrom').value.trim(), name: $('#mlName').value.trim(), reply: $('#mlRep').value.trim() };
+    var b = busy('Đang lưu thiết lập email…');
+    svApi('email-cfg', body).then(function (j) { b.done(); if (!j.ok) { toast('Chưa lưu được', 'err', j.loi || ''); return; } log('Cài đặt: lưu thiết lập gửi email tự động (' + body.from + ')'); toast('Đã lưu thiết lập email', 'ok', 'Bấm Gửi thử để kiểm tra.'); mailLoad(true); });
+  };
+  ACTS['ml-off'] = function () { confirmBox('Tắt gửi email tự động?', 'Xóa khóa API và email gửi đi trên máy chủ. Nút Gửi qua email ở Tuyển dụng sẽ không gửi được cho đến khi thiết lập lại.', 'Tắt', function () { svApi('email-cfg', { xoa: 1 }).then(function (j) { if (!j.ok) { toast('Chưa tắt được', 'err', j.loi || ''); return; } log('Cài đặt: tắt gửi email tự động'); toast('Đã tắt gửi email tự động', 'ok'); mailLoad(true); }); }); };
+  ACTS['ml-test'] = function () {
+    var to = $('#mlTo').value.trim(); if (!to) { toast('Nhập email nhận thư thử', 'err'); return; }
+    var b = busy('Đang gửi thư thử…');
+    mailSend(to, 'Thư thử – gửi email tự động từ Phần mềm quản lý nhân sự', 'Xin chào,\n\nĐây là thư thử từ Phần mềm quản lý nhân sự. Nhận được thư này nghĩa là thiết lập gửi email tự động đã hoạt động.\n\nTrân trọng.').then(function (j) { b.done(); if (j.ok) toast('Đã gửi thư thử đến ' + to, 'ok', 'Kiểm tra hộp thư (cả mục Spam / Quảng cáo).'); else toast('Chưa gửi được', 'err', j.loi || ''); });
+  };
+  function mailSend(to, subject, text) { return SV ? svApi('email-gui', { to: to, subject: subject, text: text }) : Promise.resolve({ ok: false, loi: 'Gửi email tự động có ở bản đầy đủ.' }); }
+  // Gọi từ Tuyển dụng: gửi thật nếu đã thiết lập; chưa thì báo cách thiết lập
+  function mailSendUi(to, subject, text, okFn) {
+    if (!SV) { modal('Gửi email tự động có ở bản đầy đủ', '', '<p>Bản này chạy trên trình duyệt nên không gửi email trực tiếp được. Bấm <b>Sao chép gửi Zalo / SMS</b> hoặc <b>In / lưu PDF</b> – phần mềm ghi lại vào lịch sử ứng viên.</p><div style="display:flex;justify-content:flex-end"><button class="btn btn-primary" data-close>Đã hiểu</button></div>', true); return; }
+    mailLoad().then(function (c) {
+      if (!c || !c.on) {
+        var m = modal('Chưa thiết lập gửi email tự động', '', '<p>Thư chưa được gửi. ' + (c && c.admin ? 'Thiết lập một lần ở <b>Cài đặt → Gửi email tự động</b> (có hướng dẫn 5 bước), sau đó bấm gửi lại.' : 'Nhờ tài khoản Quản trị hệ thống thiết lập ở <b>Cài đặt → Gửi email tự động</b>.') + '</p><div class="link-row" style="justify-content:flex-end;margin-top:12px"><button class="btn" data-close>Để sau</button>' + (c && c.admin ? '<button class="btn btn-primary" id="mlGo">Mở Cài đặt</button>' : '') + '</div>', true);
+        var g = $('#mlGo', m); if (g) g.addEventListener('click', function () { m.close(); $$('.modal-bg').forEach(function (x) { x.remove(); }); go('caidat'); setTimeout(function () { var el = $('#mailCard'); if (el) el.scrollIntoView({ block: 'start' }); }, 300); });
+        return;
+      }
+      var b = busy('Đang gửi email đến ' + to + '…');
+      mailSend(to, subject, text).then(function (j) { b.done(); if (j.ok) { toast('Đã gửi email đến ' + to, 'ok'); okFn && okFn(); } else toast('Chưa gửi được email', 'err', j.loi || ''); });
+    });
   }
 
 

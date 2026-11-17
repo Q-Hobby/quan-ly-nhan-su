@@ -994,6 +994,35 @@ async function api(req, env, url) {
       if (await checkPw(moi, nv.mk_salt, nv.mk)) return bad('Mật khẩu mới cần khác mật khẩu đang dùng.');
       const salt = randHex(16); await db.prepare('UPDATE nv SET mk = ?, mk_salt = ?, mk_doi = NULL WHERE ma = ?').bind(await hashPw(moi, salt), salt, U.ma).run(); return json({ ok: true });
     }
+    // 17/11/2026 đợt 2 (anh duyệt): GỬI EMAIL TỰ ĐỘNG QUA RESEND – khóa API lưu trong cfg (chỉ Quản trị hệ thống thiết lập, trả về dạng che), gửi từ máy chủ, không lộ khóa ra trình duyệt
+    if (r === 'email-cfg') {
+      if (req.method === 'POST') {
+        if (!U.sys) return bad('Chỉ tài khoản Quản trị hệ thống được thiết lập gửi email.', 403);
+        if (body.xoa) { await setCfg(db, { mail_key: '', mail_from: '', mail_name: '', mail_reply: '' }); return json({ ok: true }); }
+        const o = {}, k = String(body.key || '').trim();
+        if (k) { if (!/^re_[A-Za-z0-9_]{8,}$/.test(k)) return bad('Khóa API Resend chưa đúng – khóa bắt đầu bằng re_ (tạo ở resend.com → API Keys).'); o.mail_key = k; }
+        if (!k && !cfg.mail_key) return bad('Chưa nhập khóa API Resend.');
+        const from = String(body.from || '').trim().toLowerCase(); if (!/^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i.test(from)) return bad('Email gửi đi chưa đúng (VD: tuyendung@tencongty.vn).');
+        const rep = String(body.reply || '').trim().toLowerCase(); if (rep && !/^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i.test(rep)) return bad('Email nhận phản hồi chưa đúng.');
+        o.mail_from = from; o.mail_name = String(body.name || '').trim().replace(/[<>"\r\n]/g, '').slice(0, 80); o.mail_reply = rep;
+        await setCfg(db, o); return json({ ok: true });
+      }
+      return json({ ok: true, on: !!(cfg.mail_key && cfg.mail_from), key: cfg.mail_key ? 're_…' + String(cfg.mail_key).slice(-4) : '', from: cfg.mail_from || '', name: cfg.mail_name || '', reply: cfg.mail_reply || '', admin: !!U.sys });
+    }
+    if (r === 'email-gui' && req.method === 'POST') {
+      if (!cfg.mail_key || !cfg.mail_from) return bad('Chưa thiết lập gửi email tự động. Vào Cài đặt → Gửi email tự động.');
+      const to = String(body.to || '').trim(); if (!/^[^\s@<>,;"]+@[^\s@<>,;"]+\.[a-z]{2,}$/i.test(to)) return bad('Email người nhận chưa đúng.');
+      const subject = String(body.subject || '').replace(/[\r\n]+/g, ' ').trim().slice(0, 250), text = String(body.text || '').slice(0, 50000);
+      if (!subject || !text.trim()) return bad('Thiếu tiêu đề hoặc nội dung thư.');
+      const h = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const msg = { from: cfg.mail_name ? cfg.mail_name + ' <' + cfg.mail_from + '>' : cfg.mail_from, to: [to], subject, text, html: '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:#1f2a1c;white-space:pre-wrap">' + h(text) + '</div>' };
+      if (cfg.mail_reply) msg.reply_to = cfg.mail_reply;
+      let rs, j = {};
+      try { rs = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { authorization: 'Bearer ' + cfg.mail_key, 'content-type': 'application/json' }, body: JSON.stringify(msg) }); j = await rs.json().catch(() => ({})); }
+      catch (e) { return bad('Không kết nối được Resend. Thử lại sau ít phút.', 502); }
+      if (!rs.ok) return bad('Resend chưa gửi được: ' + String(j.message || j.name || ('mã ' + rs.status)).slice(0, 300), 502);
+      return json({ ok: true, id: j.id || '' });
+    }
     if (r === 'du-lieu') return json({ ok: true, now, list: (await db.prepare('SELECT k, ver, at, nguoi, z, meta, size FROM qt_kv ORDER BY k').all()).results.map(x => ({ ...x, meta: x.meta ? JSON.parse(x.meta) : null })) });
     if (r === 'kv' && req.method === 'GET') {
       const k = String(url.searchParams.get('k') || ''); const row = await db.prepare('SELECT k, ver, at, nguoi, n, z FROM qt_kv WHERE k = ?').bind(k).first(); if (!row) return bad('Chưa có dữ liệu này trên máy chủ.', 404);
@@ -1484,7 +1513,7 @@ async function api(req, env, url) {
       const tb = {}; ph.results.forEach(x => { (tb[x.ma] = tb[x.ma] || []).push(x.tb + ' (' + fmtShort(x.last) + ')'); });
       const ips = await officeIPs(db, cfg, now);
       const may_chung = await sharedDevices(db);
-      const { ql_pin, ql_salt, qr_secret, ql_fail, ql_lock, schema_v, sync_key, vapid_jwk, ...pub } = cfg; pub.ket_noi = !!sync_key;
+      const { ql_pin, ql_salt, qr_secret, ql_fail, ql_lock, schema_v, sync_key, vapid_jwk, mail_key, ...pub } = cfg; pub.ket_noi = !!sync_key;
       return json({ ok: true, demo, ngay0: d0, now, ip, ip_loai: ipKind(ip), wifi: matchOffice(ip, ips), cfg: pub, nv: nv.results.map(x => ({ ...x, thiet_bi: tb[x.ma] || [], khoa: x.lock_until > now })), cham, tu_choi: tc.results, ip_vp: ips, may_chung, may_toi: req.may });
     }
     if (r === 'nv' && req.method === 'POST') {
