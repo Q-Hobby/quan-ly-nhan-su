@@ -2332,6 +2332,10 @@ body.no-mascot .cmd-in img{display:none}
 .ml-st{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-size:13px;color:var(--ink-2)}.ml-st.on{background:color-mix(in srgb,var(--ok,#3F8F4A) 12%,var(--surface));color:var(--ink)}
 .ml-guide{margin:12px 0;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px}.ml-guide summary{cursor:pointer;font-weight:600;color:var(--pri-ink)}.ml-guide ol{margin:8px 0 0 18px;padding:0;display:grid;gap:6px;line-height:1.5}
 .ml-form{margin-top:4px}.ml-btns{margin-top:10px;gap:8px;flex-wrap:wrap;align-items:center}.ml-test{display:inline-flex;gap:6px;align-items:center}.ml-test .input{width:220px;height:32px}
+
+/* 17/11: lưu phép tồn */
+.np-cy{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}.np-cyf{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}.np-cyf[hidden]{display:none}.np-cyf .field{margin:0}
+.np-adj{margin-left:6px;height:26px;padding:0 8px;font-size:12px}
 </style>
 </head>
 <body>
@@ -5298,6 +5302,7 @@ if (typeof module !== 'undefined') module.exports = XW;
   function table(id, cols, rows, opts) {
     opts = opts || {};
     var st = TB[id] = TB[id] || { sort: null, limit: opts.limit || 200 };
+    cols = cols.filter(function (c) { return !c.skip; }); // 17/11: skip = bỏ hẳn cột (không hiện, không xuất)
     var list = rows.slice(), all = cols; cols = cols.filter(function (c) { return !c.hide; }); // hide: chỉ xuất Excel, không hiện
     if (st.sort && cols[st.sort.i]) { var c0 = cols[st.sort.i], sv = c0.s || c0.f; list.sort(function (a, b) { return cmp(sv(a), sv(b)) * st.sort.dir; }); }
     st.cur = { cols: all, list: list, title: opts.title || '', note: opts.note || '' };
@@ -10418,23 +10423,38 @@ if (typeof module !== 'undefined') module.exports = XW;
     return n;
   }
   function npRound(v) { var f = Math.floor(v); return v - f >= 0.5 ? f + 1 : f; }
+  // năm y đã có dữ liệu nghỉ phép trên phần mềm chưa (chưa có thì không tự tính phép tồn – tránh chuyển cả quỹ phép năm trước khi chưa dùng phần mềm; nhập tay ở nút Sửa)
+  function npHasYear(u, y) { var L = npRule(ccOf(u)); if (L.adj && L.adj[y] && Object.keys(L.adj[y]).length) return true; return (u.data.DON || []).some(function (d) { return String(d['Từ ngày'] || '').slice(0, 4) === String(y); }); }
   // quỹ phép năm của 1 người tại ngày R
-  function npQuota(u, e, R) {
+  /* 17/11 góp ý người dùng (anh duyệt): PHÉP TỒN chuyển sang năm sau có hạn dùng + SỬA TAY số ngày phép còn lại
+     L.carry = { on, until: 'MM-DD' (hạn dùng ở năm sau), max: số ngày tối đa được chuyển ('' = không giới hạn) }
+     L.adj[năm][Mã NV] = { off: số ngày cộng/trừ để "Còn lại" đúng số nhập tay, carry: phép tồn nhập tay ('' = tự tính), why, by, at }
+     Ngày nghỉ phép trong năm trừ vào phép tồn trước (phần nghỉ trước hạn), sau đó mới trừ phép năm nay; quá hạn thì phép tồn chưa dùng hết hiệu lực. */
+  function npCarry(L) { var c = L.carry || {}; return { on: !!c.on, until: /^\d\d-\d\d$/.test(c.until || '') ? c.until : '03-31', max: c.max === '' || c.max == null || isNaN(+c.max) ? null : +c.max }; }
+  function npAdjOf(L, y, id) { return ((L.adj || {})[y] || {})[id] || null; }
+  function npQuota(u, e, R, depth) {
     var s = ccOf(u), L = npRule(s), y = +R.slice(0, 4), id = e['Mã NV'], base = +(L.emp[id] || L.base), j = String(e['Ngày vào làm'] || '').slice(0, 10);
     var yrs = 0; if (j) { yrs = y - +j.slice(0, 4); if (R.slice(5) < j.slice(5)) yrs--; yrs = Math.max(0, yrs); }
     var tn = Math.floor(yrs / 5), months = 12, note = '';
     if (j && j.slice(0, 4) === String(y)) { months = 12 - +j.slice(5, 7) + (+j.slice(8, 10) <= 15 ? 1 : 0); note = 'Vào làm ' + HR.vnDate(j) + ' → tính ' + months + ' tháng'; }
     var l = String(e['Ngày nghỉ việc'] || '').slice(0, 10); if (l && l.slice(0, 4) === String(y)) { months = Math.max(0, months - (12 - +l.slice(5, 7)) - (+l.slice(8, 10) < 15 ? 1 : 0)); note = (note ? note + '; ' : '') + 'nghỉ việc ' + HR.vnDate(l); }
     var total = months >= 12 ? base + tn : npRound((base + tn) / 12 * months);
-    var used = 0, plan = 0, wait = 0, yS = y + '-01-01', yE = y + '-12-31';
+    var used = 0, plan = 0, wait = 0, yS = y + '-01-01', yE = y + '-12-31', C = npCarry(L), cExp = y + '-' + C.until, early = 0;
     (u.data.DON || []).forEach(function (d) {
       if (d['Mã NV'] !== id || !/phép năm/i.test(d['Loại nghỉ'] || '') || !d['Từ ngày']) return;
       var a = String(d['Từ ngày']).slice(0, 10), b = String(d['Đến ngày'] || a).slice(0, 10); if (b < yS || a > yE) return;
       var n = +d['Số ngày'] || npWorkDays(u, e, a < yS ? yS : a, b > yE ? yE : b);
-      if (d['Trạng thái'] === 'Đã duyệt') { if (a <= R) used += n; else plan += n; } else if (d['Trạng thái'] === 'Chờ duyệt') wait += n;
+      if (d['Trạng thái'] === 'Đã duyệt') { if (a <= R) used += n; else plan += n; if (C.on) early += b <= cExp ? n : a > cExp ? 0 : Math.min(n, npWorkDays(u, e, a < yS ? yS : a, cExp)); } else if (d['Trạng thái'] === 'Chờ duyệt') wait += n;
     });
+    var ad = npAdjOf(L, y, id), off = ad && +ad.off ? +ad.off : 0, cIn = 0, cSrc = '';
+    if (C.on) {
+      if (ad && ad.carry !== '' && ad.carry != null && !isNaN(+ad.carry)) { cIn = +ad.carry; cSrc = 'tay'; }
+      else if ((depth || 0) < 2 && (!j || j.slice(0, 4) < String(y)) && npHasYear(u, y - 1)) { var pq = npQuota(u, e, (y - 1) + '-12-31', (depth || 0) + 1); cIn = Math.max(0, pq.regLeft); if (C.max != null) cIn = Math.min(cIn, C.max); cSrc = 'tu'; }
+      else cSrc = 'chua';
+    }
+    var cUsed = Math.min(cIn, early), cLeft = R <= cExp ? cIn - cUsed : 0, cLost = R > cExp ? cIn - cUsed : 0, regLeft = total + off - (used + plan - cUsed);
     var q = (u.data.QP || []).filter(function (x) { return x['Mã NV'] === id; })[0], fk = q ? Object.keys(q).filter(function (k) { return /^Tổng phép năm/.test(k); })[0] : null;
-    return { base: base, yrs: yrs, tn: tn, months: months, total: total, used: used, plan: plan, wait: wait, left: total - used - plan, note: note, file: q ? { total: +q[fk] || 0, used: +q['Đã nghỉ'] || 0, left: +q['Còn lại'] || 0 } : null };
+    return { base: base, yrs: yrs, tn: tn, months: months, total: total, used: used, plan: plan, wait: wait, left: regLeft + cLeft, regLeft: regLeft, off: off, adj: ad, carry: C.on ? { inn: cIn, used: cUsed, left: cLeft, lost: cLost, exp: cExp, src: cSrc } : null, note: note, file: q ? { total: +q[fk] || 0, used: +q['Đã nghỉ'] || 0, left: +q['Còn lại'] || 0 } : null };
   }
   PAGES.np = function () {
     if (!S.units.length) return pageHead('Nghỉ phép') + noData('dữ liệu');
@@ -10481,13 +10501,16 @@ if (typeof module !== 'undefined') module.exports = XW;
         return;
       }
       if (f.tab === 'quy') {
+        var anyCarry = selUnits().some(function (u) { return npCarry(npRule(ccOf(u))).on; });
         var rows = []; selUnits().forEach(function (u) { var mat = HR.maternitySet(u.data, R); (u.data.NV || []).forEach(function (e) { if (HR.staffState(e, R, mat) === 'left' && String(e['Ngày nghỉ việc'] || '').slice(0, 4) !== R.slice(0, 4)) return; if ((f.dept && e['Phòng ban'] !== f.dept) || (q && norm(e['Mã NV'] + ' ' + e['Họ và tên']).indexOf(q) < 0)) return; rows.push({ u: u, e: e, x: npQuota(u, e, R) }); }); });
         $('#nArea').innerHTML = table('np-quy', uCol().concat([{ t: 'Mã NV', f: function (r) { return r.e['Mã NV']; }, mono: 1 }, { t: 'Họ và tên', f: function (r) { return r.e['Họ và tên']; }, h: function (r) { return personLink(r.u, r.e['Mã NV'], r.e['Họ và tên']); } }, { t: 'Phòng ban', f: function (r) { return r.e['Phòng ban']; } },
           { t: 'Ngày vào làm', f: function (r) { return r.e['Ngày vào làm']; } }, { t: 'Thâm niên', f: function (r) { return r.x.yrs; }, r: 1, h: function (r) { return r.x.yrs + ' năm'; } },
           { t: 'Phép cơ bản', f: function (r) { return r.x.base; }, r: 1, h: function (r) { return '<select class="input np-base" data-u="' + r.u.id + '" data-id="' + esc(r.e['Mã NV']) + '" aria-label="Phép cơ bản">' + [12, 14, 16].map(function (v) { return opt(v, v, r.x.base); }).join('') + '</select>'; } },
           { t: 'Thâm niên +', f: function (r) { return r.x.tn; }, r: 1 }, { t: 'Tổng phép năm', f: function (r) { return r.x.total; }, r: 1, h: function (r) { return '<b>' + nfmt(r.x.total) + '</b>' + (r.x.note ? '<small class="faint" style="display:block" title="' + esc(r.x.note) + '">' + r.x.months + ' tháng</small>' : ''); } },
+          { t: 'Phép tồn năm trước', skip: !anyCarry, f: function (r) { return r.x.carry ? r.x.carry.inn : ''; }, r: 1, h: function (r) { var c = r.x.carry; if (!c) return '<span class="faint">–</span>'; if (c.src === 'chua' && !c.inn) return '<span class="faint" title="Năm trước chưa có dữ liệu nghỉ phép trên phần mềm – bấm Sửa để nhập phép tồn">chưa có</span>'; return '<b>' + nfmt(c.inn) + '</b>' + (c.src === 'tay' ? ' <span class="faint" title="Nhập tay">✎</span>' : '') + (c.inn ? '<small class="faint" style="display:block">' + (c.lost ? '<span class="down">hết hạn ' + HR.vnDate(c.exp).slice(0, 5) + ', mất ' + nfmt(c.lost) + '</span>' : c.left ? 'còn ' + nfmt(c.left) + ' · hạn ' + HR.vnDate(c.exp).slice(0, 5) : 'đã dùng hết') + '</small>' : ''); } },
           { t: 'Đã nghỉ', f: function (r) { return r.x.used; }, r: 1 }, { t: 'Đã duyệt sắp nghỉ', f: function (r) { return r.x.plan; }, r: 1 }, { t: 'Chờ duyệt', f: function (r) { return r.x.wait; }, r: 1, h: function (r) { return r.x.wait ? '<span class="tag tag-warn">' + nfmt(r.x.wait) + '</span>' : '<span class="faint">0</span>'; } },
-          { t: 'Còn lại', f: function (r) { return r.x.left; }, r: 1, h: function (r) { var v = r.x.left; return '<b class="' + (v < 0 ? 'down' : v <= (cfg().leaveLow || 1) ? 'np-low' : '') + '">' + nfmt(v) + '</b>'; } },
+          { t: 'Điều chỉnh tay', f: function (r) { return r.x.off || ''; }, r: 1, h: function (r) { return r.x.off ? '<span class="tag tag-info" title="' + esc((r.x.adj.why || '') + ' · ' + (r.x.adj.by || '') + ' ' + (r.x.adj.at || '')) + '">' + (r.x.off > 0 ? '+' : '') + nfmt(Math.round(r.x.off * 10) / 10) + '</span>' : '<span class="faint">0</span>'; } },
+          { t: 'Còn lại', f: function (r) { return r.x.left; }, r: 1, h: function (r) { var v = Math.round(r.x.left * 10) / 10; return '<b class="' + (v < 0 ? 'down' : v <= (cfg().leaveLow || 1) ? 'np-low' : '') + '">' + nfmt(v) + '</b> <button class="btn btn-sm np-adj" data-act="np-adj" data-id="' + r.u.id + '|' + esc(r.e['Mã NV']) + '" title="Sửa tay số ngày phép còn lại' + (r.x.carry ? ', phép tồn năm trước' : '') + '">Sửa</button>'; } },
           { t: 'Theo file (tổng / đã nghỉ / còn)', f: function (r) { return r.x.file ? r.x.file.total + ' / ' + r.x.file.used + ' / ' + r.x.file.left : ''; }, h: function (r) { if (!r.x.file) return '<span class="faint">–</span>'; var df = r.x.file.total !== r.x.total || r.x.file.used !== r.x.used; return '<span class="' + (df ? 'tag tag-warn' : 'faint') + '" title="' + (df ? 'Khác số tự tính – xem lại file Quỹ phép' : 'Khớp') + '">' + r.x.file.total + ' / ' + r.x.file.used + ' / ' + r.x.file.left + '</span>'; } }]), rows, { title: 'Quy phep nam ' + R.slice(0, 4), note: 'Tính đến ' + HR.vnDate(R) });
         $$('.np-base').forEach(function (el) { el.addEventListener('change', function () { var u = unitById(el.getAttribute('data-u')), s = ccOf(u), L = npRule(s), id = el.getAttribute('data-id'); if (+el.value === +L.base) delete L.emp[id]; else L.emp[id] = +el.value; ccSave(u, 'phép cơ bản ' + id + ' = ' + el.value); toast('Đã lưu', 'ok'); refresh(); }); });
         return;
@@ -10564,10 +10587,42 @@ if (typeof module !== 'undefined') module.exports = XW;
     });
   };
   function npRuleHtml() {
-    var us = selUnits(); return '<div class="set-grid">' + us.map(function (u) { var L = npRule(ccOf(u)); return '<div class="card card-pad"><div class="card-head"><div><h3>' + esc(shortUnit(u.name)) + '</h3><p>Áp dụng cho người chưa đặt riêng ở bảng Quỹ phép năm</p></div></div><div class="tl-qs"><div class="tl-q"><label>Phép năm cơ bản</label><span class="tl-qi"><select class="input np-rb" data-u="' + u.id + '">' + [[12, '12 ngày – điều kiện bình thường'], [14, '14 ngày – nặng nhọc, độc hại'], [16, '16 ngày – đặc biệt nặng nhọc']].map(function (v) { return opt(v[0], v[1], L.base); }).join('') + '</select></span></div></div></div>'; }).join('') + '</div>' +
-      '<div class="notice" style="margin-top:14px">' + ic('info') + '<div><b>Cách phần mềm tính:</b><br>• Phép cơ bản 12 / 14 / 16 ngày làm việc (Điều 113 BLLĐ 2019), cộng 1 ngày cho mỗi đủ 5 năm làm việc (Điều 114).<br>• Vào làm hoặc nghỉ việc trong năm: tính theo số tháng làm việc – tháng vào làm trước ngày 16 được tính cả tháng; (phép năm ÷ 12) × số tháng, phần lẻ từ 0,5 làm tròn lên (Điều 66 NĐ 145/2020). Quy định đầy đủ còn xét số ngày làm việc thực tế trong tháng – trường hợp đặc biệt anh/chị sửa tay ở cột Phép cơ bản.<br>• Đã nghỉ = đơn <b>Nghỉ phép năm</b> đã duyệt, đếm theo ngày làm việc của ca (trừ ngày nghỉ tuần, lễ tết).<br>• Thời gian nghỉ thai sản, nghỉ ốm (tối đa 2 tháng/năm), nghỉ không lương được đồng ý (tối đa 1 tháng/năm) vẫn được tính là thời gian làm việc để tính phép (Điều 65 NĐ 145/2020) – phần mềm chưa trừ các trường hợp vượt mức này.</div></div>';
+    var us = selUnits(); return '<div class="set-grid">' + us.map(function (u) { var L = npRule(ccOf(u)); return '<div class="card card-pad"><div class="card-head"><div><h3>' + esc(shortUnit(u.name)) + '</h3><p>Áp dụng cho người chưa đặt riêng ở bảng Quỹ phép năm</p></div></div><div class="tl-qs"><div class="tl-q"><label>Phép năm cơ bản</label><span class="tl-qi"><select class="input np-rb" data-u="' + u.id + '">' + [[12, '12 ngày – điều kiện bình thường'], [14, '14 ngày – nặng nhọc, độc hại'], [16, '16 ngày – đặc biệt nặng nhọc']].map(function (v) { return opt(v[0], v[1], L.base); }).join('') + '</select></span></div></div>' + npCarryHtml(u) + '</div>'; }).join('') + '</div>' +
+      '<div class="notice" style="margin-top:14px">' + ic('info') + '<div><b>Cách phần mềm tính:</b><br>• Phép cơ bản 12 / 14 / 16 ngày làm việc (Điều 113 BLLĐ 2019), cộng 1 ngày cho mỗi đủ 5 năm làm việc (Điều 114).<br>• Vào làm hoặc nghỉ việc trong năm: tính theo số tháng làm việc – tháng vào làm trước ngày 16 được tính cả tháng; (phép năm ÷ 12) × số tháng, phần lẻ từ 0,5 làm tròn lên (Điều 66 NĐ 145/2020). Quy định đầy đủ còn xét số ngày làm việc thực tế trong tháng – trường hợp đặc biệt anh/chị sửa tay ở cột Phép cơ bản.<br>• Đã nghỉ = đơn <b>Nghỉ phép năm</b> đã duyệt, đếm theo ngày làm việc của ca (trừ ngày nghỉ tuần, lễ tết).<br>• Thời gian nghỉ thai sản, nghỉ ốm (tối đa 2 tháng/năm), nghỉ không lương được đồng ý (tối đa 1 tháng/năm) vẫn được tính là thời gian làm việc để tính phép (Điều 65 NĐ 145/2020) – phần mềm chưa trừ các trường hợp vượt mức này.<br>• <b>Phép tồn</b> (khi bật): số ngày phép năm trước chưa nghỉ chuyển sang năm sau, dùng đến hạn đã chọn; nghỉ phép trừ vào phép tồn trước. Chuyển, hủy phép tồn là chính sách của công ty – nên ghi trong nội quy / quy chế. Người lao động thôi việc mà chưa nghỉ hết phép năm thì được thanh toán tiền lương những ngày chưa nghỉ (Điều 113 BLLĐ 2019).<br>• <b>Sửa tay</b> (nút Sửa ở bảng Quỹ phép năm): dùng khi bắt đầu dùng phần mềm giữa năm hoặc cần khớp sổ cũ – nhập số ngày còn lại, ghi lý do; đơn nghỉ phép duyệt sau đó tiếp tục trừ từ số này.</div></div>';
   }
-  function npRuleBind() { $$('.np-rb').forEach(function (el) { el.addEventListener('change', function () { var u = unitById(el.getAttribute('data-u')); npRule(ccOf(u)).base = +el.value; ccSave(u, 'phép năm cơ bản = ' + el.value); toast('Đã lưu', 'ok'); }); }); }
+  function npRuleBind() { $$('.np-rb').forEach(function (el) { el.addEventListener('change', function () { var u = unitById(el.getAttribute('data-u')); npRule(ccOf(u)).base = +el.value; ccSave(u, 'phép năm cơ bản = ' + el.value); toast('Đã lưu', 'ok'); }); });
+    // 17/11: lưu phép tồn
+    $$('[data-npc]').forEach(function (el) { el.addEventListener('change', function () {
+      var u = unitById(el.getAttribute('data-u')), L = npRule(ccOf(u)), c = L.carry = L.carry || {}, k = el.getAttribute('data-npc');
+      if (k === 'on') c.on = el.checked; else if (k === 'until') c.until = el.value; else if (k === 'max') { var v = el.value.trim().replace(',', '.'); if (v !== '' && (isNaN(+v) || +v < 0)) { toast('Số ngày tối đa chưa đúng', 'err'); return; } c.max = v === '' ? '' : +v; }
+      var C = npCarry(L); ccSave(u, 'lưu phép tồn: ' + (C.on ? 'bật, hạn ' + C.until.split('-').reverse().join('/') + ' năm sau' + (C.max != null ? ', tối đa ' + C.max + ' ngày' : '') : 'tắt')); toast('Đã lưu', 'ok'); render();
+    }); });
+  }
+  function npCarryHtml(u) {
+    var C = npCarry(npRule(ccOf(u))), M = ['01-31', '02-28', '03-31', '04-30', '05-31', '06-30', '07-31', '08-31', '09-30', '10-31', '11-30', '12-31'];
+    return '<div class="np-cy"><label class="tl-ro"><input type="checkbox" data-npc="on" data-u="' + u.id + '"' + (C.on ? ' checked' : '') + '><span><b>Cho chuyển phép năm chưa nghỉ hết sang năm sau</b></span></label>' +
+      '<div class="np-cyf"' + (C.on ? '' : ' hidden') + '><div class="field"><label>Hạn dùng phép tồn</label><select class="input" data-npc="until" data-u="' + u.id + '">' + M.map(function (m) { return opt(m, 'Đến hết ' + m.split('-').reverse().join('/') + ' năm sau' + (m === '03-31' ? ' (hết quý 1)' : m === '06-30' ? ' (hết quý 2)' : ''), C.until); }).join('') + '</select></div>' +
+      '<div class="field"><label>Chuyển tối đa (ngày)</label><input class="input" data-npc="max" data-u="' + u.id + '" inputmode="decimal" value="' + (C.max == null ? '' : C.max) + '" placeholder="Để trống = không giới hạn" style="max-width:200px"></div></div>' +
+      '<p class="faint" style="font-size:12.5px;margin:6px 0 0">Đầu năm phần mềm tự tính phép tồn = số ngày phép năm trước chưa nghỉ (từ năm đã có dữ liệu nghỉ phép trên phần mềm; năm trước đó nhập tay ở nút <b>Sửa</b> trong bảng Quỹ phép năm). Ngày nghỉ phép trừ vào phép tồn trước; quá hạn thì phần phép tồn chưa dùng hết hiệu lực.</p></div>';
+  }
+  ACTS['np-adj'] = function (a, key) {
+    var k = key.split('|'), u = unitById(k[0]), id = k.slice(1).join('|'), e = u && nvIndex(u)[id]; if (!e) return; var R = refDate(), y = +R.slice(0, 4), L = npRule(ccOf(u)), q = npQuota(u, e, R), C = npCarry(L), ad = q.adj || {};
+    var body = '<div class="npq"><div><span>Phép năm ' + y + '</span><b>' + nfmt(q.total) + '</b></div>' + (q.carry ? '<div><span>Phép tồn ' + (y - 1) + '</span><b>' + nfmt(q.carry.inn) + '</b></div>' : '') + '<div><span>Đã nghỉ + đã duyệt</span><b>' + nfmt(q.used + q.plan) + '</b></div><div class="hl"><span>Còn lại (hiện tại)</span><b>' + nfmt(Math.round(q.left * 10) / 10) + '</b></div></div>' +
+      '<div class="form-grid" style="margin-top:12px">' + (C.on ? '<div class="field"><label for="naC">Phép tồn năm ' + (y - 1) + ' chuyển sang (ngày)</label><input class="input" id="naC" inputmode="decimal" value="' + (ad.carry === '' || ad.carry == null ? '' : ad.carry) + '" placeholder="' + (q.carry && q.carry.src === 'tu' ? 'Tự tính: ' + nfmt(q.carry.inn) : 'Để trống = tự tính') + '"><small class="faint">Hạn dùng đến ' + HR.vnDate(q.carry.exp) + '</small></div>' : '') +
+      '<div class="field"><label for="naL">Số ngày phép còn lại đến ' + HR.vnDate(R) + ' *</label><input class="input" id="naL" inputmode="decimal" value="' + nfmt(Math.round(q.left * 10) / 10) + '"><small class="faint">Đơn nghỉ phép duyệt sau này tiếp tục trừ từ số này</small></div>' +
+      '<div class="field span2"><label for="naW">Lý do *</label><input class="input" id="naW" maxlength="160" value="' + esc(ad.why || '') + '" placeholder="VD: Bắt đầu dùng phần mềm giữa năm – đã nghỉ 4 ngày theo sổ cũ"></div></div>' + bcWho() +
+      (q.adj ? '<p class="faint" style="font-size:12px">Điều chỉnh hiện tại: ' + (q.off > 0 ? '+' : '') + nfmt(Math.round(q.off * 10) / 10) + ' ngày' + (ad.carry !== '' && ad.carry != null ? ', phép tồn nhập tay ' + nfmt(+ad.carry) : '') + ' · ' + esc(ad.by || '') + ' ' + esc(ad.at || '') + '</p>' : '') +
+      '<div class="link-row" style="justify-content:space-between;margin-top:12px">' + (q.adj ? '<button class="btn btn-danger-ghost" id="naDel">Bỏ điều chỉnh tay</button>' : '<span></span>') + '<span class="link-row" style="margin:0"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="naOk">Lưu</button></span></div>';
+    var m = modal('Sửa ngày phép – ' + e['Họ và tên'], 'Năm ' + y + ' · ' + id + (isMulti() ? ' · ' + shortUnit(u.name) : ''), body, true);
+    var save = function (o) { L.adj = L.adj || {}; L.adj[y] = L.adj[y] || {}; if (o) L.adj[y][id] = o; else delete L.adj[y][id]; ccSave(u, 'sửa ngày phép ' + id + ' năm ' + y + (o ? ': còn ' + $('#naL', m).value + (o.carry !== '' ? ', phép tồn ' + o.carry : '') + ' – ' + o.why : ': bỏ điều chỉnh tay')); m.close(); toast('Đã lưu ngày phép', 'ok'); render(); };
+    var dl = $('#naDel', m); if (dl) dl.addEventListener('click', function () { save(null); });
+    $('#naOk', m).addEventListener('click', function () {
+      var num = function (v) { v = String(v || '').trim().replace(',', '.'); return v === '' ? '' : +v; }, cv = $('#naC', m) ? num($('#naC', m).value) : '', lv = num($('#naL', m).value), why = $('#naW', m).value.trim();
+      if (lv === '' || isNaN(lv)) { toast('Nhập số ngày phép còn lại', 'err'); return; } if (cv !== '' && (isNaN(cv) || cv < 0)) { toast('Phép tồn chưa đúng', 'err'); return; } if (!why) { toast('Ghi lý do điều chỉnh', 'err'); $('#naW', m).focus(); return; }
+      L.adj = L.adj || {}; L.adj[y] = L.adj[y] || {}; var keep = L.adj[y][id]; L.adj[y][id] = { off: 0, carry: cv }; var q0 = npQuota(u, e, R); if (keep) L.adj[y][id] = keep; else delete L.adj[y][id];
+      save({ off: Math.round((lv - q0.left) * 100) / 100, carry: cv, why: why, by: ccUser(), at: nowVn() });
+    });
+  };
 
   /* =====================================================================
      BƯỚC 4/4 – CHẤM CÔNG WI‑FI (07/11/2026)
@@ -10615,7 +10670,7 @@ if (typeof module !== 'undefined') module.exports = XW;
   function ccAppExtra(u) {
     var s = ccOf(u), y = +HR.isoToday().slice(0, 4), mon = ccMon(HR.isoToday()), byD = {};
     var xmc = xmCfg(s, u); delete xmc.mau; var dhc = {}, DH = donHan(s); Object.keys(DH).forEach(function (l) { if (DH[l].k !== 'tudo') dhc[l] = { k: DH[l].k, m: donHanM(DH[l]) }; });
-    return { xm: xmc, dh: dhc, qp: function (e) { try { var q = npQuota(u, e, refDate()); return { nam: y, tong: q.total, da: q.used, cho: q.wait, con: q.left }; } catch (er) { return null; } }, le: holOf(s, y).concat(holOf(s, y + 1)).map(function (x) { return { d: x.d, t: x.t }; }), kh: s.codes.map(function (x) { return [x.k, x.t, x.type]; }),
+    return { xm: xmc, dh: dhc, qp: function (e) { try { var q = npQuota(u, e, refDate()); return { nam: y, tong: q.total, da: q.used, cho: q.wait, con: Math.round(q.left * 10) / 10, ton: q.carry && q.carry.left ? { con: q.carry.left, han: q.carry.exp } : null }; } catch (er) { return null; } }, le: holOf(s, y).concat(holOf(s, y + 1)).map(function (x) { return { d: x.d, t: x.t }; }), kh: s.codes.map(function (x) { return [x.k, x.t, x.type]; }),
       dept: function (dept) { if (byD[dept]) return byD[dept]; var sh = ccShiftOf(s, dept), t = [], nua = []; for (var i = 0; i < 7; i++) { var d = ccAdd(mon, i); if (sh && ccDayK(sh, d) !== 'o') t.push(ccDow(d)); if (sh && ccDayK(sh, d) === 'h') nua.push(ccDow(d)); }
         return (byD[dept] = { tuan: t, nua: nua, ca: sh ? (function () { var o = { ten: sh.name, vao: sh.inT, ra: sh.outT }, ng = {}; CC_DOW.forEach(function (w) { var dt = sh.dayT && sh.dayT[w[0]]; if (dt && t.indexOf(w[0]) >= 0) ng[w[0]] = { vao: dt.inT, ra: dt.outT }; }); if (Object.keys(ng).length) o.ngay = ng; if (+sh.pre) { o.som = +sh.pre; o.som_ngay = (sh.preDays && sh.preDays.length ? sh.preDays.map(Number) : [0, 1, 2, 3, 4, 5, 6]).filter(function (d) { return t.indexOf(d) >= 0; }); } return o; })() : null, sx: ccIsSxDept(s, dept) ? 1 : 0 }); /* 12/11 17:56: nua = thứ làm nửa ngày (app tô nửa xám) */ } };
   }
