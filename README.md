@@ -93,6 +93,8 @@ Dữ liệu nằm trong cơ sở dữ liệu D1, tách khỏi mã phần mềm. 
 - Nút **Cập nhật từ bản gốc** (GitHub Actions) đang được chạy thử lần đầu.
 - **Dán link Google Drive**: đã thử với máy chủ mô phỏng; chưa thử với Google Drive thật (file lớn có trang xác nhận quét virus, Google Sheets nhiều trang tính).
 - **Gửi email tự động qua Resend**: đã thử với máy chủ mô phỏng, chưa thử gửi thật bằng tài khoản Resend và tên miền thật (tên hiển thị tiếng Việt có dấu, thư vào hộp Spam hay không).
+- **Cổng tuyển dụng của công ty** (`/tuyen-dung/...`): đã thử trọn vòng với máy chủ mô phỏng (đưa vị trí lên, ứng viên nộp CV 2,6 MB, phần mềm tự lấy về, đóng cổng); chưa thử trên Cloudflare thật.
+- **Thời gian lưu thông báo, cảnh báo dung lượng**: số dung lượng lấy từ Cloudflare D1 (`size_after`); chưa đối chiếu với số trên trang Cloudflare.
 
 Giới hạn và giá các gói xem tại trang giá của Cloudflare (Workers, D1).
 

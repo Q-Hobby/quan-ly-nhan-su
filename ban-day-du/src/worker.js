@@ -249,9 +249,101 @@ async function vbTbApi(r, db, cfg, body, url, req, now, demo, jc, ctyOk) {
     if (ds.length) later(req, pushTo(db, cfg, url.origin, ds, { t: td, b: nd.replace(/\s+/g, ' ').slice(0, 140), u: '/?tb=' + id, tag: id }));
     return jc({ ok: true, id, n: ds.length });
   }
+  if (r === 'tb-luu') { // 17/11: thời gian lưu thông báo + dung lượng dữ liệu (cảnh báo khi gần hạn mức gói miễn phí D1 500 MB)
+    if (req.method === 'POST' && !demo) { const m = parseInt(body.thang, 10); if (![0, 6, 12, 24].includes(m)) return jc({ ok: false, loi: 'Thời gian lưu chưa đúng' }, 400); await setCfg(db, { tb_luu_thang: m }); cfg.tb_luu_thang = String(m); }
+    return jc(Object.assign({ ok: true, demo: !!demo, thang: tbLuuThang(cfg) }, await dbDungLuong(db)));
+  }
   if (r === 'tb-list') { const cty = String(url.searchParams.get('cty') || ''); return jc({ ok: true, list: (await db.prepare("SELECT t.id, t.n, t.at, (SELECT COUNT(*) FROM tb_doc d WHERE d.id = t.id AND d.doc_at IS NOT NULL) AS doc FROM tb t WHERE t.cty = ? ORDER BY t.at DESC LIMIT 300").bind(cty).all()).results }); }
   if (r === 'tb-xoa' && req.method === 'POST') { const id = String(body.id || ''), t = await db.prepare('SELECT cty FROM tb WHERE id = ?').bind(id).first(); if (t && ctyOk(t.cty)) await db.batch([db.prepare('DELETE FROM tb WHERE id = ?').bind(id), db.prepare('DELETE FROM tb_doc WHERE id = ?').bind(id)]); return jc({ ok: true }); }
   return null;
+}
+// ===== CỔNG TUYỂN DỤNG CỦA CÔNG TY (17/11/2026) – cùng cách làm với máy chủ thử tuyen-dung-thu, khác: link /tuyen-dung/<slug>, không hết hạn, API phần mềm cần đăng nhập =====
+const TD_CV_MAX = 5 * 1024 * 1024, TD_PART = 1500000, TD_HITS = new Map();
+const tdOkTok = t => /^[a-z0-9]{8,16}$/.test(t || '');
+async function tdSha(x) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(x)); return [...new Uint8Array(b)].map(v => v.toString(16).padStart(2, '0')).join(''); }
+async function tdAuth(db, tok, key) { if (!tdOkTok(tok) || !key || key.length < 20) return null; const r = await db.prepare('SELECT * FROM td_cong WHERE tok = ?').bind(tok).first(); if (!r) return null; return r.key_hash === await tdSha(key) ? r : false; }
+async function tdDelHs(db, mas) { if (!mas.length) return; const q = mas.map(() => '?').join(','); await db.batch([db.prepare('DELETE FROM td_cv_part WHERE ma IN (' + q + ')').bind(...mas), db.prepare('DELETE FROM td_ho_so WHERE ma IN (' + q + ')').bind(...mas)]); }
+function tdTooMany(ip) { const now = Date.now(), a = (TD_HITS.get(ip) || []).filter(t => now - t < 600000); a.push(now); TD_HITS.set(ip, a); if (TD_HITS.size > 5000) TD_HITS.clear(); return a.length > 12; }
+const tdJ = (o, st = 200) => new Response(JSON.stringify(o), { status: st, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
+function tdPage(title, body, st = 200) {
+  return new Response('<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + htmlEsc(title) + '</title><style>body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:#F4EFE5;color:#231E19;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:20px}.b{max-width:560px;background:#fff;border:1px solid #E3D9C6;border-radius:18px;padding:28px;line-height:1.6}h1{font-size:21px;margin:0 0 10px}a{color:#2F7D4F}li{margin:6px 0}</style></head><body><div class="b">' + body + '</div></body></html>', { status: st, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
+}
+async function tdTrang(db, url) { // GET /tuyen-dung[/<slug>[/<vị trí>|/ve-chung-toi]]
+  const m = /^\/tuyen-dung(?:\/([a-z0-9-]{1,80}))?(?:\/([a-z0-9-]{1,120}))?\/?$/.exec(url.pathname); if (!m) return null;
+  if (!m[1]) { const L = (await db.prepare("SELECT slug, ten FROM td_cong WHERE html IS NOT NULL AND html != '' ORDER BY ten").all()).results;
+    if (L.length === 1) return Response.redirect(url.origin + '/tuyen-dung/' + L[0].slug, 302);
+    return tdPage('Tuyển dụng', L.length ? '<h1>Cơ hội việc làm</h1><ul>' + L.map(r => '<li><a href="/tuyen-dung/' + htmlEsc(r.slug) + '">' + htmlEsc(r.ten || r.slug) + '</a></li>').join('') + '</ul>' : '<h1>Chưa mở cổng tuyển dụng</h1><p>Hiện chưa có vị trí nào đang tuyển. Vui lòng quay lại sau.</p>', L.length ? 200 : 404); }
+  const r = await db.prepare('SELECT html, jobs FROM td_cong WHERE slug = ?').bind(m[1]).first();
+  if (!r || !r.html) return tdPage('Không tìm thấy', '<h1>Không tìm thấy trang tuyển dụng</h1><p>Link không đúng hoặc công ty đã tạm đóng cổng tuyển dụng.</p><p><a href="/tuyen-dung">Xem các trang tuyển dụng →</a></p>', 404);
+  if (m[2] && m[2] !== 've-chung-toi' && JSON.parse(r.jobs || '[]').indexOf(m[2]) < 0) return tdPage('Vị trí đã đóng', '<h1>Vị trí này không còn nhận hồ sơ</h1><p><a href="/tuyen-dung/' + htmlEsc(m[1]) + '">Xem các vị trí đang tuyển →</a></p>', 404);
+  return new Response(r.html, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin' } });
+}
+async function tdNop(db, req) { // ứng viên nộp hồ sơ (multipart, CV ≤ 5 MB chia phần ≤ 1,5 MB vì D1 giới hạn 2 MB mỗi dòng)
+  const ip = req.headers.get('CF-Connecting-IP') || '';
+  if (tdTooMany(ip)) return tdJ({ ok: false, msg: 'Bạn gửi quá nhiều lần, vui lòng thử lại sau ít phút.' }, 429);
+  let f; try { f = await req.formData(); } catch (e) { return tdJ({ ok: false, msg: 'Dữ liệu gửi lên chưa đúng.' }, 400); }
+  const tok = String(f.get('tok') || ''), job = String(f.get('job') || '').slice(0, 120);
+  if (!tdOkTok(tok)) return tdJ({ ok: false, msg: 'Link cổng không đúng.' }, 400);
+  const c = await db.prepare('SELECT jobs FROM td_cong WHERE tok = ?').bind(tok).first(); if (!c) return tdJ({ ok: false, msg: 'Cổng tuyển dụng đã đóng.' }, 410);
+  if (job && JSON.parse(c.jobs || '[]').indexOf(job.toLowerCase().replace(/[^a-z0-9-]/g, '')) < 0) return tdJ({ ok: false, msg: 'Vị trí này đã ngừng nhận hồ sơ. Tải lại trang để xem các vị trí đang tuyển.' }, 410);
+  const name = String(f.get('name') || '').trim().replace(/\s+/g, ' ').slice(0, 80), phone = String(f.get('phone') || '').replace(/[^\d]/g, ''), email = String(f.get('email') || '').trim().slice(0, 120);
+  if (name.split(' ').length < 2 || !/^0\d{9}$/.test(phone) || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return tdJ({ ok: false, msg: 'Thông tin chưa đúng – kiểm tra họ tên, số điện thoại, email.' }, 400);
+  if (String(f.get('consent')) !== 'true') return tdJ({ ok: false, msg: 'Cần đồng ý xử lý dữ liệu cá nhân để gửi hồ sơ.' }, 400);
+  const n = ((await db.prepare('SELECT COUNT(*) AS n FROM td_ho_so WHERE tok = ? AND tao > ?').bind(tok, Date.now() - 864e5).first()) || {}).n || 0; if (n >= 300) return tdJ({ ok: false, msg: 'Cổng đang nhận quá nhiều hồ sơ trong ngày, vui lòng thử lại vào ngày mai.' }, 429);
+  const cv = f.get('cv'); if (!cv || typeof cv === 'string' || !cv.size) return tdJ({ ok: false, msg: 'Vui lòng đính kèm CV.' }, 400);
+  if (cv.size > TD_CV_MAX || !(/^image\/|application\/pdf/.test(cv.type) || /\.(pdf|jpe?g|png|webp)$/i.test(cv.name))) return tdJ({ ok: false, msg: 'CV cần là PDF hoặc ảnh, tối đa 5 MB.' }, 400);
+  const ma = 'HS' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(), buf = new Uint8Array(await cv.arrayBuffer()), parts = Math.ceil(buf.length / TD_PART) || 1;
+  const d = { job, name, phone, email, exp: String(f.get('exp') || '').slice(0, 1000), src: String(f.get('src') || 'Cổng tuyển dụng').slice(0, 60), consentText: String(f.get('consentText') || '').slice(0, 1200), consentAt: new Date().toISOString() };
+  const st = [db.prepare('INSERT INTO td_ho_so (ma, tok, job, du_lieu, cv_ten, cv_loai, cv_size, cv_parts, ip, tao) VALUES (?,?,?,?,?,?,?,?,?,?)').bind(ma, tok, job, JSON.stringify(d), String(cv.name).slice(0, 120), cv.type || 'application/pdf', buf.length, parts, ip, Date.now())];
+  for (let i = 0; i < parts; i++) st.push(db.prepare('INSERT INTO td_cv_part (ma, i, data) VALUES (?,?,?)').bind(ma, i, buf.slice(i * TD_PART, (i + 1) * TD_PART).buffer));
+  await db.batch(st); return tdJ({ ok: true, code: ma });
+}
+async function tdCongApi(db, req, url, p) { // phần mềm: đưa trang lên, lấy hồ sơ, tải CV, xóa hồ sơ đã lấy, tắt cổng
+  if (req.method === 'POST' && p === '/api/cong') {
+    const b = await req.json().catch(() => ({})), tok = String(b.tok || ''), key = String(b.key || '');
+    if (!tdOkTok(tok) || key.length < 20) return tdJ({ ok: false, msg: 'Mã cổng không đúng' }, 400);
+    const html = String(b.html || ''); if (!html || html.length > 600000) return tdJ({ ok: false, msg: 'Trang cổng trống hoặc quá lớn' }, 400);
+    const slug = String(b.slug || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 80) || 'cong-ty', jobs = (Array.isArray(b.jobs) ? b.jobs : []).concat(Array.isArray(b.ids) ? b.ids : []).map(x => String(x).toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 120)).filter(Boolean).slice(0, 160); // slug (link trang) + mã phiếu (ô job khi nộp)
+    const cur = await tdAuth(db, tok, key); if (cur === false) return tdJ({ ok: false, msg: 'Mã cổng đã được dùng ở máy khác' }, 403);
+    const dup = await db.prepare('SELECT tok FROM td_cong WHERE slug = ? AND tok != ?').bind(slug, tok).first(); if (dup) return tdJ({ ok: false, msg: 'Tên rút gọn trên link (' + slug + ') đang được đơn vị khác dùng trên máy chủ này – đổi ở Cổng tuyển dụng → Sửa thông tin.' }, 409);
+    const now = Date.now();
+    if (cur) await db.prepare('UPDATE td_cong SET slug=?, ten=?, html=?, jobs=?, cap_nhat=? WHERE tok=?').bind(slug, String(b.ten || '').slice(0, 120), html, JSON.stringify(jobs), now, tok).run();
+    else await db.prepare('INSERT INTO td_cong (tok, key_hash, slug, ten, html, jobs, tao, cap_nhat) VALUES (?,?,?,?,?,?,?,?)').bind(tok, await tdSha(key), slug, String(b.ten || '').slice(0, 120), html, JSON.stringify(jobs), now, now).run();
+    return tdJ({ ok: true, base: url.origin + '/tuyen-dung/' + slug, het_han: 0 });
+  }
+  if (req.method === 'GET' && p === '/api/cong/ho-so') {
+    const c = await tdAuth(db, url.searchParams.get('tok'), url.searchParams.get('key')); if (!c) return tdJ({ ok: false, msg: 'Chưa có cổng hoặc sai khóa' }, c === null ? 404 : 403);
+    const rs = await db.prepare('SELECT ma, job, du_lieu, cv_ten, cv_loai, cv_size, tao FROM td_ho_so WHERE tok = ? ORDER BY tao LIMIT 30').bind(c.tok).all();
+    return tdJ({ ok: true, ds: (rs.results || []).map(r => ({ ma: r.ma, job: r.job, d: JSON.parse(r.du_lieu || '{}'), cv: { name: r.cv_ten, type: r.cv_loai, size: r.cv_size }, tao: r.tao })), het_han: 0 });
+  }
+  if (req.method === 'GET' && p === '/api/cong/cv') {
+    const c = await tdAuth(db, url.searchParams.get('tok'), url.searchParams.get('key')); if (!c) return tdJ({ ok: false }, 403);
+    const h = await db.prepare('SELECT cv_loai FROM td_ho_so WHERE ma = ? AND tok = ?').bind(url.searchParams.get('ma'), c.tok).first(); if (!h) return tdJ({ ok: false, msg: 'Không còn CV' }, 404);
+    const ps = await db.prepare('SELECT data FROM td_cv_part WHERE ma = ? ORDER BY i').bind(url.searchParams.get('ma')).all();
+    const bufs = (ps.results || []).map(r => new Uint8Array(r.data)), out = new Uint8Array(bufs.reduce((s, x) => s + x.length, 0)); let o = 0; bufs.forEach(x => { out.set(x, o); o += x.length; });
+    return new Response(out, { headers: { 'content-type': h.cv_loai || 'application/octet-stream', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
+  }
+  if (req.method === 'POST' && (p === '/api/cong/da-lay' || p === '/api/cong/tat')) {
+    const b = await req.json().catch(() => ({})), c = await tdAuth(db, b.tok, b.key); if (!c) return tdJ({ ok: false }, 403);
+    if (p === '/api/cong/da-lay') { const mas = (Array.isArray(b.ma) ? b.ma : []).map(String).slice(0, 50); const own = mas.length ? (await db.prepare('SELECT ma FROM td_ho_so WHERE tok = ? AND ma IN (' + mas.map(() => '?').join(',') + ')').bind(c.tok, ...mas).all()).results.map(r => r.ma) : []; await tdDelHs(db, own); return tdJ({ ok: true, xoa: own.length }); }
+    const all = (await db.prepare('SELECT ma FROM td_ho_so WHERE tok = ?').bind(c.tok).all()).results.map(r => r.ma); await tdDelHs(db, all); await db.prepare('DELETE FROM td_cong WHERE tok = ?').bind(c.tok).run(); return tdJ({ ok: true });
+  }
+  return tdJ({ ok: false, msg: 'Không có API này' }, 404);
+}
+function tbLuuThang(cfg) { const m = parseInt(cfg.tb_luu_thang, 10); return [0, 6, 12, 24].includes(m) ? m : 12; }
+const D1_FREE = 500 * 1024 * 1024; // Cloudflare D1 gói miễn phí: 500 MB / database (developers.cloudflare.com/d1/platform/limits)
+async function dbDungLuong(db) {
+  let size = 0; try { const m = (await db.prepare('SELECT 1').run()).meta || {}; size = Number(m.size_after) || 0; } catch (e) { }
+  const t = await db.prepare("SELECT COUNT(*) AS n, COALESCE(SUM(LENGTH(anh)), 0) + COALESCE(SUM(LENGTH(noi_dung)), 0) AS b FROM tb").first().catch(() => ({ n: 0, b: 0 }));
+  return { size, han: D1_FREE, tb_n: t ? t.n : 0, tb_b: t ? t.b : 0, canh_bao: size >= D1_FREE * 0.8 };
+}
+// 17/11: dọn thông báo quá thời gian lưu (mặc định 12 tháng; 0 = không giới hạn) – chạy 1 lần/ngày trong cron
+async function tbDon(db, cfg, now) {
+  const today = isoVN(now); if (cfg.tb_don_day === today) return; const m = tbLuuThang(cfg), st = [];
+  if (m) { const cut = now - m * 30.44 * 864e5; st.push(db.prepare("UPDATE tb SET anh = NULL WHERE at < ? AND anh IS NOT NULL").bind(cut), db.prepare('DELETE FROM tb WHERE at < ?').bind(cut), db.prepare('DELETE FROM tb_doc WHERE id NOT IN (SELECT id FROM tb)')); }
+  { const cut2 = now - 180 * 864e5; st.push(db.prepare('DELETE FROM td_cv_part WHERE ma IN (SELECT ma FROM td_ho_so WHERE tao < ?)').bind(cut2), db.prepare('DELETE FROM td_ho_so WHERE tao < ?').bind(cut2)); } // hồ sơ ứng viên chưa ai lấy về phần mềm sau 180 ngày
+  st.push(db.prepare("INSERT INTO cfg (k, v) VALUES ('tb_don_day', ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v").bind(today));
+  await db.batch(st);
 }
 async function vbFileResp(db, id, tai) {
   const f = await db.prepare('SELECT id, ten, loai, size, n FROM vb_file WHERE id = ?').bind(id).first(); if (!f) return null;
@@ -396,6 +488,7 @@ function bcDue(def, now) {
 }
 async function bcCron(env) {
   const db = env.DB; await ensureSchema(db); const cfg = await getCfg(db), demo = env.DEMO === '1' || cfg.demo_host === '1', now = Date.now(), origin = cfg.origin || '';
+  if (!demo) await tbDon(db, cfg, now).catch(e => console.error('tbDon', e));
   for (const r of (await db.prepare('SELECT cty, du_lieu FROM bc').all()).results) {
     let B; try { B = JSON.parse(r.du_lieu); } catch (e) { continue; } B.cty = r.cty;
     for (const def of B.ds || []) { const ky = bcDue(def, now); if (!ky) continue; if (await db.prepare('SELECT 1 FROM bc_gui WHERE id = ? AND ky = ?').bind(def.id, ky).first()) continue;
@@ -530,7 +623,12 @@ const SCHEMA = [
   // 16/11/2026 13:29: GỬI BÁO CÁO ĐỊNH KỲ – danh sách báo cáo + ảnh chụp số liệu từ phần mềm (bc), nhật ký đã gửi (bc_gui), nội dung từng bản đã gửi (bc_nd)
   `CREATE TABLE IF NOT EXISTS bc (cty TEXT PRIMARY KEY, du_lieu TEXT, at INTEGER)`,
   `CREATE TABLE IF NOT EXISTS bc_gui (id TEXT NOT NULL, ky TEXT NOT NULL, cty TEXT, at INTEGER, n INTEGER, PRIMARY KEY (id, ky))`,
-  `CREATE TABLE IF NOT EXISTS bc_nd (id TEXT PRIMARY KEY, cty TEXT, du_lieu TEXT, at INTEGER)`
+  `CREATE TABLE IF NOT EXISTS bc_nd (id TEXT PRIMARY KEY, cty TEXT, du_lieu TEXT, at INTEGER)`,
+  // 17/11/2026: CỔNG TUYỂN DỤNG CỦA CÔNG TY (cùng tên miền, /tuyen-dung/<tên rút gọn>) – chuyển từ máy chủ thử recruit.quantritute.com, không tự xóa sau 24 giờ
+  `CREATE TABLE IF NOT EXISTS td_cong (tok TEXT PRIMARY KEY, key_hash TEXT NOT NULL, slug TEXT, ten TEXT, html TEXT, jobs TEXT, tao INTEGER, cap_nhat INTEGER)`,
+  `CREATE TABLE IF NOT EXISTS td_ho_so (ma TEXT PRIMARY KEY, tok TEXT NOT NULL, job TEXT, du_lieu TEXT, cv_ten TEXT, cv_loai TEXT, cv_size INTEGER, cv_parts INTEGER DEFAULT 0, ip TEXT, tao INTEGER)`,
+  `CREATE INDEX IF NOT EXISTS td_ho_so_tok ON td_ho_so (tok, tao)`,
+  `CREATE TABLE IF NOT EXISTS td_cv_part (ma TEXT NOT NULL, i INTEGER NOT NULL, data BLOB, PRIMARY KEY (ma, i))`
 ];
 const MIGRATE_V2 = ['ALTER TABLE cham ADD COLUMN may TEXT', 'ALTER TABLE phien ADD COLUMN may TEXT', 'ALTER TABLE tu_choi ADD COLUMN may TEXT'];
 const MIGRATE_V3 = ['ALTER TABLE nv ADD COLUMN pb TEXT', 'ALTER TABLE nv ADD COLUMN ncc INTEGER DEFAULT 0', 'ALTER TABLE nv ADD COLUMN nguon TEXT'];
@@ -640,6 +738,13 @@ async function getCfg(db) {
   const { results } = await db.prepare('SELECT k, v FROM cfg').all();
   const o = { ...DEF }; results.forEach(r => { o[r.k] = r.v; }); return o;
 }
+// Tên miền đăng ký được từ hostname (bỏ www/sub, giữ đuôi 2 cấp kiểu .com.vn). workers.dev, pages.dev, localhost, IP → '' (không tự nhận được)
+function regDomain(h) {
+  h = String(h || '').toLowerCase();
+  if (!h || h === 'localhost' || /^[\d.:]+$/.test(h) || /(^|\.)(workers|pages)\.dev$/.test(h) || !h.includes('.')) return '';
+  const p = h.split('.'), two = /^(com|net|org|edu|gov|ac|co|info|biz|name|pro|health|int)$/;
+  return p.length >= 3 && two.test(p[p.length - 2]) && p[p.length - 1].length === 2 ? p.slice(-3).join('.') : p.slice(-2).join('.');
+}
 async function setCfg(db, obj) {
   await db.batch(Object.entries(obj).map(([k, v]) => db.prepare('INSERT INTO cfg (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v').bind(k, String(v))));
 }
@@ -726,6 +831,12 @@ function demoQtOf(ma) { const r = DEMO_QT[ma] || (demoFind(ma) && (demoFind(ma).
 async function api(req, env, url) {
   const db = env.DB; await ensureSchema(db);
   const p = url.pathname, now = Date.now(), ip = clientIP(req, env);
+  /* ----- 17/11: CỔNG TUYỂN DỤNG CỦA CÔNG TY – ứng viên nộp (công khai), phần mềm đưa trang lên / lấy hồ sơ (cần đăng nhập Phần mềm quản lý nhân sự trên máy chủ này) ----- */
+  if (p === '/api/ung-tuyen' || p === '/api/cong' || p.startsWith('/api/cong/')) { // đọc thân yêu cầu riêng (multipart / JSON) nên đặt trước phần đọc body chung
+    if (isDemo(env, url)) return json({ ok: false, msg: 'Bản thử dùng cổng thử recruit.quantritute.com.' }, 404);
+  if (p === '/api/ung-tuyen' && req.method === 'POST') return tdNop(db, req);
+  if (p === '/api/cong' || p.startsWith('/api/cong/')) { const U = await qtUser(db, req); if (!U) return json({ ok: false, msg: 'Phiên đăng nhập đã hết – đăng nhập lại Phần mềm quản lý nhân sự.', loi: 'Phiên đăng nhập đã hết.' }, 401); return tdCongApi(db, req, url, p); }
+  }
   const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
   let cfg = await getCfg(db);
   const demo = isDemo(env, url);
@@ -1016,6 +1127,8 @@ async function api(req, env, url) {
     }
     // 17/11/2026 đợt 2 (anh duyệt): GỬI EMAIL TỰ ĐỘNG QUA RESEND – khóa API lưu trong cfg (chỉ Quản trị hệ thống thiết lập, trả về dạng che), gửi từ máy chủ, không lộ khóa ra trình duyệt
     if (r === 'email-cfg') {
+      // 17/11: email gửi đi phải thuộc tên miền của đơn vị. Tự nhận từ địa chỉ máy chủ; chạy trên workers.dev thì quản trị nhập tay (mail_domain)
+      const autoDom = regDomain(new URL(req.url).hostname), dom = autoDom || String(cfg.mail_domain || '');
       if (req.method === 'POST') {
         if (!U.sys) return bad('Chỉ tài khoản Quản trị hệ thống được thiết lập gửi email.', 403);
         if (body.xoa) { await setCfg(db, { mail_key: '', mail_from: '', mail_name: '', mail_reply: '' }); return json({ ok: true }); }
@@ -1024,10 +1137,12 @@ async function api(req, env, url) {
         if (!k && !cfg.mail_key) return bad('Chưa nhập khóa API Resend.');
         const from = String(body.from || '').trim().toLowerCase(); if (!/^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i.test(from)) return bad('Email gửi đi chưa đúng (VD: tuyendung@tencongty.vn).');
         const rep = String(body.reply || '').trim().toLowerCase(); if (rep && !/^[^\s@<>"]+@[^\s@<>"]+\.[a-z]{2,}$/i.test(rep)) return bad('Email nhận phản hồi chưa đúng.');
+        let d = autoDom; if (!d) { d = String(body.domain || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, ''); if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d) || /(^|\.)(workers|pages)\.dev$/.test(d)) return bad('Nhập tên miền riêng của đơn vị (VD: tencongty.vn).'); o.mail_domain = d; }
+        const fd = from.split('@')[1]; if (fd !== d && !fd.endsWith('.' + d)) return bad('Email gửi đi phải thuộc tên miền của đơn vị (@' + d + '). Email ' + from + ' không thuộc tên miền này.');
         o.mail_from = from; o.mail_name = String(body.name || '').trim().replace(/[<>"\r\n]/g, '').slice(0, 80); o.mail_reply = rep;
         await setCfg(db, o); return json({ ok: true });
       }
-      return json({ ok: true, on: !!(cfg.mail_key && cfg.mail_from), key: cfg.mail_key ? 're_…' + String(cfg.mail_key).slice(-4) : '', from: cfg.mail_from || '', name: cfg.mail_name || '', reply: cfg.mail_reply || '', admin: !!U.sys });
+      return json({ ok: true, on: !!(cfg.mail_key && cfg.mail_from), key: cfg.mail_key ? 're_…' + String(cfg.mail_key).slice(-4) : '', from: cfg.mail_from || '', name: cfg.mail_name || '', reply: cfg.mail_reply || '', dom: dom, autoDom: !!autoDom, admin: !!U.sys });
     }
     if (r === 'email-gui' && req.method === 'POST') {
       if (!cfg.mail_key || !cfg.mail_from) return bad('Chưa thiết lập gửi email tự động. Vào Cài đặt → Gửi email tự động.');
@@ -1154,6 +1269,16 @@ async function api(req, env, url) {
     let ok = false; try { ok = !!t && (JSON.parse(t.den || '{}').ma || []).includes(s.nv.ma); } catch (e) { }
     const r = ok ? await db.prepare('SELECT du_lieu FROM bc_nd WHERE id = ?').bind(id).first() : null; if (!r) return bad('Không tìm thấy báo cáo (có thể đã quá hạn lưu).', 404);
     return json({ ok: true, bc: JSON.parse(r.du_lieu) });
+  }
+  if (p === '/api/tb-luu') { // 17/11: Lưu trữ thông báo nội bộ – mọi thông báo gửi từ "Gửi thông báo nội bộ" tới người này, kể cả đã xóa khỏi danh sách; tìm theo từ khóa
+    const s = await session(db, req, 'nv'); if (!s) return bad('Phiên đăng nhập đã hết. Đăng nhập lại.', 401);
+    const ma = s.nv.ma, BY = await hsLite(db, demo), H = BY[ma] || { cty: '', pb: s.nv.pb || '' };
+    const fold = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'd').toLowerCase();
+    const q = fold(url.searchParams.get('q')).trim(), w = q ? q.split(/\s+/) : [], trang = Math.max(0, parseInt(url.searchParams.get('trang'), 10) || 0), N = 30;
+    const doc = {}; (await db.prepare('SELECT id, doc_at FROM tb_doc WHERE ma = ?').bind(ma).all()).results.forEach(r => { doc[r.id] = r.doc_at; });
+    const L = (await db.prepare("SELECT id, cty, tieu_de, noi_dung, anh IS NOT NULL AS co_anh, den, nguoi, at FROM tb WHERE loai = 'tb' ORDER BY at DESC LIMIT 3000").all()).results
+      .filter(r => tbHop(r, ma, H) && (!w.length || (x => w.every(k => x.includes(k)))(fold(r.tieu_de + ' ' + r.noi_dung + ' ' + (r.nguoi || '')))));
+    return json({ ok: true, n: L.length, trang, het: (trang + 1) * N >= L.length, thang: tbLuuThang(cfg), list: L.slice(trang * N, trang * N + N).map(r => ({ id: r.id, tieu_de: r.tieu_de, noi_dung: r.noi_dung, co_anh: r.co_anh ? 1 : 0, nguoi: r.nguoi, at: r.at, doc_at: doc[r.id] || null })) });
   }
   if (p === '/api/tb' && req.method === 'POST') { // đánh dấu đã đọc / xóa (ẩn với riêng mình)
     const s = await session(db, req, 'nv'); if (!s) return bad('Phiên đăng nhập đã hết. Đăng nhập lại.', 401);
@@ -1664,6 +1789,7 @@ export default {
         return withMay(new Response(HRM_HTML.replace(/<head([^>]*)>/i, m => m + sv), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', ...SEC } }));
       }
       if (/^\/og-(ql|nv)\.jpg$/.test(url.pathname) && isDemo(env, url)) return new Response(b64ToBytes(url.pathname === '/og-ql.jpg' ? OG_QL_B64 : OG_NV_B64), { headers: { 'content-type': 'image/jpeg', 'cache-control': 'max-age=86400' } });
+      if (/^\/tuyen-dung(\/|$)/.test(url.pathname) && !isDemo(env, url)) { await ensureSchema(env.DB); const r = await tdTrang(env.DB, url); if (r) return r; } // 17/11: cổng tuyển dụng của công ty
       const ROUTES = { '/': 'nv', '/q': 'q', '/tram': 'tram', '/quan-ly': 'ql' };
       const route = ROUTES[url.pathname.replace(/\/+$/, '') || '/'];
       if (!route) return new Response('Không có trang này', { status: 404, headers: { 'content-type': 'text/plain; charset=utf-8' } });

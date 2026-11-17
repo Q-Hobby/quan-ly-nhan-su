@@ -2367,6 +2367,8 @@ body.nav-hide .nav-hide-btn{background:var(--pri-soft);border-color:var(--pri);c
 /* 17/11 21:09: Google Drive */
 .gd-st{margin:0 0 0 18px;padding:0;display:grid;gap:8px;line-height:1.55;font-size:13.5px}
 .gd-warn ul{margin:6px 0 0 16px;padding:0;display:grid;gap:5px;font-size:13px;line-height:1.5}
+.ml-red{display:block;color:#c0392b;font-size:12px;line-height:1.45;margin:-2px 0 6px}.ml-red b{color:inherit}
+.tbl-card{margin-bottom:12px;display:flex;flex-direction:column;gap:6px;font-size:13px}.tbl-r{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;justify-content:space-between}.tbl-sel{width:auto;display:inline-block;padding:4px 8px;margin-left:6px}.tbl-bar{height:6px;border-radius:4px;background:var(--line,#e5e5e5);overflow:hidden}.tbl-bar i{display:block;height:100%;background:var(--pri,#2e7d32)}.tbl-bar.warn i{background:#c0392b}
 </style>
 </head>
 <body>
@@ -4028,7 +4030,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     { id: 'bhxh', g: null, t: 'Bảo hiểm xã hội', st: 7, k: 'bhxh bao hiem' },
     { id: 'nhap', g: 'ht', t: 'Nhập dữ liệu', st: 'ok', k: 'nap file excel thang moi' },
     { id: 'xuat', g: 'ht', t: 'Xuất báo cáo', st: 'ok', k: 'bao cao excel' },
-    { id: 'dm', g: 'ht', t: 'Danh mục', st: 'ok', k: 'danh muc phong ban chuc vu ca ky hieu' },
+    // 17/11: bỏ mục Danh mục – Phòng ban, Chức vụ xem ở Sơ đồ tổ chức
     { id: 'dinhky', g: 'ht', t: 'Việc định kỳ', st: 'ok', k: 'viec dinh ky lap lai hang thang nhac chot cong luong' },
     { id: 'appnv', g: 'ht', t: 'Ứng dụng nhân viên', st: 'ok', k: 'app dien thoai nhan vien tai khoan pin cap khoa mo khoa dang nhap' },
     { id: 'caidat', g: 'ht', t: 'Cài đặt', st: 'ok', k: 'cai dat nguong xoa du lieu' }
@@ -6010,7 +6012,8 @@ if (typeof module !== 'undefined') module.exports = XW;
   };
 
   /* ================== DANH MỤC ================== */
-  PAGES.dm = function () {
+  PAGES.dm = function () { setTimeout(function () { ps('tochuc', {}).view = 'cv'; go('tochuc'); }, 0); return ''; }; // 17/11: mục cũ, chuyển sang Sơ đồ tổ chức
+  PAGES.dmCu = function () {
     var R = refDate(), h = pageHead('Danh mục', 'Đọc từ file danh mục trong thư mục dữ liệu');
     var pb = gather('PB'), cnt = {};
     selUnits().forEach(function (u) { var mat = HR.maternitySet(u.data, R); u.data.NV.forEach(function (e) { if (HR.isActive(e, R, mat)) { var k = u.id + '|' + e['Phòng ban']; cnt[k] = (cnt[k] || 0) + 1; } }); });
@@ -6548,11 +6551,12 @@ if (typeof module !== 'undefined') module.exports = XW;
     orgs.forEach(function (o) { o.depts.forEach(function (x) { if (!x.pb && !x.members.length) return; nD++; act += x.members.length; work += x.working; vac += x.vac; if (x.plan !== null) plan += x.plan; if ((!x.head || x.headOut) && !x.isRoot) noHead++; }); });
     var kpi = '<div class="org-kpi"><div><b>' + nD + '</b><span>bộ phận</span></div><div><b>' + act + '</b><span>người đang làm' + (work < act ? ' · ' + work + ' đang đi làm' : '') + '</span></div><div><b>' + plan + '</b><span>định biên</span></div>' +
       '<div class="' + (vac ? 'k-vac' : '') + '"><b>' + vac + '</b><span>vị trí còn trống</span></div><div class="' + (noHead ? 'k-warn' : '') + '"><b>' + noHead + '</b><span>bộ phận thiếu người phụ trách</span></div></div>';
-    var tools = '<div class="seg" role="tablist"><button class="' + (f.view === 'chart' ? 'on' : '') + '" data-act="org-view" data-id="chart">Sơ đồ</button><button class="' + (f.view === 'table' ? 'on' : '') + '" data-act="org-view" data-id="table">Bảng phòng ban</button></div>' +
-      '<label class="radio"><input type="checkbox" id="orgLeft"' + (f.left ? ' checked' : '') + '> Hiện người đã nghỉ</label>' +
-      '<button class="btn btn-sm" data-act="org-print">In sơ đồ</button>';
+    var tools = '<div class="seg" role="tablist"><button class="' + (f.view === 'chart' ? 'on' : '') + '" data-act="org-view" data-id="chart">Sơ đồ</button><button class="' + (f.view === 'table' ? 'on' : '') + '" data-act="org-view" data-id="table">Bảng phòng ban</button><button class="' + (f.view === 'cv' ? 'on' : '') + '" data-act="org-view" data-id="cv">Chức vụ</button></div>' +
+      (f.view === 'cv' ? '' : '<label class="radio"><input type="checkbox" id="orgLeft"' + (f.left ? ' checked' : '') + '> Hiện người đã nghỉ</label>' +
+      '<button class="btn btn-sm" data-act="org-print">In sơ đồ</button>');
     var body;
-    if (f.view === 'table') body = '<div id="orgTbl"></div>';
+    if (f.view === 'cv') { var cvs = gather('CV'); body = '<div class="card card-pad"><div class="card-head"><div><h3>Chức vụ</h3><p>Đọc từ danh mục chức vụ trong dữ liệu (sheet CV)</p></div></div>' + (cvs.length ? table('dm-CV', uCol().concat(['Mã chức vụ', 'Tên chức vụ', 'Cấp bậc', 'Phụ cấp chức vụ (đồng/tháng)'].map(function (k) { return { t: k, f: function (x) { return x.r[k]; }, r: /Cấp|Phụ cấp/.test(k) ? 1 : 0 }; })), cvs, { title: 'Chức vụ', limit: 1000 }) : '<p class="muted">Chưa có danh mục chức vụ.</p>') + '</div>'; }
+    else if (f.view === 'table') body = '<div id="orgTbl"></div>';
     else body = orgs.map(function (o) { return '<div class="card card-pad org-card">' + orgChart(o, f) + '</div>'; }).join('') +
       '<div class="org-leg"><span><i class="lg-head"></i>Trưởng bộ phận</span><span><i class="lg-mat"></i>Nghỉ thai sản</span><span><i class="lg-prob"></i>Thử việc</span><span><i class="lg-vac"></i>Còn trống theo định biên</span><span class="faint">Kéo một người sang ô phòng khác để chuyển phòng · bấm tên phòng để sửa</span></div>';
     return editBar() + pageHead('Sơ đồ tổ chức', 'Vẽ từ Danh mục phòng ban và Danh sách nhân sự · tính đến ' + vn(R), tools) + kpi + body;
@@ -13595,33 +13599,36 @@ if (typeof module !== 'undefined') module.exports = XW;
   /* Cổng tuyển dụng – máy chủ THỬ NGHIỆM recruit.quantritute.com (11/11 19:32 anh chốt: bản thử, đổi link sang recruit.quantritute.com, không dùng R2).
      Mỗi trình duyệt có mã cổng (tok, nằm trong link) + khóa bí mật (key) lưu ở cfg.thu; link sống 24 giờ kể từ lần đưa lên gần nhất. */
   var TD_THU = window.QTT_TD_THU || 'https://recruit.quantritute.com', TD_THU_TTL = 24 * 3600 * 1000;
-  function tdThu(u) { var x = tdOf(u).cfg.thu; return x && x.tok && x.at && Date.now() - x.at < TD_THU_TTL - 60000 ? x : null; }
-  function tdPortalLink(u, r) { var c = tdOf(u).cfg, th = tdThu(u); return (th ? TD_THU + '/t/' + th.tok + '/' : TD_THU + '/') + c.slug + (r ? '/' + r.slug : ''); }
+  // 17/11: bản đầy đủ chạy trên máy chủ của công ty (SV) → cổng tuyển dụng THẬT ngay trên tên miền công ty: <địa chỉ>/tuyen-dung/<tên rút gọn>, không hết hạn
+  function tdSrvOwn() { return !!window.QTT_SV; }
+  function TDB() { return tdSrvOwn() ? location.origin : TD_THU; }
+  function tdThu(u) { var x = tdOf(u).cfg.thu; if (tdSrvOwn()) return x && x.tok && x.key && x.own ? x : null; return x && x.tok && x.at && !x.own && Date.now() - x.at < TD_THU_TTL - 60000 ? x : null; }
+  function tdPortalLink(u, r) { var c = tdOf(u).cfg, th = tdThu(u); return (tdSrvOwn() ? location.origin + '/tuyen-dung/' : th ? TD_THU + '/t/' + th.tok + '/' : TD_THU + '/') + c.slug + (r ? '/' + r.slug : ''); }
   function tdRand(n) { var a = new Uint8Array(n), s = 'abcdefghijklmnopqrstuvwxyz0123456789'; crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return s[x % 36]; }).join(''); }
   function tdThuPush(u, again) {
-    var cf = tdOf(u).cfg; if (!cf.thu || !cf.thu.tok || !cf.thu.key) cf.thu = { tok: tdRand(10), key: tdRand(32) };
-    var th = cf.thu, D = tdPortalData(u, 'live'); D.api = TD_THU; D.tok = th.tok; D.thu = 1; D.base = TD_THU + '/t/' + th.tok + '/' + cf.slug;
-    return fetch(TD_THU + '/api/cong', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key, slug: cf.slug, ten: cf.short, html: tdPortalHtml(D, {}), jobs: D.jobs.map(function (j) { return j.slug; }) }) })
+    var cf = tdOf(u).cfg, own = tdSrvOwn(); if (!cf.thu || !cf.thu.tok || !cf.thu.key || !!cf.thu.own !== own) cf.thu = { tok: tdRand(10), key: tdRand(32), own: own ? 1 : 0 };
+    var th = cf.thu, D = tdPortalData(u, 'live'); D.api = TDB(); D.tok = th.tok; D.thu = own ? 0 : 1; D.base = own ? location.origin + '/tuyen-dung/' + cf.slug : TD_THU + '/t/' + th.tok + '/' + cf.slug;
+    return fetch(TDB() + '/api/cong', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key, slug: cf.slug, ten: cf.short, html: tdPortalHtml(D, {}), jobs: D.jobs.map(function (j) { return j.slug; }), ids: D.jobs.map(function (j) { return j.id; }) }) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
         if (r.status === 403 && !again) { cf.thu = null; return tdThuPush(u, true); }
         if (!r.ok || !j.ok) throw new Error(j.msg || ('Máy chủ trả lỗi ' + r.status));
         th.at = Date.now(); th.exp = j.het_han; tdSave(u, 'Đưa cổng tuyển dụng lên máy chủ thử (' + D.jobs.length + ' vị trí)'); tdThuTimer(); return j; }); });
   }
   // Lấy hồ sơ ứng viên nộp trên cổng thử về Ngân hàng ứng viên (kèm CV), lấy xong máy chủ xóa ngay
-  var TD_PULLING = {};
+  var TD_PULLING = {}, TD_SKIP = {};
   function tdThuPull(u, quiet) {
     var th = tdThu(u); if (!th) { if (!quiet) toast('Cổng thử chưa bật', 'info', 'Bấm Mở link hoặc Đưa vị trí lên cổng trước.'); return Promise.resolve(0); }
     if (TD_PULLING[u.id]) return TD_PULLING[u.id];
     var q = '?tok=' + th.tok + '&key=' + th.key;
-    var pr = fetch(TD_THU + '/api/cong/ho-so' + q, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
+    var pr = fetch(TDB() + '/api/cong/ho-so' + q, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (j) {
       if (!j.ok) throw new Error(j.msg || 'Không lấy được hồ sơ');
       var got = [], s = Promise.resolve();
       (j.ds || []).forEach(function (h) { s = s.then(function () {
-        return fetch(TD_THU + '/api/cong/cv' + q + '&ma=' + encodeURIComponent(h.ma)).then(function (r) { return r.ok ? r.arrayBuffer() : null; }).catch(function () { return null; })
-          .then(function (buf) { return tdImportApp(u, h.d, buf ? { name: h.cv.name, type: h.cv.type, size: buf.byteLength, buf: buf } : null, 'cong-thu', h.ma); })
-          .then(function (c) { got.push(h.ma); if (c) toast('Có hồ sơ mới từ cổng tuyển dụng: ' + c.name, 'ok', (tdReq(u, c.rq) || {}).pos + ' · đã vào Ngân hàng ứng viên' + (c.cv ? ', kèm CV' : '')); });
+        return fetch(TDB() + '/api/cong/cv' + q + '&ma=' + encodeURIComponent(h.ma)).then(function (r) { return r.ok ? r.arrayBuffer() : null; }).catch(function () { return null; })
+          .then(function (buf) { return tdImportApp(u, h.d, buf ? { name: h.cv.name, type: h.cv.type, size: buf.byteLength, buf: buf } : null, tdSrvOwn() ? 'cong' : 'cong-thu', h.ma); })
+          .then(function (c) { if (!c && tdSrvOwn()) { if (!TD_SKIP[h.ma]) { TD_SKIP[h.ma] = 1; toast('Có hồ sơ của ' + ((h.d && h.d.name) || 'ứng viên') + ' cho vị trí không còn trong phần mềm', 'warn', 'Hồ sơ vẫn giữ trên máy chủ (tự xóa sau 180 ngày). Mở lại phiếu nhu cầu của vị trí này để nhận về.'); } return; } got.push(h.ma); if (c) toast('Có hồ sơ mới từ cổng tuyển dụng: ' + c.name, 'ok', (tdReq(u, c.rq) || {}).pos + ' · đã vào Ngân hàng ứng viên' + (c.cv ? ', kèm CV' : '')); });
       }); });
-      return s.then(function () { if (got.length) return fetch(TD_THU + '/api/cong/da-lay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key, ma: got }) }).catch(function () { }); })
+      return s.then(function () { if (got.length) return fetch(TDB() + '/api/cong/da-lay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key, ma: got }) }).catch(function () { }); })
         .then(function () { if (got.length) { renderNav(); if (/^td/.test(curPage)) render(); } else if (!quiet) toast('Chưa có hồ sơ mới trên cổng', 'info', ''); return got.length; });
     }).catch(function (e) { if (!quiet) toast('Chưa lấy được hồ sơ từ cổng', 'warn', String(e && e.message || e)); logErr('Lấy hồ sơ cổng thử', e); return 0; })
       .then(function (n) { delete TD_PULLING[u.id]; return n; });
@@ -13945,7 +13952,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       var url = URL.createObjectURL(new Blob([tdPortalHtml(D, isAb ? { about: 1 } : jobId ? { job: jobId } : {})], { type: 'text/html;charset=utf-8' }));
       try { w.location.href = url; } catch (x) { }
       setTimeout(function () { URL.revokeObjectURL(url); }, 120000);
-      toast('Chưa kết nối được cổng thử recruit.quantritute.com', 'warn', 'Đang mở trang ngay trên máy này' + (why ? ' (' + why + ')' : '') + ' – hồ sơ nộp ở tab đó vẫn vào Ngân hàng ứng viên.');
+      toast(tdSrvOwn() ? 'Chưa đưa được trang lên cổng tuyển dụng của công ty' : 'Chưa kết nối được cổng thử recruit.quantritute.com', 'warn', 'Đang mở trang ngay trên máy này' + (why ? ' (' + why + ')' : '') + ' – hồ sơ nộp ở tab đó vẫn vào Ngân hàng ứng viên.');
     }
     if (!navigator.onLine) local('máy không có mạng');
     else tdThuPush(u).then(function () { try { w.location.href = tdPortalLink(u, r) + (isAb ? '/ve-chung-toi' : ''); } catch (x) { } if (curPage === 'tdtin') render(); })
@@ -14249,7 +14256,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       '\'<div class="why">\'+D.co.why.map(function(w){return\'<div><b>\'+I.star+\'</b>\'+esc(w)+\'</div>\'}).join("")+\'</div>\'+\'<div class="about"><h2>Về \'+esc(D.co.short)+\'</h2><p style="margin:0">\'+esc(D.co.intro||(D.ab&&D.ab.story)||D.co.tag||"")+\'</p><button class="go" data-about>Tìm hiểu về chúng tôi →</button></div>\'+\'</div></main>\'+foot();' +
       'var qi=$("#q");qi.addEventListener("input",function(){q=qi.value;var p=qi.selectionStart;list();var n=$("#q");n.focus();try{n.setSelectionRange(p,p)}catch(e){}});$("#pb").addEventListener("change",function(){pb=this.value;list()});window.scrollTo(0,0)}' +
       'function blk(t,l){return l&&l.length?\'<div class="card blk"><h2>\'+t+\'</h2><ul>\'+l.map(function(x){return"<li>"+esc(x)+"</li>"}).join("")+\'</ul></div>\':""}' +
-      'function nav(x){if(D.mode!=="live"||!history.pushState)return;var b=D.base.replace(/^https?:\\/\\/[^\\/]+/,""),pth=b+(x?"/"+x:"");try{if(location.pathname!==pth)history.pushState(null,"",pth)}catch(e){}}window.addEventListener("popstate",function(){route()});function route(){var seg=location.pathname.split("/").filter(Boolean),js=seg.length>3?seg[3]:"",j=D.jobs.filter(function(x){return x.slug===js})[0];if(js==="ve-chung-toi")about(1);else if(j)job(j,1);else list(1)}' + String(tdAboutPage).replace(/^function tdAboutPage/, 'function about') + ';' +
+      'function nav(x){if(D.mode!=="live"||!history.pushState)return;var b=D.base.replace(/^https?:\\/\\/[^\\/]+/,""),pth=b+(x?"/"+x:"");try{if(location.pathname!==pth)history.pushState(null,"",pth)}catch(e){}}window.addEventListener("popstate",function(){route()});function route(){var seg=location.pathname.split("/").filter(Boolean),bn=D.base?D.base.replace(/^https?:\\/\\/[^\\/]+/,"").split("/").filter(Boolean).length:3,js=seg.length>bn?seg[bn]:"",j=D.jobs.filter(function(x){return x.slug===js})[0];if(js==="ve-chung-toi")about(1);else if(j)job(j,1);else list(1)}' + String(tdAboutPage).replace(/^function tdAboutPage/, 'function about') + ';' +
       'function job(j,nn){cur=j;if(!nn)nav(j.slug);app.innerHTML=head()+\'<main><div class="wrap"><div class="crumb"><button data-home>← Tất cả vị trí</button></div><div class="dt"><div><div class="card"><h1>\'+esc(j.pos)+\'</h1>\'+chips(j)+\'<div class="facts"><div><small>Số lượng</small><b>\'+j.sl+" người</b></div><div><small>Thu nhập</small><b>"+esc(j.sal)+\'</b></div><div><small>Địa điểm</small><b>\'+esc(j.place)+\'</b></div><div><small>Thời gian làm việc</small><b>\'+esc(j.time||"")+\'</b></div><div><small>Hạn nhận hồ sơ</small><b>\'+esc(j.deadline||"Đến khi đủ người")+\'</b></div><div><small>Thử việc</small><b>\'+(j.prob?"Tối đa "+j.prob+(j.prob===6?" ngày làm việc":" ngày"):"Không")+\'</b></div></div><div class="share"><button data-share="copy">Sao chép link</button><button data-share="fb">Chia sẻ Facebook</button><button data-share="zalo">Gửi qua Zalo</button></div></div>\'+' +
       'blk("Mô tả công việc",j.desc)+blk("Yêu cầu",j.reqs)+blk("Quyền lợi",j.bens)+(D.co.steps.length?\'<div class="card blk"><h2>Quy trình tuyển dụng</h2><div class="steps">\'+D.co.steps.map(function(s){return"<div>"+esc(s)+"</div>"}).join("")+\'</div></div>\':"")+\'</div><div class="card apply" id="ung-tuyen">\'+form(j)+\'</div></div></div></main><div class="mob-apply"><button class="sub" data-goapply>Ứng tuyển ngay</button></div>\'+foot();bindForm(j);window.scrollTo(0,0)}' +
       'function form(j){return\'<h2>Ứng tuyển vị trí này</h2><p class="s">Điền thông tin và đính kèm CV. Chúng tôi sẽ liên hệ trong vài ngày làm việc.</p><form id="fm" novalidate>\'+' +
@@ -14286,14 +14293,14 @@ if (typeof module !== 'undefined') module.exports = XW;
   });
   function tdImportApp(u, dd, file, via, ma) {
     var t = tdOf(u), r = tdReq(u, dd.job) || t.rq.filter(function (x) { return x.slug === dd.job; })[0]; if (!r) return Promise.resolve(null);
-    var thu = via === 'cong-thu';
+    var thu = via === 'cong-thu' || via === 'cong', own = via === 'cong';
     var c = { id: tdNext(t.cd, 'UV', 4), rq: r.id, name: String(dd.name || '').replace(/(^|\s)(\S)/g, function (x, a, b) { return a + b.toUpperCase(); }), phone: dd.phone, email: dd.email, exp: dd.exp, src: dd.src || 'Cổng tuyển dụng', at: HR.isoToday(), stage: 'new', ivs: [], letters: [], hist: [], note: '',
-      consent: { at: thu && dd.consentAt ? dd.consentAt.replace('T', ' ').slice(0, 19) : tdNow(), ver: via, how: thu ? 'Tích ô đồng ý trên cổng tuyển dụng thử nghiệm recruit.quantritute.com (mã nộp ' + ma + ')' : 'Tích ô đồng ý trên cổng tuyển dụng (bản xem trước trên máy này)', text: dd.consentText || '' } };
-    tdHist(c, 'Nộp hồ sơ qua cổng tuyển dụng ' + (thu ? 'thử nghiệm (máy chủ)' : '(bản xem trước)') + ' – biết tin qua: ' + c.src);
+      consent: { at: thu && dd.consentAt ? dd.consentAt.replace('T', ' ').slice(0, 19) : tdNow(), ver: via, how: own ? 'Tích ô đồng ý trên cổng tuyển dụng của công ty ' + location.host + '/tuyen-dung (mã nộp ' + ma + ')' : thu ? 'Tích ô đồng ý trên cổng tuyển dụng thử nghiệm recruit.quantritute.com (mã nộp ' + ma + ')' : 'Tích ô đồng ý trên cổng tuyển dụng (bản xem trước trên máy này)', text: dd.consentText || '' } };
+    tdHist(c, 'Nộp hồ sơ qua cổng tuyển dụng ' + (own ? 'của công ty' : thu ? 'thử nghiệm (máy chủ)' : '(bản xem trước)') + ' – biết tin qua: ' + c.src);
     t.cd.push(c);
     var p = Promise.resolve();
     if (file && file.buf) { var id = khoId(); c.cv = id; c.cvName = file.name; p = khoPut({ id: id, u: u.id, nv: c.id, kho: 'cv', ref: 'CV', name: file.name, type: file.type || 'application/pdf', size: file.size, at: tdNow().replace(' ', 'T'), blob: new Blob([file.buf], { type: file.type || 'application/pdf' }) }).catch(function (er) { logErr('Lưu CV ứng viên', er); c.cv = null; }); }
-    return p.then(function () { tdSave(u, 'Nhận hồ sơ ' + c.id + ' ' + c.name + ' – ' + r.pos + (thu ? ' (cổng thử)' : ' (cổng xem trước)')); if (PS.tdu) PS.tdu.pulse = u.id + '|' + c.id; return c; });
+    return p.then(function () { tdSave(u, 'Nhận hồ sơ ' + c.id + ' ' + c.name + ' – ' + r.pos + (own ? ' (cổng tuyển dụng)' : thu ? ' (cổng thử)' : ' (cổng xem trước)')); if (PS.tdu) PS.tdu.pulse = u.id + '|' + c.id; return c; });
   }
 
   PAGES.tdtin = function () {
@@ -14316,7 +14323,11 @@ if (typeof module !== 'undefined') module.exports = XW;
       '<dl class="td-kv"><dt>Tên hiển thị</dt><dd>' + esc(cf.short) + '</dd><dt>Liên hệ</dt><dd>' + esc(cf.contact) + (cf.phone ? '<br>' + esc(tdPhoneFmt(cf.phone)) : '') + (cf.email ? '<br>' + esc(cf.email) : '') + '</dd><dt>Chính sách dữ liệu</dt><dd>' + (cf.policy ? '<a href="' + esc(cf.policy) + '" target="_blank" rel="noopener">' + esc(cf.policy) + '</a>' : '<span class="miss">Chưa có – cần thêm trước khi nhận hồ sơ</span>') + '</dd><dt>Lưu hồ sơ</dt><dd>' + (cf.keep || 6) + ' tháng sau khi có kết quả</dd></dl>' +
       '<div class="link-row" style="margin-top:12px"><button class="btn btn-sm btn-primary" data-act="td-cfg" data-u="' + u.id + '">' + ic('td_edit', 14) + 'Sửa thông tin</button></div></div>';
     var th = tdThu(u), hh = th ? new Date(th.at + TD_THU_TTL) : null;
-    var server = ED_CT && !SV ? '<div class="card card-pad td-srv"><div class="card-head"><div><h3>Cổng ứng tuyển trực tuyến</h3><p>Có ở bản đầy đủ: trang tuyển dụng trên tên miền của đơn vị, ứng viên nộp CV trên điện thoại, hồ sơ tự về Ngân hàng ứng viên. Bản rút gọn dùng khung xem trước và tải trang tuyển dụng về để đăng nơi khác.</p></div></div></div>' : '<div class="card card-pad td-srv"><div class="card-head"><div><h3>Cổng thử trên máy chủ</h3><p>recruit.quantritute.com – mở link trên điện thoại, máy khác; ứng viên nộp CV, hồ sơ tự về phần mềm</p></div></div>' +
+    var server = SV ? '<div class="card card-pad td-srv"><div class="card-head"><div><h3>Cổng tuyển dụng của công ty</h3><p>Trang tuyển dụng ngay trên tên miền của công ty: <b>' + esc(location.host) + '/tuyen-dung/' + esc(cf.slug) + '</b> – ứng viên mở trên điện thoại, nộp CV, hồ sơ tự về Ngân hàng ứng viên.</p></div></div>' +
+      '<div class="td-srv-st' + (th ? ' on' : '') + '"><i></i>' + (th ? 'Đang mở – cập nhật lần cuối ' + (th.at ? p2(new Date(th.at).getHours()) + ':' + p2(new Date(th.at).getMinutes()) + ' ngày ' + p2(new Date(th.at).getDate()) + '/' + p2(new Date(th.at).getMonth() + 1) : '') : 'Chưa mở – bấm Đưa vị trí lên cổng') + '</div>' +
+      '<div class="link-row"><button class="btn btn-sm btn-primary" data-act="td-thu-push" data-u="' + u.id + '">' + ic('td_srv', 14) + (th ? 'Cập nhật vị trí lên cổng' : 'Đưa vị trí lên cổng') + '</button><button class="btn btn-sm" data-act="td-thu-pull" data-u="' + u.id + '"' + (th ? '' : ' disabled') + '>Lấy hồ sơ mới</button>' + (th ? '<button class="btn btn-sm" data-act="td-thu-off" data-u="' + u.id + '">Đóng cổng</button>' : '') + '</div>' +
+      '<p class="muted" style="font-size:12px;margin:10px 0 0">Sửa phiếu nhu cầu, thông tin công ty xong thì bấm <b>Cập nhật vị trí lên cổng</b>. Phần mềm tự lấy hồ sơ mới mỗi 45 giây khi đang mở; hồ sơ lấy về xong máy chủ xóa bản tạm, chưa ai lấy thì tự xóa sau 180 ngày. Cần có <b>Chính sách dữ liệu</b> trước khi nhận hồ sơ (Luật 91/2025).</p></div>'
+      : ED_CT && !SV ? '<div class="card card-pad td-srv"><div class="card-head"><div><h3>Cổng ứng tuyển trực tuyến</h3><p>Có ở bản đầy đủ: trang tuyển dụng trên tên miền của đơn vị, ứng viên nộp CV trên điện thoại, hồ sơ tự về Ngân hàng ứng viên. Bản rút gọn dùng khung xem trước và tải trang tuyển dụng về để đăng nơi khác.</p></div></div></div>' : '<div class="card card-pad td-srv"><div class="card-head"><div><h3>Cổng thử trên máy chủ</h3><p>recruit.quantritute.com – mở link trên điện thoại, máy khác; ứng viên nộp CV, hồ sơ tự về phần mềm</p></div></div>' +
       '<div class="td-srv-st' + (th ? ' on' : '') + '"><i></i>' + (th ? 'Đang bật – link dùng được đến ' + p2(hh.getHours()) + ':' + p2(hh.getMinutes()) + ' ngày ' + p2(hh.getDate()) + '/' + p2(hh.getMonth() + 1) : 'Chưa bật – bấm Mở link hoặc Đưa vị trí lên cổng') + '</div>' +
       '<div class="link-row"><button class="btn btn-sm btn-primary" data-act="td-thu-push" data-u="' + u.id + '">' + ic('td_srv', 14) + (th ? 'Cập nhật vị trí lên cổng' : 'Đưa vị trí lên cổng') + '</button><button class="btn btn-sm" data-act="td-thu-pull" data-u="' + u.id + '"' + (th ? '' : ' disabled') + '>Lấy hồ sơ mới</button>' + (th ? '<button class="btn btn-sm" data-act="td-thu-off" data-u="' + u.id + '">Tắt cổng thử</button>' : '') + '</div>' +
       '<p class="muted" style="font-size:12px;margin:10px 0 0">Bản thử dùng dữ liệu mẫu: link sống 24 giờ kể từ lần đưa lên gần nhất. Phần mềm tự lấy hồ sơ mới mỗi 45 giây khi đang mở; hồ sơ lấy về xong máy chủ xóa ngay, chưa lấy thì tự xóa sau 24 giờ. Bản chính thức: mỗi công ty có mã kết nối riêng.</p></div>';
@@ -14344,9 +14355,9 @@ if (typeof module !== 'undefined') module.exports = XW;
     function k(e) { if (e.key === 'Escape') close(); }
     $('#tdFX', bg).addEventListener('click', close); document.addEventListener('keydown', k);
   };
-  ACTS['td-thu-push'] = function (a) { var u = unitById(a.getAttribute('data-u')); if (!u) return; a.disabled = true; tdThuPush(u).then(function (j) { toast('Đã đưa ' + tdPortalData(u, 'live').jobs.length + ' vị trí lên cổng thử', 'ok', 'Link dùng được 24 giờ: ' + j.base); render(); }).catch(function (e) { a.disabled = false; toast('Chưa kết nối được cổng thử', 'warn', String(e && e.message || e) + ' – kiểm tra mạng rồi thử lại.'); }); };
+  ACTS['td-thu-push'] = function (a) { var u = unitById(a.getAttribute('data-u')); if (!u) return; a.disabled = true; tdThuPush(u).then(function (j) { toast('Đã đưa ' + tdPortalData(u, 'live').jobs.length + ' vị trí lên cổng' + (tdSrvOwn() ? ' tuyển dụng' : ' thử'), 'ok', (tdSrvOwn() ? 'Link: ' : 'Link dùng được 24 giờ: ') + j.base); render(); }).catch(function (e) { a.disabled = false; toast(tdSrvOwn() ? 'Chưa đưa được lên cổng' : 'Chưa kết nối được cổng thử', 'warn', String(e && e.message || e) + ' – kiểm tra mạng rồi thử lại.'); }); };
   ACTS['td-thu-pull'] = function (a) { var u = unitById(a.getAttribute('data-u')); if (u) tdThuPull(u, false); };
-  ACTS['td-thu-off'] = function (a) { var u = unitById(a.getAttribute('data-u')), cf = u && tdOf(u).cfg; if (!cf || !cf.thu) return; var th = cf.thu; tdThuPull(u, true).then(function () { return fetch(TD_THU + '/api/cong/tat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key }) }); }).catch(function () { }).then(function () { cf.thu = null; tdSave(u, 'Tắt cổng tuyển dụng thử'); toast('Đã tắt cổng thử', 'ok', 'Trang cổng và hồ sơ chưa lấy đã xóa trên máy chủ.'); render(); }); };
+  ACTS['td-thu-off'] = function (a) { var u = unitById(a.getAttribute('data-u')), cf = u && tdOf(u).cfg; if (!cf || !cf.thu) return; var th = cf.thu; tdThuPull(u, true).then(function () { return fetch(TDB() + '/api/cong/tat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key }) }); }).catch(function () { }).then(function () { cf.thu = null; tdSave(u, tdSrvOwn() ? 'Đóng cổng tuyển dụng' : 'Tắt cổng tuyển dụng thử'); toast(tdSrvOwn() ? 'Đã đóng cổng tuyển dụng' : 'Đã tắt cổng thử', 'ok', 'Trang cổng và hồ sơ chưa lấy đã xóa trên máy chủ.'); render(); }); };
   ACTS['td-srv'] = function (a) {
     var u = unitById(a.getAttribute('data-u')), cf = tdOf(u).cfg; cf.srv = cf.srv || {};
     cf.srv.url = ($('#tdSU').value || '').trim(); cf.srv.key = ($('#tdSK').value || '').trim(); tdSave(u, 'Lưu cấu hình máy chủ cổng tuyển dụng');
@@ -18964,10 +18975,12 @@ if (typeof module !== 'undefined') module.exports = XW;
      ===================================================================== */
   var VB_TT = ['Đang hiệu lực', 'Hết hiệu lực', 'Dự thảo'], VB_NHOM0 = ['Nội quy, quy định', 'Quy chế lương, thưởng', 'KPI, đánh giá', 'Quy trình làm việc', 'Biểu mẫu', 'Thông báo chung'];
   (function () {
-    if (!MODS.some(function (m) { return m.id === 'thongtin'; })) { var i = MODS.map(function (m) { return m.id; }).indexOf('taisan'); if (i < 0) i = MODS.map(function (m) { return m.id; }).indexOf('hd'); MODS.splice(i < 0 ? MODS.length : i + 1, 0, { id: 'thongtin', g: 'ns', t: 'Thông tin chung toàn công ty', st: 'ok', k: 'thong tin chung noi quy quy dinh quy che kpi tai lieu van ban ban hanh thong bao popup gui nhan vien' }); }
+    if (!MODS.some(function (m) { return m.id === 'thongtin'; })) { var i = MODS.map(function (m) { return m.id; }).indexOf('taisan'); if (i < 0) i = MODS.map(function (m) { return m.id; }).indexOf('hd'); MODS.splice(i < 0 ? MODS.length : i + 1, 0, { id: 'thongtin', g: 'ns', t: 'Kho văn bản chung', st: 'ok', k: 'kho van ban chung thong tin chung noi quy quy dinh quy che kpi tai lieu van ban ban hanh' }, { id: 'thongbao', g: 'ns', t: 'Gửi thông báo nội bộ', st: 'ok', k: 'gui thong bao noi bo popup gui nhan vien da gui luu tru' }); } // 17/11 23:21 anh: tách Gửi thông báo nội bộ thành mục riêng, đổi tên Kho văn bản chung
+    if (!MODS.some(function (m) { return m.id === 'thongbao'; })) { var j = MODS.map(function (m) { return m.id; }).indexOf('thongtin'); MODS.splice(j + 1, 0, { id: 'thongbao', g: 'ns', t: 'Gửi thông báo nội bộ', st: 'ok', k: 'gui thong bao noi bo popup' }); }
     IC.thongtin = '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H10l2 2h6.5A1.5 1.5 0 0 1 20 7.5v11a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5z"/><path d="M8 12h8M8 15.5h5"/>';
     IC.image = '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/>';
     IC.zoom = '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5M11 8.5v5M8.5 11h5"/>';
+    IC.thongbao = '<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/>';
     IC.bell = '<path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10 20a2 2 0 0 0 4 0"/>';
   })();
   function vbOf(u) {
@@ -18975,7 +18988,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     if (u.source === 'sample' && !V.mau) vbSample(u, V);
     return V;
   }
-  function vbSave(u, txt) { var V = vbOf(u); V.v++; u.ver = (u.ver || 0) + 1; saveUnits(); if (txt) log('Thông tin chung (' + shortUnit(u.name) + '): ' + txt); }
+  function vbSave(u, txt) { var V = vbOf(u); V.v++; u.ver = (u.ver || 0) + 1; saveUnits(); if (txt) log('Kho văn bản chung (' + shortUnit(u.name) + '): ' + txt); }
   function vbCty(u) { return typeof coInfo === 'function' ? coInfo(u).ten : u.name; }
   function vbTt(d) { if (d.tt === 'Dự thảo') return 'Dự thảo'; if (d.het && d.het < refDate()) return 'Hết hiệu lực'; return d.tt || 'Đang hiệu lực'; }
   function vbVn(iso) { return iso ? HR.vnDate(iso) : ''; }
@@ -19033,23 +19046,53 @@ if (typeof module !== 'undefined') module.exports = XW;
 
   /* ---------------- Trang ---------------- */
   PAGES.thongtin = function () {
-    var us = selUnits(); if (!us.length) return pageHead('Thông tin chung toàn công ty') + noData('dữ liệu');
-    var f = ps('vb', { tab: 'kho', nhom: '', q: '', tt: '', u: '' }), u = us.filter(function (x) { return x.id === f.u; })[0] || us[0]; f.u = u.id;
+    return vbPage('kho');
+  };
+  PAGES.thongbao = function () { return vbPage(PS.vb && (PS.vb.tab === 'ds') ? 'ds' : 'gui'); };
+  BINDS.thongbao = function () { BINDS.thongtin(); tbLuuLoad(); };
+  // 17/11: thời gian lưu thông báo (nhân viên xem lại ở Lưu trữ thông báo trên app) + dung lượng dữ liệu máy chủ
+  var TBLUU = {};
+  function tbLuuHtml(u, j) {
+    if (!j) return '<div class="card card-pad tbl-card"><span class="muted">Đang tải thời gian lưu thông báo…</span></div>';
+    if (!j.ok) return '';
+    var mb = function (b) { return (b / 1048576).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' MB'; }, pct = j.size && j.han ? Math.min(100, Math.round(j.size * 100 / j.han)) : 0;
+    var sel = j.demo ? '<b>14 ngày</b> <span class="faint">(bản thử tự dọn)</span>' : '<select class="input tbl-sel" id="tbLuuSel">' + [[6, '6 tháng'], [12, '12 tháng (mặc định)'], [24, '24 tháng'], [0, 'Không giới hạn']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === j.thang ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>';
+    var bar = j.size ? '<div class="tbl-bar' + (j.canh_bao ? ' warn' : '') + '"><i style="width:' + Math.max(pct, 1) + '%"></i></div><span class="faint">Dữ liệu máy chủ: <b>' + mb(j.size) + '</b> / ' + mb(j.han) + ' (' + pct + '% hạn mức gói miễn phí) · thông báo: ' + fmtInt(j.tb_n) + ' cái, ~' + mb(j.tb_b) + '</span>' : '<span class="faint">Thông báo đang lưu: ' + fmtInt(j.tb_n) + ' cái, ~' + mb(j.tb_b) + '</span>';
+    return '<div class="card card-pad tbl-card"><div class="tbl-r"><span><b>Lưu thông báo trong</b> ' + sel + '</span><span class="faint">Nhân viên tìm, xem lại ở <b>Chuông → Lưu trữ</b> trên app. Quá hạn, máy chủ tự xóa (ảnh và nội dung).</span></div>' + bar +
+      (j.canh_bao ? '<div class="notice warn" style="margin-top:8px">' + ic('info') + '<div><b>Dữ liệu sắp chạm hạn mức gói miễn phí (500 MB).</b> Giảm thời gian lưu thông báo, hạn chế gửi kèm ảnh, hoặc nâng gói Cloudflare Workers Paid.</div></div>' : '') + '</div>';
+  }
+  function tbLuuLoad() {
+    var el = $('#tbLuu'), u = vbU(), call = u && vbCall(u); if (!el || !call) { if (el) el.innerHTML = ''; return; }
+    if (TBLUU[u.id]) el.innerHTML = tbLuuHtml(u, TBLUU[u.id]);
+    call('tb-luu').then(function (j) { TBLUU[u.id] = j; var e2 = $('#tbLuu'); if (e2) { e2.innerHTML = tbLuuHtml(u, j); tbLuuBind(u); } }).catch(function () { var e2 = $('#tbLuu'); if (e2) e2.innerHTML = ''; });
+  }
+  function tbLuuBind(u) {
+    var sl = $('#tbLuuSel'); if (!sl) return;
+    sl.onchange = function () { var m = +sl.value, call = vbCall(u);
+      var go2 = function () { call('tb-luu', { thang: m }).then(function (j) { if (!j.ok) { toast('Chưa lưu được', 'err', j.loi || ''); return; } TBLUU[u.id] = j; log('Gửi thông báo nội bộ (' + shortUnit(u.name) + '): lưu thông báo ' + (m ? m + ' tháng' : 'không giới hạn')); toast('Đã đặt thời gian lưu thông báo: ' + (m ? m + ' tháng' : 'không giới hạn'), 'ok'); tbLuuLoad(); }).catch(function (e) { toast('Chưa lưu được', 'err', e.message || ''); }); };
+      if (m && m < (TBLUU[u.id] || {}).thang) confirmBox('Rút ngắn thời gian lưu?', 'Thông báo cũ hơn ' + m + ' tháng sẽ bị máy chủ xóa trong lần dọn tiếp theo (mỗi ngày 1 lần), nhân viên không xem lại được nữa.', 'Đồng ý', go2); else go2();
+    };
+  }
+  function vbPage(mode) {
+    var TT = mode === 'kho' ? 'Kho văn bản chung' : 'Gửi thông báo nội bộ';
+    var us = selUnits(); if (!us.length) return pageHead(TT) + noData('dữ liệu');
+    var f = ps('vb', { tab: 'kho', nhom: '', q: '', tt: '', u: '' }), u = us.filter(function (x) { return x.id === f.u; })[0] || us[0]; f.u = u.id; f.tab = mode;
     var V = vbOf(u), conn = !!vbCall(u), n = { 'Đang hiệu lực': 0, 'Hết hiệu lực': 0, 'Dự thảo': 0 }; V.ds.forEach(function (d) { n[vbTt(d)]++; });
-    var head = pageHead('Thông tin chung toàn công ty', 'Nội quy, quy định, quy chế, KPI… để mọi nhân viên xem trên app · gửi thông báo, popup tới điện thoại nhân viên' + (V.mau ? ' · <b>dữ liệu mẫu</b>' : '') + '.',
-      '<button class="btn" data-act="vb-nhom">' + ic('dm', 15) + 'Nhóm dữ liệu</button><button class="btn" data-act="vb-tab" data-id="gui">' + ic('bell', 15) + 'Soạn thông báo</button><button class="btn btn-primary" data-act="vb-add">+ Thêm tài liệu</button>');
+    var head = mode === 'kho' ? pageHead('Kho văn bản chung', 'Nội quy, quy định, quy chế, KPI… để mọi nhân viên xem trên app' + (V.mau ? ' · <b>dữ liệu mẫu</b>' : '') + '.',
+      '<button class="btn" data-act="vb-nhom">' + ic('dm', 15) + 'Nhóm dữ liệu</button><button class="btn" data-go="thongbao">' + ic('bell', 15) + 'Gửi thông báo nội bộ</button><button class="btn btn-primary" data-act="vb-add">+ Thêm tài liệu</button>')
+      : pageHead('Gửi thông báo nội bộ', 'Gửi thông báo, popup tới app của nhân viên – toàn công ty, theo phòng ban hoặc từng người · nhân viên xem lại được ở mục Lưu trữ thông báo trên app' + (V.mau ? ' · <b>dữ liệu mẫu</b>' : '') + '.', '<button class="btn" data-go="thongtin">' + ic('thongtin', 15) + 'Kho văn bản chung</button>');
     var pick = us.length > 1 ? '<div class="seg" style="margin-bottom:12px">' + us.map(function (x) { return '<button class="' + (x.id === u.id ? 'on' : '') + '" data-act="vb-u" data-id="' + x.id + '">' + esc(shortUnit(x.name)) + '</button>'; }).join('') + '</div>' : '';
-    var kpi = '<div class="org-kpi"><div><b>' + V.ds.length + '</b><span>tài liệu</span></div><div><b>' + n['Đang hiệu lực'] + '</b><span>đang hiệu lực</span></div><div><b>' + n['Dự thảo'] + '</b><span>dự thảo (chưa công bố)</span></div><div><b>' + V.tb.length + '</b><span>thông báo đã gửi</span></div></div>';
+    var kpi = mode === 'kho' ? '<div class="org-kpi"><div><b>' + V.ds.length + '</b><span>tài liệu</span></div><div><b>' + n['Đang hiệu lực'] + '</b><span>đang hiệu lực</span></div><div><b>' + n['Dự thảo'] + '</b><span>dự thảo (chưa công bố)</span></div><div><b>' + (n['Hết hiệu lực'] || 0) + '</b><span>hết hiệu lực</span></div></div>' : '';
     var warn = conn ? '' : '<div class="notice warn">' + ic('info') + '<div><b>Chưa kết nối máy chủ chấm công</b> – tài liệu, thông báo chỉ tới app nhân viên khi công ty đã kết nối (Chấm công → Chấm công Wi‑Fi).</div></div>';
-    var tabs = '<div class="tl-tabs">' + [['kho', 'Kho tài liệu'], ['gui', 'Gửi thông báo'], ['ds', 'Thông báo đã gửi (' + V.tb.length + ')']].map(function (t) { return '<button class="' + (f.tab === t[0] ? 'on' : '') + '" data-act="vb-tab" data-id="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>';
-    if (f.tab === 'gui') return head + pick + warn + tabs + vbCompose(u);
-    if (f.tab === 'ds') return head + pick + kpi + warn + tabs + '<div id="vbArea"></div>';
+    var tabs = mode === 'kho' ? '' : '<div class="tl-tabs">' + [['gui', 'Soạn thông báo'], ['ds', 'Thông báo đã gửi (' + V.tb.length + ')']].map(function (t) { return '<button class="' + (f.tab === t[0] ? 'on' : '') + '" data-act="vb-tab" data-id="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>';
+    if (f.tab === 'gui') return head + pick + warn + (conn ? '<div id="tbLuu"></div>' : '') + tabs + vbCompose(u);
+    if (f.tab === 'ds') return head + pick + kpi + warn + (conn ? '<div id="tbLuu"></div>' : '') + tabs + '<div id="vbArea"></div>';
     var cnt = {}; V.ds.forEach(function (d) { cnt[d.nhom] = (cnt[d.nhom] || 0) + 1; });
     var side = '<div class="card vb-side"><button class="' + (!f.nhom ? 'on' : '') + '" data-act="vb-g" data-id=""><span>Tất cả nhóm</span><em>' + V.ds.length + '</em></button>' + V.nhom.map(function (g) { return '<button class="' + (f.nhom === g ? 'on' : '') + '" data-act="vb-g" data-id="' + esc(g) + '"><span>' + esc(g) + '</span><em>' + (cnt[g] || 0) + '</em></button>'; }).join('') + '<button class="vb-addg" data-act="vb-nhom">+ Thêm, sửa nhóm</button></div>';
     var flt = '<div class="filters card card-pad">' + searchBox('vbQ', f.q, 'Tên, số hiệu, mô tả…') + selectBox('vbTt', 'Tình trạng', [['', 'Tất cả']].concat(VB_TT.map(function (t) { return [t, t]; })), f.tt, 180) + '</div>';
     return head + pick + kpi + warn + tabs + '<div class="vb-lay">' + side + '<div>' + flt + '<div id="vbArea"></div></div></div>';
   };
-  ACTS['vb-tab'] = function (a, id) { PS.vb.tab = id; render(); };
+  ACTS['vb-tab'] = function (a, id) { PS.vb.tab = id; if (id === 'kho') go('thongtin'); else if (curPage !== 'thongbao') go('thongbao'); else render(); };
   ACTS['vb-u'] = function (a, id) { PS.vb.u = id; render(); };
   ACTS['vb-g'] = function (a, id) { PS.vb.nhom = id; render(); };
   function vbU() { var f = PS.vb || {}; return unitById(f.u) || selUnits()[0]; }
@@ -19237,7 +19280,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     $('#tbGo').onclick = function () {
       var t = $('#tbT').value.trim(), n = $('#tbN').value.trim(); if (!t) { toast('Nhập tiêu đề', 'err'); return; } if (!sc.ok()) return;
       var o = { tieu_de: t, noi_dung: n, anh: img || '', popup: $('#tbPop').checked ? 1 : 0, den: sc.read(), loai: 'tb' }, b = this;
-      vbPreview(u, o, sc.n()).then(function (go) { if (!go) return; b.disabled = true; vbSend(u, o).then(function () { PS.vb.tab = 'ds'; render(); }, function () { b.disabled = false; }); });
+      vbPreview(u, o, sc.n()).then(function (go) { if (!go) return; b.disabled = true; vbSend(u, o).then(function () { PS.vb.tab = 'ds'; if (curPage !== 'thongbao') go('thongbao'); else render(); }, function () { b.disabled = false; }); });
     };
     pv();
   }
@@ -21886,7 +21929,8 @@ var cur = ndSnap(u), out = cur, sd = { n: 0, kept: 0 };
     if (!adm) return stt + '<p class="faint" style="font-size:12.5px;margin:8px 0 0">Chỉ tài khoản Quản trị hệ thống thiết lập được phần này.</p>';
     return stt + mailGuide() + '<div class="form-grid ml-form">' +
       '<div class="field"><label for="mlKey">Khóa API Resend' + (c.key ? ' <span class="faint">(đang dùng ' + esc(c.key) + ')</span>' : '') + '</label><input class="input mono" id="mlKey" type="password" autocomplete="off" placeholder="' + (c.key ? 'Để trống nếu giữ khóa hiện tại' : 're_…') + '"></div>' +
-      '<div class="field"><label for="mlFrom">Email gửi đi</label><input class="input" id="mlFrom" type="email" value="' + esc(c.from || '') + '" placeholder="tuyendung@tencongty.vn"></div>' +
+      (c.autoDom ? '' : '<div class="field"><label for="mlDom">Tên miền của đơn vị</label><input class="input" id="mlDom" value="' + esc(c.dom || '') + '" placeholder="tencongty.vn"><span class="ml-red">Máy chủ đang chạy trên địa chỉ workers.dev nên phần mềm không tự nhận được tên miền – nhập tên miền riêng đã xác minh ở Resend.</span></div>') +
+      '<div class="field"><label for="mlFrom">Email gửi đi</label><span class="ml-red">Email gửi đi phải thuộc tên miền của đơn vị' + (c.dom ? ' (<b>@' + esc(c.dom) + '</b>)' : '') + ' và tên miền này đã xác minh ở Resend.</span><input class="input" id="mlFrom" type="email" value="' + esc(c.from || '') + '" placeholder="tuyendung@' + esc(c.dom || 'tencongty.vn') + '"></div>' +
       '<div class="field"><label for="mlName">Tên hiển thị</label><input class="input" id="mlName" value="' + esc(c.name || '') + '" placeholder="VD: Phòng Nhân sự – Công ty ABC"></div>' +
       '<div class="field"><label for="mlRep">Email nhận thư trả lời <span class="faint">(không bắt buộc)</span></label><input class="input" id="mlRep" type="email" value="' + esc(c.reply || '') + '" placeholder="nhansu@tencongty.vn"></div></div>' +
       '<div class="link-row ml-btns"><button class="btn btn-sm btn-primary" data-act="ml-save">Lưu</button>' + (c.on ? '<span class="ml-test"><input class="input" id="mlTo" type="email" placeholder="Email nhận thư thử"><button class="btn btn-sm" data-act="ml-test">Gửi thử</button></span><button class="btn btn-sm btn-danger-ghost" data-act="ml-off">Tắt gửi email</button>' : '') + '</div>';
@@ -21895,6 +21939,10 @@ var cur = ndSnap(u), out = cur, sd = { n: 0, kept: 0 };
   ACTS['ml-reload'] = function () { MAIL.err = ''; mailLoad(true); };
   ACTS['ml-save'] = function () {
     var body = { key: $('#mlKey').value.trim(), from: $('#mlFrom').value.trim(), name: $('#mlName').value.trim(), reply: $('#mlRep').value.trim() };
+    var c = MAIL.cfg || {}, dEl = $('#mlDom'), d = c.autoDom ? c.dom : (dEl ? dEl.value.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '') : '');
+    if (!c.autoDom) { if (!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d) || /(^|\.)(workers|pages)\.dev$/.test(d)) { modal('Chưa có tên miền của đơn vị', '', '<p>Nhập tên miền riêng của đơn vị (VD: <b>tencongty.vn</b>) – tên miền đã thêm và xác minh ở Resend. Địa chỉ workers.dev không dùng để gửi email được.</p><div class="link-row" style="justify-content:flex-end"><button class="btn btn-primary" data-close>Đã hiểu</button></div>', true); return; } body.domain = d; }
+    var fd = (body.from.split('@')[1] || '').toLowerCase();
+    if (d && fd && fd !== d && fd.slice(-(d.length + 1)) !== '.' + d) { modal('Email gửi đi không thuộc tên miền của đơn vị', '', '<p>Email <b>' + esc(body.from) + '</b> không thuộc tên miền <b>@' + esc(d) + '</b>.</p><p>Resend chỉ gửi được từ tên miền đã xác minh. Dùng email dạng <b>tuyendung@' + esc(d) + '</b> (không cần hộp thư thật – chỉ cần tên miền đã xác minh). Không dùng Gmail/Yahoo… để gửi đi.</p><div class="link-row" style="justify-content:flex-end"><button class="btn btn-primary" data-close>Sửa lại</button></div>', true); var fe = $('#mlFrom'); if (fe) fe.focus(); return; }
     var b = busy('Đang lưu thiết lập email…');
     svApi('email-cfg', body).then(function (j) { b.done(); if (!j.ok) { toast('Chưa lưu được', 'err', j.loi || ''); return; } log('Cài đặt: lưu thiết lập gửi email tự động (' + body.from + ')'); toast('Đã lưu thiết lập email', 'ok', 'Bấm Gửi thử để kiểm tra.'); mailLoad(true); });
   };
