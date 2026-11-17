@@ -1,6 +1,6 @@
 # Lịch sử phiên bản
 
-## 1.0.1 – sửa lỗi, cải thiện sau thử nghiệm thực tế (17/11/2026)
+## 1.0.1 – sửa lỗi, cải thiện sau thử nghiệm thực tế (18/11/2026)
 - **Thêm công ty** (đổi tên từ "Thêm đơn vị"): tạo công ty trống không cần chọn file; chọn file / thư mục từ nút này thì dữ liệu vào một công ty mới, không lẫn vào công ty đang xem; thêm xong vẫn ở trang Cài đặt.
 - **Thương hiệu riêng từng công ty**: logo, tên, màu. Xem một công ty: cả phần mềm theo thương hiệu công ty đó; xem Tổng các công ty: khung theo thương hiệu chung, mỗi nhân sự có chấm màu và logo nhỏ của công ty mình (danh sách, hồ sơ, sơ đồ tổ chức).
 - **Hồ sơ nhân sự → Tài khoản app nhân viên**: tên đăng nhập, tình trạng, ngày cấp, đăng nhập lần cuối; chưa có thì nút **Tạo tài khoản**.
