@@ -1,6 +1,6 @@
-# Phần mềm quản lý nhân sự – Quản trị tử tế
+# Phần mềm quản lý nhân sự toàn diện – Quản trị tử tế
 
-Phần mềm quản lý nhân sự miễn phí, mã nguồn mở, viết bằng tiếng Việt cho doanh nghiệp nhỏ và vừa: hồ sơ, hợp đồng, chấm công, nghỉ phép, lương, bảo hiểm xã hội, tuyển dụng, hội nhập, đào tạo nội bộ, tài sản, thông tin chung.
+Phần mềm quản lý nhân sự toàn diện miễn phí, mã nguồn mở, viết bằng tiếng Việt cho doanh nghiệp nhỏ và vừa: hồ sơ, hợp đồng, chấm công, nghỉ phép, lương, bảo hiểm xã hội, tuyển dụng, hội nhập, đào tạo nội bộ, tài sản, thông tin chung.
 
 - Bản hiện tại: **1.0.1** (phát hành 18/11/2026) – xem [CHANGELOG.md](CHANGELOG.md)
 - Trang giới thiệu, so sánh 2 bản: https://quantritute.com/quan-ly-nhan-su/so-sanh/
@@ -45,6 +45,8 @@ Lần đầu mở, phần mềm hỏi tên công ty rồi dẫn sang **Nhập d�
 <a id="ban-day-du"></a>
 ## Bản đầy đủ
 
+> **Không rành kỹ thuật?** Làm theo [hướng dẫn thiết lập từng bước có ảnh minh họa](https://quantritute.com/quan-ly-nhan-su/huong-dan-cai-dat/).
+
 Chạy trên tài khoản Cloudflare **của chính đơn vị** (Worker + cơ sở dữ liệu D1). Quản trị viên dùng phần mềm tại `/quan-tri`, nhân viên dùng app tại địa chỉ gốc `/`.
 
 ### Chuẩn bị
@@ -58,8 +60,8 @@ Chạy trên tài khoản Cloudflare **của chính đơn vị** (Worker + cơ s
 
 1. Bấm nút trên, đăng nhập Cloudflare và GitHub.
 2. Đặt tên Worker, tên cơ sở dữ liệu (giữ mặc định cũng được). Cloudflare tự tạo một kho GitHub của anh/chị, tự tạo cơ sở dữ liệu và đưa phần mềm lên.
-3. **Đặt mã cài đặt** (nút Deploy không hỏi bước này): Cloudflare → Workers & Pages → chọn Worker vừa tạo → **Settings → Variables and Secrets → Add** → loại *Secret*, tên `MA_CAI_DAT`, giá trị là một mã tự đặt từ 8 ký tự → **Deploy**. Ghi lại mã – chỉ dùng một lần ở bước 5. Cơ sở dữ liệu D1 được tạo tự động, không phải làm gì thêm.
-4. Xong, Cloudflare cho địa chỉ dạng `https://quan-ly-nhan-su.<tên-tài-khoản>.workers.dev`.
+3. **Đặt mã cài đặt** (nút Deploy không hỏi bước này): Cloudflare → Workers & Pages → chọn Worker vừa tạo → tab **Settings** → mục *Runtime variables and secrets* → **+ Add variable** → Key `MA_CAI_DAT`, Value là một mã tự đặt từ 8 ký tự, tích **Secret** → **Add 1 variable and deploy**. Ghi lại mã – chỉ dùng một lần ở bước 5. Cơ sở dữ liệu D1 được tạo tự động, không phải làm gì thêm.
+4. Xong, địa chỉ ở tab **Domains** → *Worker URL*, dòng Production, dạng `https://quan-ly-nhan-su.<tên-tài-khoản>.workers.dev`.
 5. Mở `<địa chỉ>/quan-ly` → nhập **mã cài đặt** (MA_CAI_DAT), tên công ty, **mật khẩu quản trị** (từ 8 ký tự, có cả chữ và số – tự đặt, ghi lại) → tạo tài khoản quản trị đầu tiên.
 6. Mở `<địa chỉ>/quan-tri`, đăng nhập: **Mã nhân viên** `quantri`, **Mật khẩu** là mật khẩu quản trị vừa đặt ở bước 5 (không phải mã cài đặt). Thêm nhân viên, cấp tài khoản ở **Ứng dụng nhân viên**; nhân viên mở `<địa chỉ>/` trên điện thoại.
 
@@ -74,7 +76,7 @@ Chạy trên tài khoản Cloudflare **của chính đơn vị** (Worker + cơ s
 4. Làm tiếp bước 5–6 của cách 1.
 
 ### Gắn tên miền riêng
-Tên miền phải đang dùng DNS của Cloudflare. Cloudflare → Workers & Pages → chọn Worker → **Settings → Domains & Routes → Add → Custom domain** → nhập ví dụ `nhansu.tencongty.vn`.
+Tên miền phải đang dùng DNS của Cloudflare. Cloudflare → Workers & Pages → chọn Worker → tab **Domains** → **+ Add Domain** → chọn tên miền → nhập subdomain, ví dụ `nhansu` → **Add domain**.
 
 ### Nhận bản cập nhật – dữ liệu giữ nguyên
 Dữ liệu nằm trong cơ sở dữ liệu D1, tách khỏi mã phần mềm. Máy chủ tự nâng cấp cấu trúc dữ liệu (chỉ thêm bảng, thêm cột – không xóa) ở lần chạy đầu sau cập nhật. Trước khi cập nhật vẫn nên tải bản sao lưu.

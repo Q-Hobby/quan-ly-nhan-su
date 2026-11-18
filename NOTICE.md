@@ -1,6 +1,6 @@
 # NOTICE
 
-Phần mềm quản lý nhân sự – Quản trị tử tế
+Phần mềm quản lý nhân sự toàn diện – Quản trị tử tế
 Copyright (C) 2026 Đỗ Minh Tuấn (Quản trị tử tế – https://quantritute.com)
 
 Chương trình này là phần mềm tự do: anh/chị được phân phối lại và/hoặc sửa đổi theo các điều khoản của

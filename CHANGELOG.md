@@ -38,6 +38,7 @@
 ## Các bản dùng thử trước bản chính thức
 Dữ liệu mẫu hư cấu, chạy trên quantritute.com.
 
+- **1.0.1** (18/11/2026) – Bản chính thức · Nhiều công ty, thương hiệu riêng · Kiêm nhiệm · Lịch sử điều chuyển · Phép tồn · Nhập chấm công máy vân tay · Gửi email tự động · Dữ liệu trên Google Drive · Cổng tuyển dụng của công ty · Gửi thông báo nội bộ, lưu trữ thông báo
 - **0.8.1** (16/11/2026) – Một tài khoản cho app và trang quản trị · App nhân viên trên máy tính · Đơn xin đi muộn, về sớm · Báo cáo đi muộn, về sớm · Thiết bị, tài sản · Thông tin chung toàn công ty · Gửi thông báo, chuông thông báo trên app · Gửi báo cáo định kỳ
 - **0.7.1** (13/11/2026) – Phân quyền tài khoản: Tài khoản, Vai trò và quyền, Người duyệt đơn · Nhập dữ liệu theo từng bước · Ghép cột từ file bất kỳ · Bảng phân loại nhiều file · Lịch sử nhập và hoàn tác · Bộ phận của tôi trên app nhân viên
 - **0.6.1** (12/11/2026) – Hội nhập nhân sự mới · Thiết lập hành trình · Hành trình hội nhập trên app nhân viên · Kho khóa học · Theo dõi học tập · Học trên app nhân viên · Bảo hiểm xã hội: Danh sách đóng BH, Đối chiếu C12, Thiết lập BHXH

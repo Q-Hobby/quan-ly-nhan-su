@@ -12,16 +12,16 @@ import { DEMO_HN } from './demo-hoinhap.js';
 import { DEMO_DT } from './demo-daotao.js'; // 12/11 16:30: khóa đào tạo nội bộ mẫu (0.6.1 bản thử)
 import { TAY_LATIN, TAY_VI } from './font-tay.js'; // 12/11: phông viết tay cho phần chào mừng hội nhập // 12/11: hành trình hội nhập mẫu (0.6.1 bản thử)
 import { OG_QL_B64, OG_NV_B64 } from './og-anh.js'; // 08/11: ảnh chia sẻ Facebook/Zalo cho bản chạy thử
-import HRM_HTML from './phan-mem.html'; // 08/11: Phần mềm quản lý nhân sự bản xem trước (build/index.html chép sang khi node build.js)
+import HRM_HTML from './phan-mem.html'; // 08/11: Phần mềm quản lý nhân sự toàn diện bản xem trước (build/index.html chép sang khi node build.js)
 
 const VER = '1.0.1';  // 13/11/2026 18:30 (bản 0.8.1 phần mềm): một tài khoản chung – tài khoản có quyền quản trị dùng mật khẩu, trang /quan-tri, dữ liệu phần mềm quản trị lưu trên máy chủ, mã cài đặt lần đầu. Trước: '0.4.6';  // 13/11/2026 14:55: nhiều người có quyền duyệt đơn (ai duyệt trước thì đơn chuyển trạng thái, ghi tên người duyệt) + màn Bộ phận của tôi. Trước: '0.4.5';  // 12/11/2026 22:54: ca có yêu cầu có mặt sớm (som, som_ngay) hiện trên app. Trước: '0.4.4';  // 12/11/2026: hành trình hội nhập trên app nhân viên (đi cùng phần mềm 0.6.1)
-// trước: VER '0.4.1'  // 07/11/2026: nối Phần mềm quản lý nhân sự (đồng bộ nhân viên, lượt chấm, đơn nghỉ, xác nhận công)
+// trước: VER '0.4.1'  // 07/11/2026: nối Phần mềm quản lý nhân sự toàn diện (đồng bộ nhân viên, lượt chấm, đơn nghỉ, xác nhận công)
 /* 07/11/2026 17:42 – CHẾ ĐỘ BẢN THỬ (để mọi người trải nghiệm, góp ý): bật khi chạy ở tên miền chamcong-thu.* hoặc biến môi trường DEMO=1.
    Không cần mật khẩu trang Quản lý và trang Mã QR chấm công; có sẵn tài khoản nhân viên mẫu (PIN chung DEMO_PIN); khóa các thao tác làm hỏng dữ liệu dùng chung;
-   API công khai /api/demo/* để Phần mềm quản lý nhân sự (bản thử) kéo lượt chấm, đơn nghỉ về dữ liệu mẫu. Mỗi ngày tự dọn dữ liệu cũ. */
+   API công khai /api/demo/* để Phần mềm quản lý nhân sự toàn diện (bản thử) kéo lượt chấm, đơn nghỉ về dữ liệu mẫu. Mỗi ngày tự dọn dữ liệu cũ. */
 const DEMO_SEED = '2026-11-11d'; // 16:12: đơn mẫu chờ duyệt, người bàn giao hợp lý ← // 11/11 15:32: hồ sơ, phiếu lương 3 tháng, quản lý trực tiếp, công Xưởng Đóng gói ← // 11/11: thêm Xưởng Đóng gói SG008–SG013 (khối sản xuất, xếp ca) → // 09/11: thêm DS010 bán thời gian, DS011 cộng tác viên → máy chủ thử nạp lại dữ liệu mẫu
 const MAU = 'Dữ liệu mẫu';
-// giờ vào/ra tự sinh cho ngày sau ngày chốt dữ liệu mẫu – CÙNG công thức với Phần mềm quản lý nhân sự (bcSynRow) để hai bên khớp nhau
+// giờ vào/ra tự sinh cho ngày sau ngày chốt dữ liệu mẫu – CÙNG công thức với Phần mềm quản lý nhân sự toàn diện (bcSynRow) để hai bên khớp nhau
 function demoHash(str) { let h = 7; for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) % 1000003; return h; }
 function hm2min(t) { const m = /^(\d{1,2}):(\d{2})/.exec(String(t || '')); return m ? +m[1] * 60 + +m[2] : null; }
 function vnHM(t) { const d = new Date(t + 7 * 3600e3); return String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0'); }
@@ -135,7 +135,7 @@ async function donChoDuyet(db, by, me) {
   return pend.filter(d => duocDuyet(by, me, d)).slice(0, 40).map(d => { const cung = nguoiDuyet(by, d.ma).filter(x => x !== me).map(x => by[x].ten); const { duyet_ma, ...o } = d; return { ...o, cung }; });
 }
 /* ===== 16/11/2026 – ĐƠN XIN ĐI MUỘN / VỀ SỚM (góp ý người dùng, anh Tuấn chốt: đơn vị tự bật/tắt và tự đặt quy tắc) =====
-   Cấu hình của đơn vị đi kèm hồ sơ mỗi người (ho_so.du_lieu.xm), do Phần mềm quản lý nhân sự gửi lên:
+   Cấu hình của đơn vị đi kèm hồ sơ mỗi người (ho_so.du_lieu.xm), do Phần mềm quản lý nhân sự toàn diện gửi lên:
      { on: 1, han: 'truoc' | 'ngay' | 'n', n: số ngày được gửi bù sau khi phát sinh, max: số đơn tối đa/tháng (0 = không giới hạn), tinh: 'dung' | 'ghi' }
      tinh 'dung' = đơn được duyệt → tính như chấm vào/ra đúng giờ (không trừ giờ, không tính lượt vi phạm); 'ghi' = vẫn trừ giờ thực tế, chỉ không tính vi phạm.
    Bản thử: mặc định BẬT để người dùng thử. Người duyệt = người duyệt đơn nghỉ (nguoiDuyet). */
@@ -214,7 +214,7 @@ async function pushTo(db, cfg, origin, mas, msg) {
 }
 function later(req, p) { if (req.ctx && req.ctx.waitUntil) req.ctx.waitUntil(p); else return p; }
 /* ===== 16/11/2026 12:21 – KHO THÔNG TIN CHUNG + THÔNG BÁO =====
-   Phần mềm quản lý nhân sự đẩy lên: danh mục tài liệu theo công ty (vb.du_lieu = { nhom: [...], ds: [...] }), file chia mảnh ≤ 700.000 ký tự base64 (tối đa 10 MB),
+   Phần mềm quản lý nhân sự toàn diện đẩy lên: danh mục tài liệu theo công ty (vb.du_lieu = { nhom: [...], ds: [...] }), file chia mảnh ≤ 700.000 ký tự base64 (tối đa 10 MB),
    thông báo (tb: tiêu đề, nội dung, ảnh JPEG base64 ≤ 600 KB, popup, đối tượng den = { all } | { pb: [] } | { ma: [] }). Nhân viên: tb_doc = đã đọc / đã xóa (ẩn với riêng mình). */
 const VB_PART = 700000, VB_MAX = 10 * 1024 * 1024;
 function tbDen(r) { try { return JSON.parse(r.den || '{}') || {}; } catch (e) { return {}; } }
@@ -605,11 +605,11 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS bao_sai (ma TEXT, ngay TEXT, noi_dung TEXT, tao INTEGER, PRIMARY KEY (ma, ngay))`, // 11/11 17:54: nhân viên báo sai công từng ngày
   `CREATE TABLE IF NOT EXISTS hn_xong (ma TEXT NOT NULL, sid TEXT NOT NULL, x INTEGER DEFAULT 1, at INTEGER, PRIMARY KEY (ma, sid))`, // 12/11: người mới tự xác nhận việc hội nhập của mình trên app
   `CREATE TABLE IF NOT EXISTS dt_kq (ma TEXT NOT NULL, kh TEXT NOT NULL, du_lieu TEXT, at INTEGER, PRIMARY KEY (ma, kh))`, // 12/11 16:30: tiến độ học, bài làm khóa đào tạo nội bộ trên app
-  /* 0.5.1 (13/11/2026): dữ liệu Phần mềm quản lý nhân sự lưu trên máy chủ của đơn vị. Mỗi khóa (settings, units = danh sách công ty, unit:<id> = dữ liệu từng công ty, done, ndhist, kho:<id> = file kho) có số phiên bản để không ghi đè lẫn nhau;
+  /* 0.5.1 (13/11/2026): dữ liệu Phần mềm quản lý nhân sự toàn diện lưu trên máy chủ của đơn vị. Mỗi khóa (settings, units = danh sách công ty, unit:<id> = dữ liệu từng công ty, done, ndhist, kho:<id> = file kho) có số phiên bản để không ghi đè lẫn nhau;
      nội dung chia thành nhiều phần ≤ 400.000 ký tự (≤ 1,2 MB – dưới giới hạn kích thước 1 dòng của D1). */
   `CREATE TABLE IF NOT EXISTS qt_kv (k TEXT PRIMARY KEY, ver INTEGER NOT NULL, at INTEGER, nguoi TEXT, n INTEGER, z INTEGER DEFAULT 0, meta TEXT, size INTEGER)`,
   `CREATE TABLE IF NOT EXISTS qt_part (k TEXT NOT NULL, i INTEGER NOT NULL, v TEXT, PRIMARY KEY (k, i))`,
-  // 16/11/2026 (góp ý người dùng): đơn xin đi muộn / về sớm – đơn vị bật/tắt ở Phần mềm quản lý nhân sự; thông báo đẩy trên điện thoại
+  // 16/11/2026 (góp ý người dùng): đơn xin đi muộn / về sớm – đơn vị bật/tắt ở Phần mềm quản lý nhân sự toàn diện; thông báo đẩy trên điện thoại
   `CREATE TABLE IF NOT EXISTS xin_muon (so TEXT PRIMARY KEY, ma TEXT NOT NULL, ngay TEXT NOT NULL, kieu TEXT NOT NULL, gio TEXT, phut INTEGER, ly_do TEXT, tao INTEGER, trang_thai TEXT, nguoi_duyet TEXT, duyet_ma TEXT, ngay_duyet TEXT, ly_do_tc TEXT, cap_nhat INTEGER)`,
   `CREATE INDEX IF NOT EXISTS xin_muon_ma ON xin_muon(ma, ngay)`,
   `CREATE TABLE IF NOT EXISTS push_sub (ep TEXT PRIMARY KEY, ma TEXT NOT NULL, p256dh TEXT NOT NULL, auth TEXT NOT NULL, at INTEGER, may TEXT)`,
@@ -687,7 +687,7 @@ function json(o, status = 200, headers = {}) {
   return new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers } });
 }
 function bad(msg, status = 400) { return json({ ok: false, loi: msg }, status); }
-/* 0.3.1: API đồng bộ cho Phần mềm quản lý nhân sự (chạy trên trình duyệt của kế toán, khác tên miền) – xác thực bằng Mã kết nối, không dùng cookie */
+/* 0.3.1: API đồng bộ cho Phần mềm quản lý nhân sự toàn diện (chạy trên trình duyệt của kế toán, khác tên miền) – xác thực bằng Mã kết nối, không dùng cookie */
 const CORS = { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'GET, POST, OPTIONS', 'access-control-allow-headers': 'authorization, content-type', 'access-control-max-age': '86400' };
 function jc(o, status = 200) { return json(o, status, CORS); }
 function isoVN(t) { const q = vnParts(t); return q.y + '-' + q.m + '-' + q.d; }
@@ -748,7 +748,7 @@ function regDomain(h) {
 async function setCfg(db, obj) {
   await db.batch(Object.entries(obj).map(([k, v]) => db.prepare('INSERT INTO cfg (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v').bind(k, String(v))));
 }
-const COOKIE = { nv: 'qtt_nv', ql: 'qtt_ql', tram: 'qtt_tram', qt: 'qtt_qt' }; // 13/11: qt = phiên trang quản trị (Phần mềm quản lý nhân sự trên máy chủ)
+const COOKIE = { nv: 'qtt_nv', ql: 'qtt_ql', tram: 'qtt_tram', qt: 'qtt_qt' }; // 13/11: qt = phiên trang quản trị (Phần mềm quản lý nhân sự toàn diện trên máy chủ)
 const AGE = { nv: 180 * 864e2, ql: 12 * 3600, tram: 365 * 864e2, qt: 12 * 3600 };
 async function newSession(db, vai, ma, req) {
   const tok = randHex(32), now = Date.now();
@@ -823,7 +823,7 @@ async function qtUser(db, req) {
 }
 // phần phân quyền dùng để so: chỉ quản trị viên được đổi (bỏ các trường thay đổi khi dùng bình thường, như lần đăng nhập gần nhất)
 function pqCore(pq) { if (!pq) return null; return { on: !!pq.on, roles: pq.roles || [], users: (pq.users || []).map(u => ({ id: u.id, nv: u.nv || '', user: u.user, role: u.role, dv: u.dv, pb: u.pb, off: !!u.off })) }; }
-/* Bản thử: ai trong dữ liệu mẫu có quyền quản trị (để thử mục Quản trị trên app). Mở Phần mềm quản lý nhân sự bản thử với vai trò tương ứng (xem thử theo vai trò). */
+/* Bản thử: ai trong dữ liệu mẫu có quyền quản trị (để thử mục Quản trị trên app). Mở Phần mềm quản lý nhân sự toàn diện bản thử với vai trò tương ứng (xem thử theo vai trò). */
 const DEMO_QT = { DS001: 'gd', SG001: 'gd', DS002: 'kt', DS004: 'ns', SG002: 'ns' }, DEMO_QT_T = { gd: 'Giám đốc', kt: 'Kế toán lương', ns: 'Nhân sự', tbp: 'Trưởng bộ phận' };
 function demoQtOf(ma) { const r = DEMO_QT[ma] || (demoFind(ma) && (demoFind(ma).hs || {}).truong ? 'tbp' : ''); return r ? { r, t: DEMO_QT_T[r], sys: 0 } : null; }
 
@@ -831,11 +831,11 @@ function demoQtOf(ma) { const r = DEMO_QT[ma] || (demoFind(ma) && (demoFind(ma).
 async function api(req, env, url) {
   const db = env.DB; await ensureSchema(db);
   const p = url.pathname, now = Date.now(), ip = clientIP(req, env);
-  /* ----- 17/11: CỔNG TUYỂN DỤNG CỦA CÔNG TY – ứng viên nộp (công khai), phần mềm đưa trang lên / lấy hồ sơ (cần đăng nhập Phần mềm quản lý nhân sự trên máy chủ này) ----- */
+  /* ----- 17/11: CỔNG TUYỂN DỤNG CỦA CÔNG TY – ứng viên nộp (công khai), phần mềm đưa trang lên / lấy hồ sơ (cần đăng nhập Phần mềm quản lý nhân sự toàn diện trên máy chủ này) ----- */
   if (p === '/api/ung-tuyen' || p === '/api/cong' || p.startsWith('/api/cong/')) { // đọc thân yêu cầu riêng (multipart / JSON) nên đặt trước phần đọc body chung
     if (isDemo(env, url)) return json({ ok: false, msg: 'Bản thử dùng cổng thử recruit.quantritute.com.' }, 404);
   if (p === '/api/ung-tuyen' && req.method === 'POST') return tdNop(db, req);
-  if (p === '/api/cong' || p.startsWith('/api/cong/')) { const U = await qtUser(db, req); if (!U) return json({ ok: false, msg: 'Phiên đăng nhập đã hết – đăng nhập lại Phần mềm quản lý nhân sự.', loi: 'Phiên đăng nhập đã hết.' }, 401); return tdCongApi(db, req, url, p); }
+  if (p === '/api/cong' || p.startsWith('/api/cong/')) { const U = await qtUser(db, req); if (!U) return json({ ok: false, msg: 'Phiên đăng nhập đã hết – đăng nhập lại Phần mềm quản lý nhân sự toàn diện.', loi: 'Phiên đăng nhập đã hết.' }, 401); return tdCongApi(db, req, url, p); }
   }
   const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
   let cfg = await getCfg(db);
@@ -845,7 +845,7 @@ async function api(req, env, url) {
   const isSetup = !!cfg.ql_pin;
   const sess = vai => demo && (vai === 'ql' || vai === 'tram') ? Promise.resolve({ vai, demo: true }) : session(db, req, vai); // bản thử: không cần mật khẩu quản lý / kích hoạt màn hình chung
 
-  /* ----- BẢN THỬ: API công khai cho Phần mềm quản lý nhân sự (bản thử, chạy file trên máy người dùng) ----- */
+  /* ----- BẢN THỬ: API công khai cho Phần mềm quản lý nhân sự toàn diện (bản thử, chạy file trên máy người dùng) ----- */
   if (p.startsWith('/api/demo/')) {
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
     if (!demo) return jc({ ok: false, loi: 'Chỉ có ở bản thử.' }, 404);
@@ -921,7 +921,7 @@ async function api(req, env, url) {
     const key = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
     // 13/11/2026: phần mềm mở từ chính máy chủ này (/quan-tri) dùng phiên đăng nhập của người có quyền quản trị thay cho Mã kết nối
     const viaQt = key === 'phien' && !demo && !!(await qtUser(db, req));
-    if (!viaQt && (!cfg.sync_key || !key || await sha256(key) !== cfg.sync_key)) return jc({ ok: false, loi: 'Mã kết nối không đúng hoặc chưa tạo. Vào trang Quản lý → Cài đặt → Kết nối Phần mềm quản lý nhân sự.' }, 401);
+    if (!viaQt && (!cfg.sync_key || !key || await sha256(key) !== cfg.sync_key)) return jc({ ok: false, loi: 'Mã kết nối không đúng hoặc chưa tạo. Vào trang Quản lý → Cài đặt → Kết nối Phần mềm quản lý nhân sự toàn diện.' }, 401);
     const r = p.slice(10);
     if (r === 'ping') {
       const n = await db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN pin IS NOT NULL THEN 1 ELSE 0 END) AS c FROM nv WHERE active = 1').first();
@@ -1067,7 +1067,7 @@ async function api(req, env, url) {
   /* ===== 13/11/2026 – MỘT TÀI KHOẢN + TRANG QUẢN TRỊ TRÊN MÁY CHỦ =====
      - Tài khoản = Mã nhân viên. Người được cấp quyền quản trị (cột qt) đăng nhập bằng MẬT KHẨU (≥ 8 ký tự, có chữ và số) ở cả app và trang quản trị.
      - Tài khoản quản trị hệ thống dự phòng: tên đăng nhập "quantri", mật khẩu lưu ở cfg.ql_pin (gộp với mã PIN quản lý cũ của trang /quan-ly).
-     - Dữ liệu Phần mềm quản lý nhân sự: bảng qt_kv + qt_part, mỗi khóa có số phiên bản – ghi khi phiên bản trên máy chủ đã khác → trả 409 để phần mềm hỏi người dùng.
+     - Dữ liệu Phần mềm quản lý nhân sự toàn diện: bảng qt_kv + qt_part, mỗi khóa có số phiên bản – ghi khi phiên bản trên máy chủ đã khác → trả 409 để phần mềm hỏi người dùng.
      - GIỚI HẠN (đã báo anh): máy chủ chỉ kiểm tra "có quyền quản trị hay không" và "có phải quản trị viên không" (sửa phân quyền). Quyền theo từng module, công ty, phòng ban vẫn chặn ở giao diện như 0.7.1. */
   if (p.startsWith('/api/qt/')) {
     const r = p.slice(8);
@@ -1782,7 +1782,7 @@ export default {
       if (url.pathname === '/qr-app.svg') return new Response(qrSvg(url.origin + '/'), { headers: { 'content-type': 'image/svg+xml', 'cache-control': 'max-age=3600', 'access-control-allow-origin': '*' } }); // 12/11: mã QR mở app nhân viên (phần mềm hiện ở trang Ứng dụng nhân viên)
       if (url.pathname === '/icon.svg') return new Response(ICON_SVG, { headers: { 'content-type': 'image/svg+xml', 'cache-control': 'max-age=86400' } });
       if (/^\/phan-mem\/?$/.test(url.pathname) && isDemo(env, url)) return new Response(HRM_HTML, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache', 'x-content-type-options': 'nosniff', 'referrer-policy': 'no-referrer' } });
-      // 13/11/2026: trang quản trị của đơn vị = Phần mềm quản lý nhân sự chạy ngay trên máy chủ này, dữ liệu lưu trên máy chủ (bản thử: chuyển sang /phan-mem dùng dữ liệu mẫu)
+      // 13/11/2026: trang quản trị của đơn vị = Phần mềm quản lý nhân sự toàn diện chạy ngay trên máy chủ này, dữ liệu lưu trên máy chủ (bản thử: chuyển sang /phan-mem dùng dữ liệu mẫu)
       if (/^\/quan-tri\/?$/.test(url.pathname)) {
         if (isDemo(env, url)) return Response.redirect(url.origin + '/phan-mem' + url.search, 302);
         const sv = '<script>window.QTT_SV=' + JSON.stringify({ v: VER, api: '/api/qt/' }) + ';window.QTT_BR=' + brJs(await brCfg(env)) + ';</script>';

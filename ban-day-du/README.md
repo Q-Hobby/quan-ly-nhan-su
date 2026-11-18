@@ -1,4 +1,4 @@
-# Bản đầy đủ – Phần mềm quản lý nhân sự
+# Bản đầy đủ – Phần mềm quản lý nhân sự toàn diện
 
 Hướng dẫn cài đặt, cập nhật, sao lưu: xem [README chính](../README.md#ban-day-du).
 

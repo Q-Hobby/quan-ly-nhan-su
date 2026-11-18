@@ -913,7 +913,7 @@ function hdr(sub, right) {
 }
 function foot() { var br = window.QTT_BR || {}; return '<p class="faint small" style="text-align:center;margin-top:18px">' + (br.name ? esc(br.name) + ' · ' : '') + (window.QTT_BR ? 'bản ' : 'Quản trị tử tế · bản thử nghiệm ') + esc(VER) + (window.QTT_BR ? ' · Tác giả: <a href="https://quantritute.com" target="_blank" rel="noopener" style="color:inherit">Quản trị tử tế</a>' : '') + '</p>'; } // 16/11/2026: máy chủ của đơn vị có thương hiệu riêng + dòng tác giả
 /* ===== BẢN THỬ: thanh đầu trang + khung hướng dẫn từng bước ===== */
-var DEMO = false, HRM = '/phan-mem'; // 08/11: Phần mềm quản lý nhân sự bản xem trước chạy cùng máy chủ thử
+var DEMO = false, HRM = '/phan-mem'; // 08/11: Phần mềm quản lý nhân sự toàn diện bản xem trước chạy cùng máy chủ thử
 function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
 function demoBar(cur) {
   if (!DEMO) return '';
@@ -942,7 +942,7 @@ function calHtml(c) {
 }
 function isMobile() { return /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent); }
 function money(n) { return (+n || 0).toLocaleString('vi-VN'); }
-/* 0.4.1: phiếu lương (bảng kê trả lương – BLLĐ 2019 Điều 95.3) gửi từ Phần mềm quản lý nhân sự; hỏi lại từng dòng */
+/* 0.4.1: phiếu lương (bảng kê trả lương – BLLĐ 2019 Điều 95.3) gửi từ Phần mềm quản lý nhân sự toàn diện; hỏi lại từng dòng */
 function slipHtml(ph, pi) {
   var d = ph.du_lieu || {}, hoi = ph.hoi || [], G = { tn: 'I. Thu nhập', bh: 'II. Bảo hiểm bắt buộc trừ vào lương', tax: 'III. Thuế thu nhập cá nhân', kt: 'IV. Khấu trừ khác' }, tot = { tn: d.tn, bh: d.bh, tax: d.thue, kt: d.kt };
   var h = '<div class="card"><h3 style="font-size:16px;margin-bottom:2px">Phiếu lương tháng ' + ph.ym.slice(5) + '/' + ph.ym.slice(0, 4) + '</h3><p class="faint small" style="margin:0 0 8px">' + esc(d.cty || '') + ' · ' + esc(d.cong || '') + (d.han ? ' · hỏi lại trước ' + esc(d.han) : '') + '</p>' + (d.loi_nhan ? '<div class="msg" style="margin:0 0 8px;white-space:pre-wrap">' + esc(d.loi_nhan) + '</div>' : '') + '<table><tbody>'; // 10/11: lời nhắn kèm phiếu do quản lý soạn khi gửi
@@ -1197,7 +1197,7 @@ var PUSH_SYNC = '';
 function pushResync(st) { if (!st.me || PUSH_SYNC === st.me.ma || !pushSupport() || Notification.permission !== 'granted') return; PUSH_SYNC = st.me.ma; pushSub().then(function (x) { if (x) api('/api/push/dang-ky', { sub: x.toJSON() }); }); } // máy dùng chung: gắn lại máy này với người đang đăng nhập
 var PUSH_TXT = { on: 'Đang bật · bấm để tắt', off: 'Đang tắt · bấm để bật', denied: 'Bạn đã chặn – cho phép lại trong cài đặt', ios: 'iPhone: cần thêm app vào màn hình chính', no: 'Trình duyệt này chưa hỗ trợ' };
 function pushInfo(k) { return k === 'ios' ? 'Trên iPhone, thông báo chỉ chạy khi app đã được ghim ra màn hình chính (iOS 16.4 trở lên): Safari → nút Chia sẻ → <b>Thêm vào MH chính</b>, rồi mở app từ biểu tượng đó và bật lại ở đây.' : k === 'denied' ? 'Bạn đã chặn thông báo. Android: giữ biểu tượng app → Thông tin ứng dụng → Thông báo → Cho phép. Máy tính: bấm biểu tượng ổ khóa cạnh địa chỉ trang → Thông báo → Cho phép.' : 'Trình duyệt này chưa hỗ trợ thông báo đẩy. Hãy dùng Chrome, Edge, Safari bản mới, hoặc ghim app ra màn hình chính.'; }
-/* 16/11/2026 – ĐƠN XIN ĐI MUỘN / VỀ SỚM (đơn vị bật ở Phần mềm quản lý nhân sự) */
+/* 16/11/2026 – ĐƠN XIN ĐI MUỘN / VỀ SỚM (đơn vị bật ở Phần mềm quản lý nhân sự toàn diện) */
 function xmCa(st, HS, iso) { // ca của ngày: lịch xếp ca → ca theo thứ → ca phòng ban
   var L = st.lich; if (L && HS && HS.lich && HS.lich.sx) { var r = (L.d || []).filter(function (x) { return x.ngay === iso; })[0]; if (!r || !r.ca || r.ca === 'N') return null; var ps = String(r.ca).split('+').map(function (k) { return (L.ca || []).filter(function (c) { return c.id === k; })[0]; }).filter(Boolean); return ps.length && ps[0].vao ? { vao: ps[0].vao, ra: ps[ps.length - 1].ra, som: +ps[0].som || 0 } : null; }
   var l = HS && HS.lich, ca = l && l.ca; if (!ca || !ca.vao) return null; var dw = isoDow(iso); if (l.tuan && l.tuan.length && l.tuan.indexOf(dw) < 0) return null;
@@ -1507,7 +1507,7 @@ function toiHtml(st, HS, HSo, ten, cty, av) {
   if (S === 'bp') return '<div id="bp"><section class="nvx-card nvx-empty">Đang tải dữ liệu bộ phận…</section></div>';
   if (S === 'org') return '<div id="org"><section class="nvx-card nvx-empty">Đang tải sơ đồ tổ chức…</section></div>';
   if (S === 'hs') {
-    if (!HS) return '<section class="nvx-card nvx-empty">Hồ sơ sẽ hiện ở đây sau khi phòng nhân sự đồng bộ từ Phần mềm quản lý nhân sự.</section>';
+    if (!HS) return '<section class="nvx-card nvx-empty">Hồ sơ sẽ hiện ở đây sau khi phòng nhân sự đồng bộ từ Phần mềm quản lý nhân sự toàn diện.</section>';
     var Kf = (st.kho || []).filter(function (f) { return f.kho === 'hoso'; });
     h += '<div class="nvx-sec">Thông tin của bạn</div><section class="nvx-card"><dl class="kv2"><dt>Họ và tên</dt><dd>' + esc(HS.ten) + '</dd><dt>Mã nhân viên</dt><dd>' + esc(st.me.ma) + '</dd><dt>Chức danh</dt><dd>' + cdFmt(HS.cd) + '</dd>' + (HS.info || []).map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('') + '</dl><p class="nvx-note" style="margin:8px 0 0">Số giấy tờ, tài khoản chỉ hiện 4 số cuối. Thông tin sai: báo phòng nhân sự để sửa.</p></section>';
     if ((HS.giay_to || []).length) h += '<div class="nvx-sec">Giấy tờ đã nộp</div><section class="nvx-card nvx-list">' + HS.giay_to.map(function (x) { var fs = Kf.filter(function (f) { return f.ref === x.ten; }); return '<div class="it top"><span class="ic' + (x.tt === 'Đã nộp' ? '' : ' bad') + '">' + ni(x.tt === 'Đã nộp' ? 'check' : 'x', 16) + '</span><span class="tx"><b>' + esc(x.ten) + '</b><small>' + esc(x.tt) + (x.ngay ? ' · ' + esc(x.ngay) : '') + (fs.length ? ' · ' + fs.length + ' bản scan' : '') + '</small>' + fs.map(fileRow).join('') + '</span></div>'; }).join('') +
@@ -1542,7 +1542,7 @@ function toiHtml(st, HS, HSo, ten, cty, av) {
     if (rest.length) h += '<div class="nvx-sec">Bản đã ký khác</div><section class="nvx-card">' + rest.map(fileRow).join('') + '</section>';
     else if (!Kh.length && HS.kho && HS.kho.hd) h += '<p class="nvx-note">Có ' + HS.kho.hd + ' file bản đã ký lưu ở phòng nhân sự.</p>';
     if (Kh.some(function (f) { return f.mau; })) h += '<p class="nvx-note">Bản thử: bản scan là ảnh mẫu tự vẽ (dữ liệu hư cấu).</p>';
-    if (HS.hop_dong.some(function (x) { return !x.html; })) h += '<p class="nvx-note">Nội dung hợp đồng hiện sau khi phòng nhân sự bấm Đồng bộ trong Phần mềm quản lý nhân sự.</p>';
+    if (HS.hop_dong.some(function (x) { return !x.html; })) h += '<p class="nvx-note">Nội dung hợp đồng hiện sau khi phòng nhân sự bấm Đồng bộ trong Phần mềm quản lý nhân sự toàn diện.</p>';
     return h;
   }
   if (S === 'ht') {
@@ -2054,11 +2054,11 @@ function nvBind(st, X) {
     if (c.html) api('/api/hop-dong?i=' + i).then(function (j) { if (j.ok) nvDoc(j.loai + ' số ' + j.so, j.html); else if (sc) window.open('/api/kho-file?id=' + encodeURIComponent(sc.id), '_blank', 'noopener'); });
     else if (sc) window.open('/api/kho-file?id=' + encodeURIComponent(sc.id), '_blank', 'noopener'); }; });
   if ($('#help')) $('#help').onclick = function () {
-    openSheet('Thử chấm công theo 4 bước', '<p class="small muted" style="margin:0 0 8px">Mỗi bước làm xong, lượt chấm hiện ngay ở <a href="/tram">Mã QR chấm công</a> và <a href="/quan-ly">Trang quản lý</a>, rồi đổ về Phần mềm quản lý nhân sự.</p><ol class="nvx-steps">' +
+    openSheet('Thử chấm công theo 4 bước', '<p class="small muted" style="margin:0 0 8px">Mỗi bước làm xong, lượt chấm hiện ngay ở <a href="/tram">Mã QR chấm công</a> và <a href="/quan-ly">Trang quản lý</a>, rồi đổ về Phần mềm quản lý nhân sự toàn diện.</p><ol class="nvx-steps">' +
       ['Đang bắt Wi‑Fi đã ghi là mạng văn phòng → bấm nút lớn <b>Chấm vào ca</b>.<small>Nếu báo chưa nhận ra mạng: mở trang Mã QR chấm công trên máy tính dùng cùng Wi‑Fi rồi bấm <b>Kiểm tra lại mạng</b>.</small>',
        '<b>Tắt Wi‑Fi</b> trên điện thoại (dùng 4G) → <b>Kiểm tra lại mạng</b> → <b>Ra ca</b>.<small>Bị từ chối "Không nhận ra mạng Wi‑Fi văn phòng" – người ở nhà không chấm hộ được.</small>',
        'Vẫn dùng 4G, mở <b>camera</b> quét mã ở trang <a href="/tram">Mã QR chấm công</a> → <b>Ra ca</b>.<small>Mã đổi mỗi 30 giây nên chụp ảnh gửi người khác không dùng được.</small>',
-       'Xem các mục dưới đáy: <b>Lịch</b>, <b>Công</b> (bấm từng ngày), <b>Đơn</b> (chọn người bàn giao; đăng nhập người quản lý để duyệt), <b>Lương</b>, và mục <b>Bạn</b> (bấm ảnh đại diện).<small>Kế toán thấy ở <a href="' + HRM + '" target="_blank" rel="noopener">Phần mềm quản lý nhân sự</a> → dùng dữ liệu mẫu → Chấm công.</small>'].map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>');
+       'Xem các mục dưới đáy: <b>Lịch</b>, <b>Công</b> (bấm từng ngày), <b>Đơn</b> (chọn người bàn giao; đăng nhập người quản lý để duyệt), <b>Lương</b>, và mục <b>Bạn</b> (bấm ảnh đại diện).<small>Kế toán thấy ở <a href="' + HRM + '" target="_blank" rel="noopener">Phần mềm quản lý nhân sự toàn diện</a> → dùng dữ liệu mẫu → Chấm công.</small>'].map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ol>');
   };
   var clk = setInterval(function () { var c = $('#clk'), s = $('#sbclk'); if (!c && !s) return clearInterval(clk); var q = vp(Date.now()); if (c) c.textContent = q.h + ':' + q.mi; if (s) s.textContent = q.h + ':' + q.mi; }, 5000);
   if ($('#mtog')) $('#mtog').onclick = function () { ls('nv-hide-money', ls('nv-hide-money') !== '0' ? '0' : '1'); var y = scrY(); nvView(st); scrTop(y); };
@@ -2333,7 +2333,7 @@ function qlRender(msg) {
   if (!QL.tab0) { QL.tab0 = 1; QL.tab = d.demo || !d.ip_vp.some(function (r) { return r.hieu_luc; }) ? 'ip' : 'ngay'; } // 08/11: tab Thiết lập mạng Wi‑Fi đứng đầu
   DEMO = !!d.demo;
   var h = '<div class="wrap wide">' + hdr(d.cfg.ten_cty + ' · Quản lý', '<a class="btn sm" href="/tram" title="Mở trên thiết bị cố định ở văn phòng – dùng khi điện thoại nhân viên không bắt được Wi‑Fi văn phòng">Mã QR chấm công</a>' + (DEMO ? '' : '<button class="btn sm" id="lo">Đăng xuất</button>')) + demoBar('ql') +
-    guide('ql', 'Trang quản lý – dành cho kế toán, nhân sự', 'Xem ai đã chấm, chấm bằng cách nào, lượt nào bị từ chối; khai báo <b>Wi‑Fi văn phòng</b>; quản lý tài khoản nhân viên; tải CSV. Khi nối Phần mềm quản lý nhân sự, lượt chấm tự đổ về bảng công. Bản thử: không cần mật khẩu.',
+    guide('ql', 'Trang quản lý – dành cho kế toán, nhân sự', 'Xem ai đã chấm, chấm bằng cách nào, lượt nào bị từ chối; khai báo <b>Wi‑Fi văn phòng</b>; quản lý tài khoản nhân viên; tải CSV. Khi nối Phần mềm quản lý nhân sự toàn diện, lượt chấm tự đổ về bảng công. Bản thử: không cần mật khẩu.',
       ['Máy này đang bắt Wi‑Fi muốn thử? Ở tab đầu tiên <b>Thiết lập mạng Wi‑Fi</b> → bấm <b>Thêm IP của máy này</b>.<small>Hoặc mở trang <a href="/tram">Mã QR chấm công</a> trên máy này – IP tự được ghi.</small>',
        'Trên điện thoại cùng Wi‑Fi, mở <a href="/">Trang nhân viên</a> → chọn nhân sự mẫu → chấm <b>Vào ca</b>.',
        'Quay lại tab <b>Tổng hợp lượt chấm</b> (bấm Hôm nay để tải lại) xem lượt vừa chấm; tab <b>Bị từ chối</b> xem lượt chấm bằng 4G bị chặn; tab <b>Máy dùng chung</b> cảnh báo một điện thoại chấm cho nhiều người.']) +
@@ -2450,14 +2450,14 @@ function tabCd() {
     '<label class="row" style="margin-top:12px;gap:8px"><input type="checkbox" id="c-ip"' + (c.hien_ip === '1' ? ' checked' : '') + '> Hiện IP cho nhân viên (bật khi test)</label>' +
     '<label class="lbl">Tên đơn vị</label><input id="c-ten" type="text" value="' + esc(c.ten_cty) + '">' +
     '<div style="margin-top:12px"><button class="btn pri" id="c-go">Lưu</button></div></div>' +
-    '<div class="card"><h3 style="font-size:16px">Kết nối Phần mềm quản lý nhân sự</h3><p class="muted small">Phần mềm nhân sự dùng mã kết nối để đẩy danh sách nhân viên, mã PIN và lấy lượt chấm, đơn nghỉ về bảng công. ' + (c.ket_noi ? '<b>Đã có mã kết nối</b>' + (c.sync_at ? ' (tạo ' + fDate(+c.sync_at) + ')' : '') + '. Tạo mã mới thì mã cũ hết hiệu lực.' : 'Chưa có mã kết nối.') + '</p><button class="btn pri" id="c-key">' + (c.ket_noi ? 'Tạo mã kết nối mới' : 'Tạo mã kết nối') + '</button><div id="c-keyo"></div></div>' +
+    '<div class="card"><h3 style="font-size:16px">Kết nối Phần mềm quản lý nhân sự toàn diện</h3><p class="muted small">Phần mềm nhân sự dùng mã kết nối để đẩy danh sách nhân viên, mã PIN và lấy lượt chấm, đơn nghỉ về bảng công. ' + (c.ket_noi ? '<b>Đã có mã kết nối</b>' + (c.sync_at ? ' (tạo ' + fDate(+c.sync_at) + ')' : '') + '. Tạo mã mới thì mã cũ hết hiệu lực.' : 'Chưa có mã kết nối.') + '</p><button class="btn pri" id="c-key">' + (c.ket_noi ? 'Tạo mã kết nối mới' : 'Tạo mã kết nối') + '</button><div id="c-keyo"></div></div>' +
     '<div class="card"><h3 style="font-size:16px">Bảo mật</h3><label class="lbl">Đổi mật khẩu tài khoản quản trị hệ thống quantri (từ 8 ký tự, có chữ và số)</label><div class="row"><input id="c-pin" type="password" autocomplete="new-password" style="max-width:220px"><button class="btn" id="c-pgo">Đổi mật khẩu</button></div>' +
     '<p class="hint">Đổi mã QR bí mật: mọi mã QR cũ (kể cả ảnh chụp) hết hiệu lực ngay.</p><button class="btn" id="c-qr">Đổi mã QR bí mật</button></div>' +
     '<div class="card"><h3 style="font-size:16px">Dữ liệu thử</h3><p class="muted small">Xóa toàn bộ lượt chấm và lượt bị từ chối (giữ nhân viên, IP, cài đặt). Dùng khi test xong muốn làm lại từ đầu.</p><div class="row"><input id="c-xoa" type="text" placeholder="Gõ XOA" style="max-width:140px"><button class="btn dan" id="c-xgo">Xóa dữ liệu chấm công</button></div></div>';
   $('#c-mode').value = c.che_do;
   $('#c-go').onclick = function () { api('/api/ql/cfg', { che_do: $('#c-mode').value, ip_gio: $('#c-gio').value, hien_ip: $('#c-ip').checked, ten_cty: $('#c-ten').value }).then(function (j) { after(j, 'Đã lưu cài đặt.'); }); };
   $('#c-pgo').onclick = function () { api('/api/ql/cfg', { pin_moi: $('#c-pin').value }).then(function (j) { if (j.ok) qlLogin(); else say(esc(j.loi), 'err'); }); };
-  $('#c-key').onclick = function () { if (QL.d.cfg.ket_noi && !confirmBox('Tạo mã mới thì Phần mềm nhân sự đang kết nối phải nhập lại mã. Tiếp tục?')) return; api('/api/ql/cfg', { tao_ma_ket_noi: true }).then(function (j) { if (!j.ok) return say(esc(j.loi), 'err'); $('#c-keyo').innerHTML = '<p class="small" style="margin-top:12px">Mở <b>Phần mềm quản lý nhân sự → Chấm công → Chấm công Wi‑Fi</b>, dán 2 thông tin sau. <b>Mã chỉ hiện một lần</b> – chép ngay.</p><div class="small muted">Địa chỉ máy chủ</div><div class="keybox">' + esc(location.origin) + '</div><div class="small muted">Mã kết nối</div><div class="keybox">' + esc(j.ma_ket_noi) + '</div>'; QL.d.cfg.ket_noi = true; }); };
+  $('#c-key').onclick = function () { if (QL.d.cfg.ket_noi && !confirmBox('Tạo mã mới thì Phần mềm nhân sự đang kết nối phải nhập lại mã. Tiếp tục?')) return; api('/api/ql/cfg', { tao_ma_ket_noi: true }).then(function (j) { if (!j.ok) return say(esc(j.loi), 'err'); $('#c-keyo').innerHTML = '<p class="small" style="margin-top:12px">Mở <b>Phần mềm quản lý nhân sự toàn diện → Chấm công → Chấm công Wi‑Fi</b>, dán 2 thông tin sau. <b>Mã chỉ hiện một lần</b> – chép ngay.</p><div class="small muted">Địa chỉ máy chủ</div><div class="keybox">' + esc(location.origin) + '</div><div class="small muted">Mã kết nối</div><div class="keybox">' + esc(j.ma_ket_noi) + '</div>'; QL.d.cfg.ket_noi = true; }); };
   $('#c-qr').onclick = function () { api('/api/ql/cfg', { doi_qr: true }).then(function (j) { after(j, 'Đã đổi mã QR bí mật.'); }); };
   $('#c-xgo').onclick = function () { api('/api/ql/xoa-du-lieu', { xac_nhan: $('#c-xoa').value.trim() }).then(function (j) { after(j, 'Đã xóa dữ liệu chấm công.'); }); };
 }
