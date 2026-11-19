@@ -4,6 +4,9 @@
 - **Mã NV nhập linh hoạt**: bỏ quy định dạng "chữ cái + số" – dùng đúng mã đơn vị đang có (VD: 0001, HĐ-01/A, KT 001.B), tối đa 20 ký tự, phần mềm tự viết hoa; chỉ không dùng các ký tự < > " ' ` \. App nhân viên đăng nhập được với mọi mã hợp lệ.
 - **Số sổ BHXH nhập linh hoạt**: bỏ bắt buộc đủ 10 chữ số – nhập đúng như trên sổ / tờ khai (tối đa 30 ký tự).
 - **Tự động đồng bộ máy chủ và app nhân viên** (bản đầy đủ): không cần bấm "Đồng bộ ngay". Phần mềm tự đồng bộ khi mở / vừa thiết lập máy chủ, khoảng 15 giây sau mỗi thay đổi dữ liệu và 5 phút một lần khi đang mở – đẩy danh sách nhân viên, tài khoản, hồ sơ, lịch làm lên máy chủ; lấy lượt chấm, đơn từ về phần mềm. Nút "Đồng bộ ngay" vẫn giữ khi cần lấy dữ liệu tức thì. Nhiều người quản trị cùng mở phần mềm: phần dữ liệu do đồng bộ tự sinh được tự gộp, không hỏi "giữ bản của ai".
+- **Sửa lỗi đánh dấu "Đã nộp" vẫn hiện "Còn thiếu"** ở Hồ sơ nhân sự → Tổng hợp giấy tờ (xảy ra với người chưa có dòng giấy tờ nào); dữ liệu đã đánh dấu trước đây tự được khôi phục, không phải làm lại.
+- **Sửa lỗi danh mục giấy tờ tự rút còn 1–2 loại** sau khi bấm Lưu một ô; danh mục đầy đủ tự hiện lại.
+- **Đánh dấu "Đã nộp" là đủ**, không bắt buộc tải file. Ô đã nộp nhưng chưa có file scan trong Kho có thêm chấm cam nhỏ ở góc (rê chuột thấy "chưa có file scan") – file scan chỉ để lưu trữ, xem lại.
 
 ## 1.0.1 – sửa lỗi, cải thiện sau thử nghiệm thực tế (18/11/2026)
 - **Thêm công ty** (đổi tên từ "Thêm đơn vị"): tạo công ty trống không cần chọn file; chọn file / thư mục từ nút này thì dữ liệu vào một công ty mới, không lẫn vào công ty đang xem; thêm xong vẫn ở trang Cài đặt.
