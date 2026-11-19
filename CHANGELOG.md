@@ -13,6 +13,7 @@
 - **Mẫu từ file Word giữ logo, cỡ chữ**: logo ở đầu trang của file gốc được giữ lại (khi tải Word lặp lại ở mọi trang như bản gốc), ảnh trong văn bản giữ nguyên; giữ cỡ chữ, giãn dòng như file gốc.
 - **Chèn ảnh trong trình sửa văn bản**: nút **Ảnh** trên thanh công cụ – tải ảnh lên chèn tại con trỏ (logo, con dấu, sơ đồ…); bấm vào ảnh để đổi kích thước, căn lề, đặt làm logo đầu trang hoặc xóa.
 - Trang Kho hợp đồng mẫu bỏ nút "Nhập từ file" (trùng với "Tải lên mẫu (Word / PDF)"); ở Sổ hợp đồng nút này đổi tên thành **Nhập sổ hợp đồng từ Excel** cho rõ mục đích.
+- **Căn chữ theo chiều cao hàng trong ô bảng**: trình sửa văn bản có 3 nút căn trên / giữa / dưới (chọn một hoặc nhiều ô); mẫu tải từ Word giữ cách căn của file gốc, tải Word ra giữ nguyên.
 
 ## 1.0.1 – sửa lỗi, cải thiện sau thử nghiệm thực tế (18/11/2026)
 - **Thêm công ty** (đổi tên từ "Thêm đơn vị"): tạo công ty trống không cần chọn file; chọn file / thư mục từ nút này thì dữ liệu vào một công ty mới, không lẫn vào công ty đang xem; thêm xong vẫn ở trang Cài đặt.
