@@ -7866,8 +7866,43 @@ if (typeof module !== 'undefined') module.exports = XW;
     function tpDraw() {
       var pid = $('#hfP', m).value, hh = { 'Mã NV': pid, 'Loại hợp đồng': $('#hfT', m).value, 'Phòng ban': $('#hfPb', m).value, 'Chức danh': $('#hfCd', m).value.trim() }, rk = tplRank(u, hh), auto = rk.length ? rk[0].tp : null;
       var curV = tpMan && $('#hfTp', m) ? $('#hfTp', m).value : tpMan && h ? h['Mẫu HĐ'] : auto ? auto.id : '';
-      $('#hfTpB', m).innerHTML = '<label for="hfTp">Mẫu văn bản hợp đồng</label><div class="hf-tp-r"><select class="input" id="hfTp">' + tpls().map(function (x) { return '<option value="' + x.id + '"' + (x.id === curV ? ' selected' : '') + '>' + esc(x.ten) + (auto && x.id === auto.id ? ' – tự chọn' : '') + '</option>'; }).join('') + '</select><small class="faint">' + (tpMan ? 'Đã chọn tay cho hợp đồng này' : auto ? 'Tự chọn theo loại hợp đồng' + (tplScopeTxt(auto) ? ', ' + esc(tplScopeTxt(auto)) : '') + ' – đổi phòng ban, chức danh thì tự chọn lại' : '') + '</small></div>';
-      $('#hfTp', m).addEventListener('change', function () { tpMan = true; tpDraw(); });
+      $('#hfTpB', m).innerHTML = '<label for="hfTp">Mẫu văn bản hợp đồng</label><div class="hf-tp-r"><select class="input" id="hfTp">' + tpls().map(function (x) { return '<option value="' + x.id + '"' + (x.id === curV ? ' selected' : '') + '>' + esc(x.ten) + (auto && x.id === auto.id ? ' – tự chọn' : '') + '</option>'; }).join('') + '</select><button type="button" class="btn" id="hfPv">' + ic('eye', 15) + 'Xem trước</button><small class="faint">' + (DOC ? '<b>Đã sửa văn bản riêng cho hợp đồng này</b> · <a href="#" class="plink" id="hfRs">Dùng lại nội dung mẫu</a>' : tpMan ? 'Đã chọn tay cho hợp đồng này' : auto ? 'Tự chọn theo loại hợp đồng' + (tplScopeTxt(auto) ? ', ' + esc(tplScopeTxt(auto)) : '') + ' – đổi phòng ban, chức danh thì tự chọn lại' : '') + '</small></div>';
+      $('#hfTp', m).addEventListener('change', function () { tpMan = true; if (DOC) { DOC = null; toast('Đã đổi mẫu', 'info', 'Bản sửa riêng trước đó không dùng nữa – văn bản theo mẫu mới.'); } tpDraw(); });
+      $('#hfPv', m).addEventListener('click', hdPreview);
+      var rs = $('#hfRs', m); if (rs) rs.addEventListener('click', function (ev) { ev.preventDefault(); confirmBox('Dùng lại nội dung mẫu?', 'Bỏ phần đã sửa riêng cho hợp đồng này, văn bản điền lại theo mẫu và thông tin hiện tại.', 'Dùng lại mẫu', function () { DOC = null; DOCX = 1; if (!isNew && h) hdDocSet(u, h['Số hợp đồng'], null); tpDraw(); }); });
+    }
+    /* 19/11/2026 (anh): Lập hợp đồng → Xem trước văn bản đã điền thông tin → Sửa (trình soạn như Word) → Lưu / Tải về.
+       Bản sửa riêng lưu ở u.hdDoc[số HĐ] = { html (đã điền sẵn thông tin), tp, at } – dùng khi in, tải văn bản của hợp đồng này; mẫu trong Kho không đổi. */
+    var DOC = h && u.hdDoc && u.hdDoc[h['Số hợp đồng']] ? Object.assign({}, u.hdDoc[h['Số hợp đồng']]) : null, DOCX = 0;
+    function rowNow() {
+      var p = curP(); if (!p) { toast('Chưa chọn người lao động', 'err'); return null; }
+      var PK = pcCollect(), num = function (k) { return +($('#' + k, m).value || '').replace(/\D/g, '') || 0; };
+      return { 'Số hợp đồng': $('#hfNo', m).value.trim(), 'Mã NV': p['Mã NV'], 'Họ và tên': p['Họ và tên'], 'Phòng ban': $('#hfPb', m).value || p['Phòng ban'], 'Chức danh': $('#hfCd', m).value.trim(), 'Loại hợp đồng': $('#hfT', m).value, 'Ngày ký': $('#hfK', m)._get() || '', 'Ngày hiệu lực': $('#hfH', m)._get() || '', 'Ngày hết hạn': $('#hfE', m)._get() || '', 'Mức lương theo HĐ': num('hfL'), 'Phụ cấp chức vụ': num('hfPc'), 'Phụ cấp khác': PK.txt, 'Phụ cấp khác/tháng': PK.mon, 'Lương hiệu suất mục tiêu': num('hfHs') };
+    }
+    function tpNow() { var id = $('#hfTp', m) ? $('#hfTp', m).value : ''; return tpls().filter(function (x) { return x.id === id; })[0] || null; }
+    function hdPreview() {
+      var row = rowNow(), tp = tpNow(); if (!row) return; if (!tp) { toast('Chưa có mẫu văn bản', 'err', 'Thêm mẫu ở Hợp đồng → Kho hợp đồng mẫu.'); return; }
+      var V = tplVals(u, row), Lb = signLbl(tp), sL = [Lb[0][0], Lb[0][1], V.ho_ten], sR = [Lb[1][0], Lb[1][1], V.nguoi_dai_dien], name = hdDocName(row, tp);
+      var src = function () { return DOC ? DOC.html : tplDoc(tp); };
+      var pm = modal('Xem trước văn bản hợp đồng', (row['Số hợp đồng'] || 'Hợp đồng mới') + ' · ' + row['Họ và tên'] + ' · mẫu “' + tp.ten + '”', '<div id="hpB"></div>');
+      pm.querySelector('.modal').classList.add('lg', 'tpl-modal');
+      function draw() {
+        var c = coInfo(u);
+        $('#hpB', pm).innerHTML = (!c.dc || !c.mst ? '<div class="notice warn">' + ic('info') + '<div>Chưa có địa chỉ / mã số thuế công ty – văn bản để dòng chấm ở các ô này. Bổ sung ở Hợp đồng → <b>Thông tin công ty trên hợp đồng</b>.</div></div>' : '') +
+          (DOC ? '<div class="notice">' + ic('info') + '<div>Văn bản đã sửa riêng cho hợp đồng này' + (DOC.at ? ' lúc ' + esc(String(DOC.at).slice(0, 16)) : '') + '. Thông tin đã điền sẵn thành chữ – đổi mức lương, ngày… trong hợp đồng thì sửa lại trong văn bản hoặc bấm <b>Dùng lại nội dung mẫu</b>.</div></div>' : '') +
+          '<div class="tp-paper tv-paper">' + tplHtml(src(), V, false) + '</div>' +
+          '<div class="link-row nv-foot"><span class="link-row" style="margin:0"><button class="btn btn-primary" id="hpEd">Sửa</button></span><span class="link-row" style="margin:0"><button class="btn" data-close>Đóng</button><button class="btn" id="hpPr">' + ic('td_print', 15) + 'In</button><button class="btn" id="hpDl">' + ic('dl', 15) + 'Tải về (.docx)</button></span></div>';
+        $('#hpDl', pm).addEventListener('click', function () { try { saveDocx(tplDocx(src(), V, sL, sR), name); toast('Đã tạo ' + name, 'ok', 'Mẫu tham khảo – rà lại nội dung trước khi in, ký.'); } catch (er) { showErr('Chưa tạo được văn bản hợp đồng', er); } });
+        $('#hpPr', pm).addEventListener('click', function () { hnBmPrint((row['Loại hợp đồng'] || 'Hợp đồng') + ' ' + (row['Số hợp đồng'] || '') + ' – ' + row['Họ và tên'], tplHtml(src(), V, false)); });
+        $('#hpEd', pm).addEventListener('click', function () {
+          var K = { doc: 1, list: function () { return [{ id: 'hdoc', ten: 'Văn bản ' + (row['Số hợp đồng'] || 'hợp đồng'), loai: [], html: DOC ? DOC.html : tplFill(tplDoc(tp), V) }]; }, types: null, noun: 'hợp đồng', fields: TPL_FIELDS, defHtml: function () { return ''; }, docName: name,
+            samples: function () { return [{ label: row['Số hợp đồng'] + ' · ' + row['Họ và tên'], lt: row['Loại hợp đồng'], tag: 'hợp đồng ' + row['Số hợp đồng'], V: function () { return V; }, xml: function (html) { return tplDocx(html, V, sL, sR); } }]; },
+            save: function (L) { DOC = { html: L[0].html, tp: tp.id, at: nowVn() }; DOCX = 0; if (!isNew && h && hdIndex(u)[h['Số hợp đồng']]) hdDocSet(u, h['Số hợp đồng'], DOC); tpDraw(); draw(); },
+            savedMsg: isNew ? 'Đã lưu văn bản – bấm "Lưu hợp đồng" để hoàn tất' : 'Đã lưu văn bản của hợp đồng ' + (row['Số hợp đồng'] || '') };
+          tplEditor('hdoc', null, K);
+        });
+      }
+      draw();
     }
     pcDraw(); tpDraw(); hfTot();
     ['hfCd'].forEach(function (k) { $('#' + k, m).addEventListener('input', function () { if (!tpMan) tpDraw(); }); }); $('#hfPb', m).addEventListener('change', function () { if (!tpMan) tpDraw(); });
@@ -7923,6 +7958,7 @@ if (typeof module !== 'undefined') module.exports = XW;
         // ghi mức phụ cấp đã sửa về Cơ cấu nhân sự (tháng hiệu lực và các tháng sau chưa duyệt)
         var chg = {}, skip = []; pcItems().forEach(function (x) { var val = +PCV[x.id] || 0; if (pcTouch[x.id] && val !== pcDef(x, p['Mã NV'])) chg[x.id] = val; });
         if (Object.keys(chg).length) { var ym0 = String(H).slice(0, 7), cur0 = refDate().slice(0, 7); if (ym0 < cur0) ym0 = cur0; lgccEnsure(u, ym0); Object.keys(u.lgcc).filter(function (k) { return k >= ym0; }).forEach(function (k) { var c = u.lgcc[k]; if (c.duyet) { skip.push(HR.ymLabel(k)); return; } var Ee = c.emp[p['Mã NV']] || (c.emp[p['Mã NV']] = JSON.parse(JSON.stringify(lgEmpM(u, lgOf(u), k, p['Mã NV'])))); Ee.amt = Ee.amt || {}; Object.keys(chg).forEach(function (id2) { Ee.amt[id2] = chg[id2]; }); }); u.ver = (u.ver || 0) + 1; saveUnits(); log('Hợp đồng ' + no + ': cập nhật phụ cấp vào Cơ cấu nhân sự từ tháng ' + HR.ymLabel(ym0)); }
+        if (DOC) hdDocSet(u, no, DOC, h && h['Số hợp đồng'] !== no ? h['Số hợp đồng'] : null); else if (DOCX && !isNew) hdDocSet(u, no, null);
         m.close(); commitEdits(); toast(isNew ? 'Đã lập hợp đồng ' + no : 'Đã lưu hợp đồng ' + no, 'ok', (Object.keys(chg).length ? 'Đã cập nhật phụ cấp vào Cơ cấu nhân sự' + (skip.length ? ' (trừ tháng đã duyệt: ' + skip.join(', ') + ')' : '') + '. ' : ''));
         if (isNew) setTimeout(function () { hdAfter(u, no); }, 120);
       };
@@ -7938,7 +7974,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       '<li id="hs2"><span class="n">2</span><div><b>Ký rồi tải bản đã ký lên</b><p>Chụp ảnh hoặc scan bản có chữ ký hai bên, lưu vào Kho hợp đồng đã ký của nhân viên.</p><span class="link-row" style="margin:6px 0 0"><button class="btn btn-sm" id="hsUp">' + ic('up', 14) + 'Tải bản đã ký lên</button></span></div></li>' +
       '<li id="hs3"><span class="n">3</span><div><b>Xong</b><p>Chưa ký ngay cũng được: cột <b>Bản ký</b> ở Sổ hợp đồng nhắc những hợp đồng chưa lưu bản ký.</p></div></li></ol><div class="link-row" style="justify-content:flex-end;margin-top:12px"><button class="btn" data-close>Đóng</button></div>');
     var done = function (i) { var el = $('#hs' + i, m); if (el) el.classList.add('ok'); };
-    $('#hsPr', m).addEventListener('click', function () { if (tp) { hnBmPrint(h['Loại hợp đồng'] + ' ' + no + ' – ' + h['Họ và tên'], tplHtml(tplDoc(tp), tplVals(u, h), false)); done(1); } });
+    $('#hsPr', m).addEventListener('click', function () { if (tp) { hnBmPrint(h['Loại hợp đồng'] + ' ' + no + ' – ' + h['Họ và tên'], tplHtml(hdSrc(u, h, tp), tplVals(u, h), false)); done(1); } });
     $('#hsWd', m).addEventListener('click', function () { if (!tp) return; try { var name = hdDocName(h, tp); saveDocx(contractXml(u, h, tp), name); toast('Đã tạo ' + name, 'ok'); done(1); } catch (er) { showErr('Chưa tạo được văn bản hợp đồng', er); } });
     $('#hsUp', m).addEventListener('click', function () { m.close(); openKho(u, h['Mã NV'], 'hd', no); });
     var co = $('#hsCo', m); if (co) co.addEventListener('click', function (ev) { ev.preventDefault(); m.close(); ACTS['hd-co'](); });
@@ -8066,13 +8102,17 @@ if (typeof module !== 'undefined') module.exports = XW;
       gio_lam_viec: (pb && pb['Lịch làm việc'] ? pb['Lịch làm việc'] : 'theo nội quy lao động') + (ca ? ', từ ' + ca['Giờ bắt đầu'] + ' đến ' + ca['Giờ kết thúc'] + (ca['Nghỉ giữa ca'] ? ', nghỉ giữa ca ' + ca['Nghỉ giữa ca'] : '') : '') });
   }
   var BLANK = '……………………';
-  function contractXml(u, h, tp) { var V = tplVals(u, h), L = signLbl(tp); return tplDocx(tplDoc(tp), V, [L[0][0], L[0][1], V.ho_ten], [L[1][0], L[1][1], V.nguoi_dai_dien]); }
+  function hdDocOf(u, h) { return u.hdDoc && h && u.hdDoc[h['Số hợp đồng']] || null; }
+  function hdDocSet(u, no, d, old) { u.hdDoc = u.hdDoc || {}; if (old) delete u.hdDoc[old]; if (d) u.hdDoc[no] = { html: d.html, tp: d.tp, at: d.at || nowVn() }; else delete u.hdDoc[no]; u.ver = (u.ver || 0) + 1; saveUnits(); log('Hợp đồng ' + no + ': ' + (d ? 'lưu văn bản sửa riêng' : 'bỏ văn bản sửa riêng, dùng lại mẫu')); }
+  function hdSrc(u, h, tp) { var d = hdDocOf(u, h); return d ? d.html : tplDoc(tp); } // 19/11: văn bản đã sửa riêng cho HĐ này (nếu có)
+  function contractXml(u, h, tp) { var V = tplVals(u, h), L = signLbl(tp); return tplDocx(hdSrc(u, h, tp), V, [L[0][0], L[0][1], V.ho_ten], [L[1][0], L[1][1], V.nguoi_dai_dien]); }
   function saveDocx(xml, name) { var blob = docxBlob(xml), el = document.createElement('a'); el.href = URL.createObjectURL(blob); el.download = name; document.body.appendChild(el); el.click(); setTimeout(function () { URL.revokeObjectURL(el.href); el.remove(); }, 800); }
   function hdDocName(h, tp) { return HR.stripAcc((HRR.isProb(h['Loại hợp đồng']) ? 'HD_thu_viec_' : 'HD_lao_dong_') + h['Mã NV'] + '_' + (h['Họ và tên'] || '') + '_' + h['Số hợp đồng']).replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '') + '.docx'; }
   ACTS['hd-doc'] = function (a, k) {
     var u = unitById(a.getAttribute('data-u')), h = hdIndex(u)[k]; if (!h) return;
     var c = coInfo(u), rk = tplRank(u, h), pk = h['Mẫu HĐ'] ? tplPick(u, h) : null, list = rk.map(function (x) { return x.tp; });
     if (pk) list = [pk]; else if (rk.length > 1 && rk[0].s > rk[1].s) list = [rk[0].tp];
+    var hdd = hdDocOf(u, h); if (hdd) { var tpd = tpls().filter(function (x) { return x.id === hdd.tp; })[0] || list[0]; if (tpd) list = [tpd]; } // 19/11: đã sửa văn bản riêng → dùng luôn
     function make(tp) {
       var go3 = function () { try { var name = hdDocName(h, tp); saveDocx(contractXml(u, h, tp), name); log('Tải văn bản hợp đồng ' + k + ' theo mẫu "' + tp.ten + '" (' + name + ')'); toast('Đã tạo ' + name, 'ok', 'Theo mẫu "' + tp.ten + '". Mẫu tham khảo – rà lại nội dung trước khi in, ký.'); } catch (er) { showErr('Chưa tạo được văn bản hợp đồng', er); } };
       if (!c.dc || !c.mst) confirmBox('Chưa có địa chỉ / mã số thuế công ty', 'Văn bản sẽ để trống các ô này (dòng chấm). Bấm "Thông tin công ty trên hợp đồng" ở đầu trang để điền một lần cho mọi hợp đồng.', 'Vẫn tải', go3); else go3();
@@ -8147,6 +8187,13 @@ if (typeof module !== 'undefined') module.exports = XW;
     }).join('').replace(/<\/ul><ul>/g, '');
   }
   function tplDoc(tp) { return tp.html || tplMdToHtml(tp.nd || ''); }
+  // 19/11/2026: mẫu → văn bản đã điền sẵn thông tin (trường thành chữ, đoạn điều kiện thiếu dữ liệu thì bỏ) – để sửa riêng cho 1 hợp đồng
+  function tplFill(html, V) {
+    var d = new DOMParser().parseFromString('<!doctype html><body>' + (html || '') + '</body>', 'text/html');
+    [].slice.call(d.querySelectorAll('[data-if]')).forEach(function (n) { var v = V[n.getAttribute('data-if')]; if (v === '' || v == null) n.remove(); else { while (n.firstChild) n.parentNode.insertBefore(n.firstChild, n); n.remove(); } });
+    [].slice.call(d.querySelectorAll('[data-f]')).forEach(function (n) { var v = V[n.getAttribute('data-f')]; n.parentNode.replaceChild(d.createTextNode(v === '' || v == null ? BLANK : String(v)), n); });
+    return d.body.innerHTML;
+  }
   function tplFieldsUsed(html) { var o = {}; String(html || '').replace(/data-(?:f|if)="([^"]*)"/g, function (m, k) { o[k] = 1; }); return Object.keys(o); }
 
   // HTML mẫu → danh sách khối. V: giá trị trường (null = giữ {{khoa}}); blank: mẫu trống (in cả đoạn có điều kiện)
@@ -8370,14 +8417,14 @@ if (typeof module !== 'undefined') module.exports = XW;
       '<div class="tpe-g">' + btn('tbl', ic('tbl', 17) + '<span>Bảng</span>', 'Bảng: chèn, thêm/xóa hàng cột, gộp ô, ẩn viền') + '</div>' +
       '<div class="tpe-g">' + btn('fld', ic('fld', 17) + '<span>Trường</span>', 'Chèn trường thông tin tại con trỏ (hoặc gõ / trong văn bản)', ' data-k="1"') + btn('cond', ic('cond', 17) + '<span>Điều kiện</span>', 'Đoạn chỉ in khi trường có dữ liệu (ví dụ dòng phụ cấp)') + btn('sign', ic('sign', 17), 'Chèn khối chữ ký 2 bên') + btn('pb', ic('pb', 17), 'Ngắt trang') + '</div>' +
       '<div class="tpe-g">' + btn('find', ic('find', 17), 'Tìm và thay thế (Ctrl+F)') + '</div>';
-    var body = '<div class="tpe"><div class="tpe-meta"><div class="field"><label for="tpN">Tên mẫu <i class="req">*</i></label><input class="input" id="tpN" value="' + esc(tp.ten) + '" maxlength="80"></div>' +
+    var body = '<div class="tpe"><div class="tpe-meta"' + (K.doc ? ' hidden' : '') + '><div class="field"><label for="tpN">Tên mẫu <i class="req">*</i></label><input class="input" id="tpN" value="' + esc(tp.ten) + '" maxlength="80"></div>' +
       (types.length ? '<div class="tpe-types"><span class="tpe-lbl">' + esc(K.typeLbl || 'Áp dụng cho') + '</span><div>' + types.map(function (t) { return '<label class="tpe-chk"><input type="checkbox" data-tt="' + esc(t) + '"' + ((tp.loai || []).indexOf(t) >= 0 ? ' checked' : '') + '><span>' + esc(t) + '</span></label>'; }).join('') + '</div></div>' : '') + '</div>' +
       '<div class="tpe-bar" id="tpeBar">' + bar + '</div>' +
       '<div class="tpe-findbar" id="tpeFind" hidden><input class="input" id="tpeQ" placeholder="Tìm…"><input class="input" id="tpeR" placeholder="Thay bằng…"><span class="faint" id="tpeCnt"></span><button type="button" class="btn btn-sm" data-c="fprev">‹</button><button type="button" class="btn btn-sm" data-c="fnext">›</button><button type="button" class="btn btn-sm" data-c="frep">Thay</button><button type="button" class="btn btn-sm" data-c="fall">Thay tất cả</button><button type="button" class="x-btn" data-c="fclose">Đóng</button></div>' +
       '<div class="tpe-main"><div class="tpe-scroll"><div class="tpe-page" id="tpeHost"></div></div>' +
       '<aside class="tpe-side"><div class="seg">' + (imp ? '<button data-tv="r">Nhận diện</button>' : '') + '<button data-tv="f">Trường thông tin</button><button data-tv="p">Xem trước</button><button data-tv="h">Hướng dẫn</button></div><div id="tpSide"></div></aside></div>' +
-      '<div class="link-row nv-foot"><span class="link-row" style="margin:0"><button class="btn" id="tpTry">' + ic('dl', 15) + 'Tải thử .docx</button><span class="faint tpe-st" id="tpeSt"></span></span><span class="link-row" style="margin:0"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="tpOk">' + (isNew ? 'Thêm mẫu' : 'Lưu mẫu') + '</button></span></div></div>';
-    var m = modal(imp ? 'Hoàn thiện mẫu từ file tải lên' : isNew ? 'Thêm ' + K.noun + ' mẫu' : 'Sửa mẫu: ' + tp.ten, imp ? 'Phần mềm đã chuyển nội dung file thành mẫu – kiểm tra từng đoạn, sửa chỗ chưa đúng rồi bấm Thêm mẫu' : 'Soạn như Word · kéo thả trường thông tin vào văn bản hoặc gõ / để chọn', body);
+      '<div class="link-row nv-foot"><span class="link-row" style="margin:0"><button class="btn" id="tpTry">' + ic('dl', 15) + (K.doc ? 'Tải về (.docx)' : 'Tải thử .docx') + '</button><span class="faint tpe-st" id="tpeSt"></span></span><span class="link-row" style="margin:0"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="tpOk">' + (K.doc ? 'Lưu' : isNew ? 'Thêm mẫu' : 'Lưu mẫu') + '</button></span></div></div>';
+    var m = K.doc ? modal('Sửa văn bản hợp đồng', 'Chỉ áp dụng cho hợp đồng này – mẫu trong Kho hợp đồng mẫu không đổi', body) : modal(imp ? 'Hoàn thiện mẫu từ file tải lên' : isNew ? 'Thêm ' + K.noun + ' mẫu' : 'Sửa mẫu: ' + tp.ten, imp ? 'Phần mềm đã chuyển nội dung file thành mẫu – kiểm tra từng đoạn, sửa chỗ chưa đúng rồi bấm Thêm mẫu' : 'Soạn như Word · kéo thả trường thông tin vào văn bản hoặc gõ / để chọn', body);
     var md = m.querySelector('.modal'); md.classList.add('tpe-modal'); m.classList.add('tpe-bg');
     var ui = { findQ: '', findIx: 0 }, X = tpeExt(), T = window.TT;
     var ed = new T.Editor({
@@ -8561,7 +8608,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     m.guard = function (e) { if (e.type === 'keydown' && (!topMost() || e.defaultPrevented)) return false; tryClose(); return false; };
     // ---- tải thử, lưu
     function collect() { return { ten: $('#tpN', m).value.trim().replace(/\s+/g, ' '), loai: collectT(), html: ed.getHTML() }; }
-    $('#tpTry', m).addEventListener('click', function () { var c = collect(), cur = samples[si]; if (!cur) { toast('Chưa có ' + K.noun + ' nào để thử', 'err'); return; } try { saveDocx(cur.xml(c.html), 'Thu_mau_' + HR.stripAcc(c.ten || 'mau').replace(/[^A-Za-z0-9]+/g, '_') + '.docx'); toast('Đã tạo file thử', 'ok', 'Điền theo ' + cur.tag + '.'); } catch (er) { showErr('Chưa tạo được file thử', er); } });
+    $('#tpTry', m).addEventListener('click', function () { var c = collect(), cur = samples[si]; if (!cur) { toast('Chưa có ' + K.noun + ' nào để thử', 'err'); return; } try { saveDocx(cur.xml(c.html), K.docName || 'Thu_mau_' + HR.stripAcc(c.ten || 'mau').replace(/[^A-Za-z0-9]+/g, '_') + '.docx'); toast(K.doc ? 'Đã tạo ' + K.docName : 'Đã tạo file thử', 'ok', K.doc ? 'Theo nội dung đang sửa (chưa lưu cũng được).' : 'Điền theo ' + cur.tag + '.'); } catch (er) { showErr('Chưa tạo được file thử', er); } });
     $('#tpOk', m).addEventListener('click', function () {
       var c = collect();
       if (!c.ten) { $('#tpN', m).classList.add('bad'); $('#tpN', m).focus(); toast('Chưa có tên mẫu', 'err'); return; }
@@ -8570,7 +8617,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       if (!ed.state.doc.textContent.trim() && !nF) { toast('Nội dung mẫu đang trống', 'err'); return; }
       if (Object.keys(bad).length) { toast('Trường ghép không đúng: ' + Object.keys(bad).join(', '), 'err', 'Bấm vào thẻ màu đỏ để đổi sang trường trong danh sách.'); return; }
       var dupT = c.loai.filter(function (t) { return L.some(function (x) { return x.id !== tp.id && (x.loai || []).indexOf(t) >= 0; }); });
-      var done = function () { var n = { id: tp.id, ten: c.ten, loai: c.loai, html: c.html, at: nowVn() }; if (tp.goc) n.goc = 1; var L2 = L.filter(function (x) { return x.id !== tp.id; }), i = L.findIndex(function (x) { return x.id === tp.id; }); if (i >= 0) L2.splice(i, 0, n); else L2.push(n); K.save(L2, (isNew ? 'thêm' : 'sửa') + ' mẫu "' + c.ten + '"'); reallyClose(); render(); toast((isNew ? 'Đã thêm' : 'Đã lưu') + ' mẫu "' + c.ten + '"', 'ok'); };
+      var done = function () { var n = { id: tp.id, ten: c.ten, loai: c.loai, html: c.html, at: nowVn() }; if (tp.goc) n.goc = 1; var L2 = L.filter(function (x) { return x.id !== tp.id; }), i = L.findIndex(function (x) { return x.id === tp.id; }); if (i >= 0) L2.splice(i, 0, n); else L2.push(n); K.save(L2, (isNew ? 'thêm' : 'sửa') + ' mẫu "' + c.ten + '"'); reallyClose(); if (K.doc) { toast(K.savedMsg || 'Đã lưu văn bản', 'ok'); return; } render(); toast((isNew ? 'Đã thêm' : 'Đã lưu') + ' mẫu "' + c.ten + '"', 'ok'); };
       if (dupT.length && K.noun === 'hợp đồng') confirmBox('Loại hợp đồng đã có mẫu khác', dupT.join(', ') + ' đã gắn với mẫu khác. Khi tải văn bản cho các loại này, phần mềm sẽ hỏi chọn mẫu nào.', 'Vẫn lưu', done); else done();
     });
     setTimeout(function () { if (!m.contains(document.activeElement) || document.activeElement === $('#tpN', m) && !imp && !isNew) ed.commands.focus('start'); }, 60);
