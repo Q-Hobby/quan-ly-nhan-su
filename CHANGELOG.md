@@ -8,6 +8,7 @@
 - **Sửa lỗi danh mục giấy tờ tự rút còn 1–2 loại** sau khi bấm Lưu một ô; danh mục đầy đủ tự hiện lại.
 - **Đánh dấu "Đã nộp" là đủ**, không bắt buộc tải file. Ô đã nộp nhưng chưa có file scan trong Kho có thêm chấm cam nhỏ ở góc (rê chuột thấy "chưa có file scan") – file scan chỉ để lưu trữ, xem lại.
 - **Tên hay gọi**: hồ sơ nhân sự có thêm trường Tên hay gọi (VD: Cô Tuyến, Anh Duy) – Sơ đồ tổ chức hiển thị tên này; để trống thì hiện 2 chữ cuối của họ tên như trước. Nhập từ file Excel nhận cột "Tên hay gọi" / "Tên gọi" / "Biệt danh".
+- **Tải mẫu hợp đồng, quy chế từ file Word giữ đúng trình bày** (góp ý người dùng): bảng giữ nguyên dạng bảng (gộp ô, độ rộng cột theo file gốc, bảng ẩn viền, hàng tiêu đề) thay vì bị chuyển thành dòng chữ – ô trong bảng vẫn tự nhận trường trộn (VD bảng "Họ và tên | : …"); giữ căn phải, căn giữa (không còn tự chuyển chữ nghiêng), thụt lề, gạch đầu dòng và đánh số a), b), 1. như file gốc.
 
 ## 1.0.1 – sửa lỗi, cải thiện sau thử nghiệm thực tế (18/11/2026)
 - **Thêm công ty** (đổi tên từ "Thêm đơn vị"): tạo công ty trống không cần chọn file; chọn file / thư mục từ nút này thì dữ liệu vào một công ty mới, không lẫn vào công ty đang xem; thêm xong vẫn ở trang Cài đặt.

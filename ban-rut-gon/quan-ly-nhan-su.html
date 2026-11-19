@@ -8126,6 +8126,8 @@ if (typeof module !== 'undefined') module.exports = XW;
       }).join('');
     };
     return String(nd || '').replace(/\r/g, '').split('\n').map(function (ln) {
+      var hm = /^§h(\d+)§$/.exec(ln.trim()); if (hm) return (typeof TPL_HTML !== 'undefined' && TPL_HTML[+hm[1]]) || ''; // 19/11/2026: bảng giữ nguyên từ file Word
+      var meta = {}, mm = /^§([^§]*)§\s?/.exec(ln); if (mm) { mm[1].split(';').forEach(function (kv) { var q = kv.split('='); if (q[0]) meta[q[0]] = q[1]; }); ln = ln.slice(mm[0].length); } // căn lề / thụt lề / gạch đầu dòng
       var cond = /^\?\s*/.test(ln); if (cond) ln = ln.replace(/^\?\s*/, '');
       var t = ln.trim(), h;
       if (t === '') h = '<p></p>';
@@ -8137,9 +8139,12 @@ if (typeof module !== 'undefined') module.exports = XW;
       else if (/^~\s/.test(t)) h = '<p style="text-align: center"><em>' + inl(t.slice(2)) + '</em></p>';
       else if (/^_\s/.test(t)) h = '<p><em>' + inl(t.slice(2)) + '</em></p>';
       else h = '<p>' + inl(t) + '</p>';
+      if (meta.al) h = h.replace(/^<(p|h1|h2)( style="[^"]*")?/, '<$1 style="text-align: ' + meta.al + '"');
+      if (+meta.ind && !meta.li) h = h.replace(/^<p/, '<p data-ind="' + (+meta.ind) + '"');
+      if (meta.li) h = '<ul><li>' + h + '</li></ul>';
       if (cond) { var mk = t.match(/\{\{\s*([a-z_]+)\s*\}\}/); if (mk) h = '<div data-if="' + mk[1] + '">' + h + '</div>'; }
       return h;
-    }).join('');
+    }).join('').replace(/<\/ul><ul>/g, '');
   }
   function tplDoc(tp) { return tp.html || tplMdToHtml(tp.nd || ''); }
   function tplFieldsUsed(html) { var o = {}; String(html || '').replace(/data-(?:f|if)="([^"]*)"/g, function (m, k) { o[k] = 1; }); return Object.keys(o); }
@@ -8814,7 +8819,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     var b = busy('Đang đọc ' + f.name + '…'), isPdf = /\.pdf$/i.test(f.name) || /pdf/.test(f.type);
     if (/\.doc$/i.test(f.name)) { b.done(); toast('File .doc (Word đời cũ) chưa đọc được', 'err', 'Mở file bằng Word → Lưu thành (Save As) → chọn kiểu .docx rồi tải lên lại.'); return; }
     if (f.size > 15 * 1024 * 1024) { b.done(); toast('File lớn hơn 15 MB', 'err'); return; }
-    f.arrayBuffer().then(function (ab) { return isPdf ? pdfLines(new Uint8Array(ab)) : docxLines(new Uint8Array(ab)); })
+    TPL_HTML = []; f.arrayBuffer().then(function (ab) { return isPdf ? pdfLines(new Uint8Array(ab)) : docxLines(new Uint8Array(ab)); })
       .then(function (lines) {
         b.done();
         var chars = lines.reduce(function (n, l) { return n + l.t.length; }, 0);
@@ -8826,23 +8831,88 @@ if (typeof module !== 'undefined') module.exports = XW;
       })
       .catch(function (er) { b.done(); if (er && er.offline) toast('Chưa đọc được PDF', 'err', 'Đọc PDF cần tải bộ đọc PDF qua mạng (cdnjs.cloudflare.com) – máy đang không có mạng hoặc bị chặn. Hãy dùng file Word (.docx).'); else showErr('Chưa đọc được file ' + f.name, er); });
   }
-  // .docx → dòng {t, c (căn giữa), b (đậm cả dòng), i (nghiêng cả dòng)}
+  // .docx → dòng {t, c (căn giữa), al (căn lề), ind (thụt lề), li (gạch đầu dòng), b (đậm cả dòng), i (nghiêng cả dòng)}
+  // 19/11/2026 (1.0.2, góp ý người dùng): GIỮ BẢNG (gộp ô, độ rộng cột, ẩn viền, hàng tiêu đề), căn phải / giữa / đều, thụt lề, gạch đầu dòng, đánh số.
+  // Bảng (trừ khối chữ ký) thành dòng {html} – từng ô vẫn qua nhận diện trường trộn; bảng "nhãn | : giá trị" ghép nhãn để nhận đúng trường.
   function docxLines(u8) {
     var z = fflate.unzipSync(u8), x = z['word/document.xml']; if (!x) throw new Error('Không phải file Word .docx hợp lệ (thiếu word/document.xml)');
     var doc = new DOMParser().parseFromString(fflate.strFromU8(x), 'application/xml'), W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main', out = [];
     var body = doc.getElementsByTagNameNS(W, 'body')[0];
+    function gv(el, k) { return el ? (el.getAttributeNS(W, k) || el.getAttribute('w:' + k) || '') : ''; }
+    function kid(el, name) { if (!el) return null; for (var i = 0; i < el.childNodes.length; i++) if (el.childNodes[i].localName === name) return el.childNodes[i]; return null; }
+    function kids(el, name) { return el ? [].filter.call(el.childNodes, function (n) { return n.localName === name; }) : []; }
+    var NUM = {}; try { var nx = z['word/numbering.xml']; if (nx) { var nd = new DOMParser().parseFromString(fflate.strFromU8(nx), 'application/xml'), abs = {};
+      [].forEach.call(nd.getElementsByTagNameNS(W, 'abstractNum'), function (a) { var lv = {}; kids(a, 'lvl').forEach(function (l) { lv[gv(l, 'ilvl')] = { f: gv(kid(l, 'numFmt'), 'val'), t: gv(kid(l, 'lvlText'), 'val'), s: +(gv(kid(l, 'start'), 'val') || 1) }; }); abs[gv(a, 'abstractNumId')] = lv; });
+      [].forEach.call(nd.getElementsByTagNameNS(W, 'num'), function (n) { NUM[gv(n, 'numId')] = abs[gv(kid(n, 'abstractNumId'), 'val')] || null; }); } } catch (e) { }
+    var CNT = {};
+    function letter(n, up) { var s = ''; while (n > 0) { n--; s = String.fromCharCode(97 + n % 26) + s; n = Math.floor(n / 26); } return up ? s.toUpperCase() : s; }
+    function roman(n) { var r = '', m = [[1000, 'm'], [900, 'cm'], [500, 'd'], [400, 'cd'], [100, 'c'], [90, 'xc'], [50, 'l'], [40, 'xl'], [10, 'x'], [9, 'ix'], [5, 'v'], [4, 'iv'], [1, 'i']]; m.forEach(function (q) { while (n >= q[0]) { r += q[1]; n -= q[0]; } }); return r; }
     function para(p) {
-      var t = '', allB = true, allI = true, any = false, jc = p.getElementsByTagNameNS(W, 'jc')[0], c = jc && /center/.test(jc.getAttributeNS(W, 'val') || jc.getAttribute('w:val') || '');
+      var pp = kid(p, 'pPr'), jc = gv(kid(pp, 'jc'), 'val'), ind = kid(pp, 'ind'), np = kid(pp, 'numPr');
+      var t = '', allB = true, allI = true, any = false;
       [].forEach.call(p.getElementsByTagNameNS(W, 'r'), function (r) {
-        var rp = r.getElementsByTagNameNS(W, 'rPr')[0], bb = rp && rp.getElementsByTagNameNS(W, 'b')[0], ii = rp && rp.getElementsByTagNameNS(W, 'i')[0], isB = bb && !/^(0|false)$/.test(bb.getAttribute('w:val') || ''), isI = ii && !/^(0|false)$/.test(ii.getAttribute('w:val') || ''), rt = '';
+        var rp = kid(r, 'rPr'), bb = kid(rp, 'b'), ii = kid(rp, 'i'), isB = bb && !/^(0|false)$/.test(gv(bb, 'val')), isI = ii && !/^(0|false)$/.test(gv(ii, 'val')), rt = '';
         [].forEach.call(r.childNodes, function (n) { if (n.localName === 't') rt += n.textContent; else if (n.localName === 'tab') rt += '    '; else if (n.localName === 'br') rt += ' '; });
         if (rt.trim()) { any = true; if (!isB) allB = false; if (!isI) allI = false; } t += rt;
       });
-      return { t: t.replace(/\s+$/, ''), c: !!c, b: any && allB, i: any && allI };
+      var al = /center/.test(jc) ? 'center' : /^(right|end)$/.test(jc) ? 'right' : '', lv = 0, li = '';
+      var left = ind ? +(gv(ind, 'left') || gv(ind, 'start') || 0) : 0;
+      if (np) { var nid = gv(kid(np, 'numId'), 'val'), il = gv(kid(np, 'ilvl'), 'val') || '0', L = NUM[nid] && NUM[nid][il];
+        if (nid && nid !== '0' && L && t.trim()) { lv = +il; if (L.f === 'bullet' || !L.f) li = 'b'; else if (L.f !== 'none') { var k = nid + ':' + il, n = CNT[k] = (CNT[k] || L.s - 1) + 1; Object.keys(CNT).forEach(function (q) { if (q.indexOf(nid + ':') === 0 && +q.split(':')[1] > +il) delete CNT[q]; });
+          var mk = L.f === 'lowerLetter' ? letter(n) : L.f === 'upperLetter' ? letter(n, 1) : L.f === 'lowerRoman' ? roman(n) : L.f === 'upperRoman' ? roman(n).toUpperCase() : String(n);
+          t = String(L.t || '%1.').replace(/%\d/g, mk) + ' ' + t.replace(/^\s+/, ''); lv = Math.max(lv, 1); } } }
+      else if (left >= 240) lv = Math.min(4, Math.max(1, Math.round(left / 360)));
+      return { t: t.replace(/\s+$/, ''), c: al === 'center', al: al, ind: lv, li: li, b: any && allB, i: any && allI };
+    }
+    function txtOf(n) { return [].map.call(n.getElementsByTagNameNS(W, 't'), function (q) { return q.textContent; }).join(' '); }
+    function cellLines(tc) { var L = []; [].forEach.call(tc.childNodes, function (n) { if (n.localName === 'p') L.push(para(n)); else if (n.localName === 'tbl') [].forEach.call(n.getElementsByTagNameNS(W, 'p'), function (p) { L.push(para(p)); }); }); return L; }
+    function rec(lines, ctx) { // nhận diện trường trong 1 ô / 1 dòng; ctx A/B mồi bằng dòng "BÊN A/BÊN B"
+      var pr = ctx ? [{ t: ctx === 'A' ? 'BÊN A' : 'BÊN B', c: false, b: false, i: false }] : [], r = tplRecognize(pr.concat(lines), 1), md = r.nd.split('\n');
+      if (pr.length) md.shift(); while (md.length && md[0] === '') md.shift(); while (md.length && md[md.length - 1] === '') md.pop();
+      return { md: md, found: r.found };
+    }
+    function cellHtml(md) { var h = tplMdToHtml(md.join('\n')).replace(/^(<p><\/p>)+|(<p><\/p>)+$/g, ''); return h || '<p></p>'; }
+    var ctx = '';
+    function table(tb) {
+      var all = txtOf(tb).toUpperCase();
+      if (/NGƯỜI LAO ĐỘNG/.test(all) && /(NGƯỜI SỬ DỤNG|ĐẠI DIỆN|BÊN A)/.test(all) && all.length < 400) return null; // khối chữ ký – giữ cách cũ
+      var grid = kids(kid(tb, 'tblGrid'), 'gridCol').map(function (g) { return +gv(g, 'w') || 0; });
+      var tbB = kid(kid(tb, 'tblPr'), 'tblBorders'), noneB = function (b) { return !b || ['top', 'left', 'bottom', 'right'].every(function (s) { var e = kid(b, s); return e && /^(none|nil)$/.test(gv(e, 'val')); }); };
+      var gsum = grid.reduce(function (a, b) { return a + b; }, 0), PXK = 600 / Math.max(gsum, 9071);
+      var rows = [], found = [], tcs = [];
+      kids(tb, 'tr').forEach(function (tr, ri) {
+        var r = [], col = 0;
+        kids(tr, 'tc').forEach(function (tc) {
+          var pr = kid(tc, 'tcPr'), cs = +(gv(kid(pr, 'gridSpan'), 'val') || 1), vm = kid(pr, 'vMerge'), vv = vm ? (gv(vm, 'val') || 'cont') : '', shd = gv(kid(pr, 'shd'), 'fill');
+          tcs.push(kid(pr, 'tcBorders'));
+          r.push({ col: col, cs: cs, vm: vv, h: ri === 0 && shd && !/^(auto|FFFFFF)$/i.test(shd), L: cellLines(tc), w: grid.slice(col, col + cs) }); col += cs;
+        });
+        rows.push(r);
+      });
+      var bl = (tbB && noneB(tbB) && tcs.every(function (b) { return !b || noneB(b); })) || (tcs.length && tcs.every(function (b) { return b && noneB(b); }));
+      var h = '<table' + (bl ? ' data-bl=""' : '') + '><tbody>';
+      rows.forEach(function (r, ri) {
+        var t0 = r[0] && r[0].L.map(function (l) { return l.t; }).join(' ').trim(), t1 = r[1] && r[1].L.map(function (l) { return l.t; }).join(' ').trim(), pair = null;
+        if (r.length === 2 && t0 && t0.length < 60 && t1 && /^[:：]/.test(t1)) { // "Họ và tên | : …" → nhận diện như "Họ và tên: …"
+          var q = rec([{ t: t0.replace(/[:：]\s*$/, '') + ': ' + t1.replace(/^[:：]\s*/, ''), c: false, b: false, i: false }], ctx), ln = q.md.join(' '), bo = /^\*\*.*\*\*$/.test(ln), raw = bo ? ln.slice(2, -2) : ln, ci = raw.search(/[:：]/);
+          if (ci > 0 && /\{\{/.test(raw)) { found = found.concat(q.found); var wb = function (s) { return bo ? '**' + s + '**' : s; }; pair = [wb(raw.slice(0, ci).trim()), wb(': ' + raw.slice(ci + 1).trim())]; }
+        }
+        h += '<tr>';
+        r.forEach(function (c, ci) {
+          if (c.vm === 'cont') return;
+          var rs = 1; if (c.vm === 'restart') for (var k = ri + 1; k < rows.length; k++) { var d = rows[k].filter(function (x) { return x.col === c.col; })[0]; if (d && d.vm === 'cont') rs++; else break; }
+          var inner; if (pair) inner = cellHtml([pair[ci] || '']); else { var q2 = rec(c.L, ctx); found = found.concat(q2.found); inner = cellHtml(q2.md); }
+          var tg = c.h ? 'th' : 'td', cw = c.w.filter(Boolean).map(function (v) { return Math.max(58, Math.round(v * PXK)); }); // độ rộng cột theo tỉ lệ file gốc, vừa khổ trang
+          h += '<' + tg + (c.cs > 1 ? ' colspan="' + c.cs + '"' : '') + (rs > 1 ? ' rowspan="' + rs + '"' : '') + (cw.length === c.cs ? ' colwidth="' + cw.join(',') + '"' : '') + '>' + inner + '</' + tg + '>';
+        });
+        h += '</tr>';
+      });
+      return { t: '[bảng]', html: h + '</tbody></table>', found: found, c: false, b: false, i: false };
     }
     [].forEach.call(body.childNodes, function (n) {
-      if (n.localName === 'p') out.push(para(n));
-      else if (n.localName === 'tbl') [].forEach.call(n.getElementsByTagNameNS(W, 'tr'), function (tr) { var cells = [].map.call(tr.getElementsByTagNameNS(W, 'tc'), function (tc) { return [].map.call(tc.getElementsByTagNameNS(W, 'p'), function (p) { return para(p).t.trim(); }).filter(Boolean); }); var mx = Math.max.apply(null, cells.map(function (c) { return c.length; }).concat([0])); for (var i = 0; i < mx; i++) out.push({ t: cells.map(function (c) { return c[i] || ''; }).join('    '), c: true, b: false, i: false, tbl: 1 }); });
+      if (n.localName === 'p') { var L = para(n), up = L.t.trim().toUpperCase(); if (/^(BÊN A|NGƯỜI SỬ DỤNG LAO ĐỘNG|BÊN SỬ DỤNG)/.test(up)) ctx = 'A'; else if (/^(BÊN B|NGƯỜI LAO ĐỘNG)/.test(up)) ctx = 'B'; out.push(L); }
+      else if (n.localName === 'tbl') { var T = table(n); if (T) { out.push(T); return; }
+        [].forEach.call(n.getElementsByTagNameNS(W, 'tr'), function (tr) { var cells = [].map.call(tr.getElementsByTagNameNS(W, 'tc'), function (tc) { return [].map.call(tc.getElementsByTagNameNS(W, 'p'), function (p) { return para(p).t.trim(); }).filter(Boolean); }); var mx = Math.max.apply(null, cells.map(function (c) { return c.length; }).concat([0])); for (var i = 0; i < mx; i++) out.push({ t: cells.map(function (c) { return c[i] || ''; }).join('    '), c: true, b: false, i: false, tbl: 1 }); }); }
     });
     return out;
   }
@@ -8890,11 +8960,21 @@ if (typeof module !== 'undefined') module.exports = XW;
   ];
   var DATE_RE = /ngày\s*[\d.…_ ]{1,6}\s*tháng\s*[\d.…_ ]{1,6}\s*năm\s*[\d.…_ ]{2,6}|ngày\s+\d{1,2}\/\d{1,2}\/\d{4}/i;
   var MONEY_RE = /[\d][\d.,\s]*\s*(?:đồng|VNĐ|VND|đ)\b|[.…_]{3,}\s*(?:đồng|VNĐ|VND|đ)\b/i;
-  function tplRecognize(lines) {
+  var TPL_HTML = []; // 19/11/2026: bảng giữ nguyên từ Word – tplMdToHtml thay dòng §hN§ bằng HTML bảng
+  function tplRecognize(lines, sub) {
     var out = [], found = [], ctx = '', blank = false, skipSign = 0, loai = [], title = '';
     var lab = REC_LABELS.map(function (l) { return { re: new RegExp('(^|\\s{2,}|\\t|;\\s*|,\\s*|\\.\\s+|-\\s*|–\\s*|\\(\\s*|\\s)(' + l[0] + ')\\s*[:：]', 'ig'), f: l[1], ctx: l[2] }; });
     function mark(f, from, ln) { found.push({ f: f, v: String(from || '').trim().slice(0, 60), ln: ln }); }
     lines.forEach(function (L, idx) {
+      var n0 = out.length; one(L, idx);
+      if (L.html) return;
+      if (out.length === n0 + 1 && out[n0] && !/^(#|\^|\[CHU_KY\]|---$)/.test(out[n0])) { // 19/11: căn lề, thụt lề, gạch đầu dòng theo file Word
+        var mt = []; if (L.al && !/^~\s/.test(out[n0])) mt.push('al=' + L.al); if (L.ind) mt.push('ind=' + L.ind); if (L.li) mt.push('li=' + L.li);
+        if (mt.length) out[n0] = '§' + mt.join(';') + '§ ' + out[n0];
+      }
+    });
+    function one(L, idx) {
+      if (L.html) { blank = false; TPL_HTML.push(L.html); out.push('§h' + (TPL_HTML.length - 1) + '§'); found.push.apply(found, L.found || []); return; }
       var t = L.t.replace(/\u00a0/g, ' ').replace(/\s+$/, ''), tt = t.trim(), up = tt.toUpperCase(), ln = idx + 1;
       if (skipSign > 0) { skipSign--; if (!tt || /^\(.*\)$/.test(tt) || L.tbl || tt.length < 40) return; }
       if (!tt) { if (!blank && out.length) out.push(''); blank = true; return; } blank = false;
@@ -8917,6 +8997,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       }
       // dòng có ngày ký / hiệu lực / thời hạn
       if (/^Hôm nay/i.test(tt) && DATE_RE.test(tt)) { t = t.replace(DATE_RE, '{{ngay_ky_chu}}'); mark('ngay_ky_chu', tt.match(DATE_RE)[0], ln); var at = /,?\s*tại\s+([^,]+),/i.exec(t); if (at && !/\{\{/.test(at[1])) { t = t.replace(at[0], ', tại {{dia_chi_cong_ty}},'); mark('dia_chi_cong_ty', at[1], ln); } }
+      else if (tt.length < 80 && /^[A-ZĐÀ-Ỹ][^,]{1,30},\s*ngày/.test(tt) && DATE_RE.test(tt)) { t = t.replace(DATE_RE, '{{ngay_ky_chu}}'); mark('ngay_ky_chu', tt.match(DATE_RE)[0], ln); } // 19/11: dòng "Hà Nội, ngày … tháng … năm …"
       else if (/hiệu lực/i.test(tt) && DATE_RE.test(tt) && !/\bđến\b/i.test(tt.slice(tt.search(DATE_RE)))) { t = t.replace(DATE_RE, '{{ngay_hieu_luc_chu}}'); mark('ngay_hieu_luc_chu', tt.match(DATE_RE)[0], ln); }
       else if (/từ\s+ngày/i.test(tt) && /đến\s+ngày/i.test(tt) && !/[:：]/.test(tt.slice(0, 40))) { var tm = /từ\s+ngày.*?đến\s+ngày\s*[\d.…_ /]+(?:tháng\s*[\d.…_ ]+năm\s*[\d.…_ ]+)?/i.exec(t); if (tm) { t = t.replace(tm[0], '{{thoi_han}}'); mark('thoi_han', tm[0], ln); } }
       // nhãn: giá trị
@@ -8945,11 +9026,12 @@ if (typeof module !== 'undefined') module.exports = XW;
       if (L.c && s2 === s2.toUpperCase() && s2.length < 70 && !/\{\{/.test(s2)) { out.push('^ ' + s2); return; }
       if (L.b && !/^\*\*/.test(s2) && s2.length < 160) s2 = '**' + s2 + '**';
       else if (L.i && /^Căn cứ/i.test(s2)) s2 = '_ ' + s2;
-      out.push(L.c && !/^#|^\^/.test(s2) ? '~ ' + s2 : s2);
-    });
+      if (L.i && !L.b && !/^_\s/.test(s2) && !/^\*\*/.test(s2)) s2 = '_ ' + s2; // 19/11: nghiêng cả dòng giữ nghiêng; căn giữa không còn tự thành chữ nghiêng
+      out.push(L.c && L.al === undefined && !/^#|^\^/.test(s2) ? '~ ' + s2 : s2);
+    }
     while (out.length && out[out.length - 1] === '') out.pop();
     var nd = out.join('\n');
-    if (nd.indexOf('[CHU_KY]') < 0) nd += '\n\n[CHU_KY]';
+    if (!sub && nd.indexOf('[CHU_KY]') < 0) nd += '\n\n[CHU_KY]';
     var T = (title || '').toUpperCase(); if (/THỬ VIỆC/.test(T)) loai = ['Hợp đồng thử việc']; else if (/LAO ĐỘNG/.test(T)) loai = [];
     return { nd: nd, found: found, loai: loai, title: title };
   }
