@@ -10,6 +10,9 @@
 - **Tên hay gọi**: hồ sơ nhân sự có thêm trường Tên hay gọi (VD: Cô Tuyến, Anh Duy) – Sơ đồ tổ chức hiển thị tên này; để trống thì hiện 2 chữ cuối của họ tên như trước. Nhập từ file Excel nhận cột "Tên hay gọi" / "Tên gọi" / "Biệt danh".
 - **Tải mẫu hợp đồng, quy chế từ file Word giữ đúng trình bày** (góp ý người dùng): bảng giữ nguyên dạng bảng (gộp ô, độ rộng cột theo file gốc, bảng ẩn viền, hàng tiêu đề) thay vì bị chuyển thành dòng chữ – ô trong bảng vẫn tự nhận trường trộn (VD bảng "Họ và tên | : …"); giữ căn phải, căn giữa (không còn tự chuyển chữ nghiêng), thụt lề, gạch đầu dòng và đánh số a), b), 1. như file gốc.
 - **Lập hợp đồng – Xem trước, Sửa, Tải về**: chọn mẫu xong bấm **Xem trước** để xem văn bản đã điền đủ thông tin; bấm **Sửa** mở trình soạn như Word để chỉnh riêng cho hợp đồng này (mẫu trong Kho không đổi), có nút **Lưu** và **Tải về (.docx)**; xem trước có thêm **In**. Bản đã sửa riêng được dùng khi in, tải văn bản của hợp đồng đó; muốn bỏ thì bấm **Dùng lại nội dung mẫu**.
+- **Mẫu từ file Word giữ logo, cỡ chữ**: logo ở đầu trang của file gốc được giữ lại (khi tải Word lặp lại ở mọi trang như bản gốc), ảnh trong văn bản giữ nguyên; giữ cỡ chữ, giãn dòng như file gốc.
+- **Chèn ảnh trong trình sửa văn bản**: nút **Ảnh** trên thanh công cụ – tải ảnh lên chèn tại con trỏ (logo, con dấu, sơ đồ…); bấm vào ảnh để đổi kích thước, căn lề, đặt làm logo đầu trang hoặc xóa.
+- Trang Kho hợp đồng mẫu bỏ nút "Nhập từ file" (trùng với "Tải lên mẫu (Word / PDF)"); ở Sổ hợp đồng nút này đổi tên thành **Nhập sổ hợp đồng từ Excel** cho rõ mục đích.
 
 ## 1.0.1 – sửa lỗi, cải thiện sau thử nghiệm thực tế (18/11/2026)
 - **Thêm công ty** (đổi tên từ "Thêm đơn vị"): tạo công ty trống không cần chọn file; chọn file / thư mục từ nút này thì dữ liệu vào một công ty mới, không lẫn vào công ty đang xem; thêm xong vẫn ở trang Cài đặt.

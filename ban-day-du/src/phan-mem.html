@@ -1797,6 +1797,7 @@ button.op:hover{background:var(--surface-2);border-color:var(--line)}
 .tp-paper .tf-v{background:#FFF7D6;border-radius:2px}
 .tp-tbl{border-collapse:collapse;width:100%;margin:4px 0;table-layout:fixed}.tp-tbl td{border:1px solid #444;padding:3px 6px;vertical-align:top}.tp-tbl.bl td{border:none}
 .tp-tbl td p{margin:0}
+.tp-img img{display:inline-block}.tpe-img{border-radius:2px}.tpe-img.hdr{outline:1px dashed #b9c4ae;outline-offset:3px}.tpe-img.ProseMirror-selectednode{outline:2px solid #0F766E}
 .tp-pb{border-top:1px dashed #999;margin:12px 0;text-align:center;height:0}.tp-pb span{position:relative;top:-.75em;background:#fff;padding:0 6px;font-size:11px;color:#777;font-family:var(--font)}
 @media (max-width:1100px){.tpe,.tpe-main{flex:none}.tpe-main{grid-template-columns:1fr}.tpe-side{max-height:none;overflow:visible}.tpe-scroll{min-height:60vh}.modal.tpe-modal{height:auto}.modal.tpe-modal .modal-body{overflow:auto}}
 @media (max-width:640px){.tpe-meta{grid-template-columns:1fr}.tpe-page{padding:14px 12px;min-height:0}.tpe-doc{min-height:50vh}.tpe-scroll{padding:8px 4px}.tpe-g{border-right:none;padding-right:0}.tpe-b span{display:none}}
@@ -8005,11 +8006,20 @@ if (typeof module !== 'undefined') module.exports = XW;
   function wsign(l, r) { var cell = function (t) { return '<w:tc><w:tcPr><w:tcW w:w="4500" w:type="dxa"/></w:tcPr>' + wp([[t[0], { b: 1 }]], { c: 1, af: 0 }) + wp([[t[1], { i: 1 }]], { c: 1, af: 1200 }) + wp([[t[2], { b: 1 }]], { c: 1 }) + '</w:tc>'; }; return '<w:tbl><w:tblPr><w:tblW w:w="9000" w:type="dxa"/><w:jc w:val="center"/></w:tblPr><w:tblGrid><w:gridCol w:w="4500"/><w:gridCol w:w="4500"/></w:tblGrid><w:tr><w:trPr><w:cantSplit/></w:trPr>' + cell(l) + cell(r) + '</w:tr></w:tbl>'; }
   function docxBlob(bodyXml) {
     var enc = function (s) { return fflate.strToU8(s); };
+    // 19/11/2026: ảnh trong văn bản + logo đầu trang (tplDocx gom vào DOCX_MEDIA / DOCX_HDR)
+    var MD = DOCX_MEDIA || [], HD = DOCX_HDR || ''; DOCX_MEDIA = []; DOCX_HDR = '';
+    var NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"';
+    var REL = function (L) { return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + L.join('') + '</Relationships>'; }, IMGT = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image';
+    var dRel = MD.filter(function (x) { return !x.hdr; }).map(function (x) { return '<Relationship Id="' + x.id + '" Type="' + IMGT + '" Target="media/' + x.f + '"/>'; }), hRel = MD.filter(function (x) { return x.hdr; }).map(function (x) { return '<Relationship Id="' + x.id + '" Type="' + IMGT + '" Target="media/' + x.f + '"/>'; });
+    if (HD) dRel.push('<Relationship Id="rIdHdr1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>');
     var files = {
-      '[Content_Types].xml': enc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'),
+      '[Content_Types].xml': enc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="gif" ContentType="image/gif"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' + (HD ? '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>' : '') + '</Types>'),
       '_rels/.rels': enc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'),
-      'word/document.xml': enc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + bodyXml + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1701" w:header="709" w:footer="709" w:gutter="0"/></w:sectPr></w:body></w:document>')
+      'word/_rels/document.xml.rels': enc(REL(dRel)),
+      'word/document.xml': enc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + NS + '><w:body>' + bodyXml + '<w:sectPr>' + (HD ? '<w:headerReference w:type="default" r:id="rIdHdr1"/>' : '') + '<w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1701" w:header="567" w:footer="709" w:gutter="0"/></w:sectPr></w:body></w:document>')
     };
+    if (HD) { files['word/header1.xml'] = enc('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr ' + NS + '>' + HD + '</w:hdr>'); files['word/_rels/header1.xml.rels'] = enc(REL(hRel)); }
+    MD.forEach(function (x) { files['word/media/' + x.f] = x.bin; });
     return new Blob([fflate.zipSync(files)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
   }
   function soChu(n) { return fmtInt(n) + ' đồng'; }
@@ -8179,7 +8189,8 @@ if (typeof module !== 'undefined') module.exports = XW;
       else if (/^~\s/.test(t)) h = '<p style="text-align: center"><em>' + inl(t.slice(2)) + '</em></p>';
       else if (/^_\s/.test(t)) h = '<p><em>' + inl(t.slice(2)) + '</em></p>';
       else h = '<p>' + inl(t) + '</p>';
-      if (meta.al) h = h.replace(/^<(p|h1|h2)( style="[^"]*")?/, '<$1 style="text-align: ' + meta.al + '"');
+      if (meta.al || +meta.lh) { var stl = (meta.al ? 'text-align: ' + meta.al + ';' : '') + (+meta.lh ? ' line-height: ' + (+meta.lh) + ';' : ''); h = h.replace(/^<(p|h1|h2)(?: style="([^"]*)")?/, function (m0, tg, st0) { var keep = String(st0 || '').replace(/text-align:[^;]*;?/, meta.al ? '' : '$&').trim(); if (keep && !/;$/.test(keep)) keep += ';'; return '<' + tg + ' style="' + (keep + ' ' + stl).trim() + '"'; }); }
+      if (+meta.fs) h = h.replace(/^(<(p|h1|h2)[^>]*>)([\s\S]*)(<\/\2>)$/, function (m0, a, tg, inner, c) { return inner ? a + '<span style="font-size: ' + (+meta.fs) + 'pt">' + inner + '</span>' + c : m0; });
       if (+meta.ind && !meta.li) h = h.replace(/^<p/, '<p data-ind="' + (+meta.ind) + '"');
       if (meta.li) h = '<ul><li>' + h + '</li></ul>';
       if (cond) { var mk = t.match(/\{\{\s*([a-z_]+)\s*\}\}/); if (mk) h = '<div data-if="' + mk[1] + '">' + h + '</div>'; }
@@ -8235,6 +8246,7 @@ if (typeof module !== 'undefined') module.exports = XW;
           [].forEach.call(n.children, function (li) { if (li.tagName !== 'LI') return; var sub = walk(li.childNodes, depth + 1), first = sub.filter(function (b) { return b.t === 'p'; })[0]; if (first) first.list = { o: tg === 'OL', n: no, d: depth }; no++; out.push.apply(out, sub); });
         }
         else if (tg === 'TABLE') out.push(table(n));
+        else if (tg === 'IMG') { if (n.getAttribute('src')) out.push({ t: 'img', src: n.getAttribute('src'), w: +(n.getAttribute('data-w') || n.getAttribute('width') || 0), h: +(n.getAttribute('data-h') || n.getAttribute('height') || 0), al: n.getAttribute('data-al') || '', hdr: n.hasAttribute('data-hdr') }); }
         else if (n.hasAttribute('data-if')) { var k = n.getAttribute('data-if'), v = V ? V[k] : null; if (!V || blank || !(v === '' || v == null)) out.push.apply(out, walk(n.childNodes, depth)); }
         else if (n.hasAttribute('data-sign')) out.push({ t: 'sign' });
         else if (n.hasAttribute('data-pb')) out.push({ t: 'pb' });
@@ -8262,11 +8274,13 @@ if (typeof module !== 'undefined') module.exports = XW;
     function bh(b, cell) {
       if (b.t === 'sign') return '<div class="tp-sign"><div><b>NGƯỜI LAO ĐỘNG</b><i>(Ký, ghi rõ họ tên)</i>' + esc(V ? V.ho_ten : '') + '</div><div><b>NGƯỜI SỬ DỤNG LAO ĐỘNG</b><i>(Ký, đóng dấu, ghi rõ họ tên)</i>' + esc(V ? V.nguoi_dai_dien : '') + '</div></div>';
       if (b.t === 'pb') return '<div class="tp-pb"><span>Ngắt trang</span></div>';
+      if (b.t === 'img') return '<div class="tp-img" style="text-align:' + (b.al || 'left') + '"><img src="' + esc(b.src) + '" alt=""' + (b.w ? ' style="width:' + b.w + 'px;max-width:100%"' : '') + '></div>';
       if (b.t === 'tbl') return '<table class="tp-tbl' + (b.bl ? ' bl' : '') + '"><tbody>' + b.rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td' + (c.cs > 1 ? ' colspan="' + c.cs + '"' : '') + (c.rs > 1 ? ' rowspan="' + c.rs + '"' : '') + '>' + c.blocks.map(function (x) { return bh(x, 1); }).join('') + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
       return ph(b, cell);
     }
     return tplBlocks(html, V, blank).map(function (b) { return bh(b, 0); }).join('');
   }
+  var DOCX_MEDIA = [], DOCX_HDR = ''; // 19/11/2026: ảnh, logo đầu trang khi xuất .docx
   var DOCX_W = 9071; // bề rộng vùng chữ A4 (twip) = 11906 − lề trái 1701 − lề phải 1134
   function tplDocx(html, V, signL, signR, blank) {
     function rx(r, base) {
@@ -8307,9 +8321,17 @@ if (typeof module !== 'undefined') module.exports = XW;
       });
       return x + '</w:tbl>';
     }
-    var x = '';
+    var x = ''; DOCX_MEDIA = []; DOCX_HDR = '';
+    function ix(b) { // ảnh → đoạn có hình (inline); logo đầu trang vào header
+      var m = /^data:image\/(png|jpe?g|gif);base64,(.+)$/.exec(b.src || ''); if (!m) return '';
+      var n = DOCX_MEDIA.length + 1, ext = m[1] === 'jpg' ? 'jpeg' : m[1], bin = Uint8Array.from(atob(m[2]), function (c) { return c.charCodeAt(0); }), id = 'rIdImg' + n, w = Math.round((b.w || 120) * 9525), h = Math.round((b.h || (b.w || 120) / 2) * 9525);
+      DOCX_MEDIA.push({ id: id, f: 'image' + n + '.' + ext, bin: bin, hdr: b.hdr });
+      var p = '<w:p><w:pPr><w:spacing w:before="0" w:after="60"/><w:jc w:val="' + ({ center: 'center', right: 'right' }[b.al] || 'left') + '"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="' + w + '" cy="' + h + '"/><wp:docPr id="' + n + '" name="Anh ' + n + '"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="' + n + '" name="image' + n + '.' + ext + '"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="' + id + '"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="' + w + '" cy="' + h + '"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>';
+      if (b.hdr) { DOCX_HDR += p; return ''; } return p;
+    }
     tplBlocks(html, V, blank).forEach(function (b) {
-      if (b.t === 'sign') x += wsign(signL, signR);
+      if (b.t === 'img') x += ix(b);
+      else if (b.t === 'sign') x += wsign(signL, signR);
       else if (b.t === 'pb') x += '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
       else if (b.t === 'tbl') x += tx(b) + '<w:p><w:pPr><w:spacing w:before="0" w:after="0"/></w:pPr></w:p>';
       else x += px(b, 0);
@@ -8341,6 +8363,12 @@ if (typeof module !== 'undefined') module.exports = XW;
       name: 'signBlock', group: 'block', atom: true, selectable: true, draggable: true,
       parseHTML: function () { return [{ tag: 'div[data-sign]' }]; },
       renderHTML: function () { return ['div', { 'data-sign': '', class: 'tpe-sign', title: 'Khối chữ ký 2 bên – tên người lao động và người đại diện tự điền' }, ['div', {}, ['b', {}, 'NGƯỜI LAO ĐỘNG'], ['i', {}, '(Ký, ghi rõ họ tên)'], ['span', {}, '‹Họ và tên›']], ['div', {}, ['b', {}, 'NGƯỜI SỬ DỤNG LAO ĐỘNG'], ['i', {}, '(Ký, đóng dấu, ghi rõ họ tên)'], ['span', {}, '‹Người đại diện›']]]; }
+    });
+    var ImgBlock = T.Node.create({ // 19/11/2026: ảnh / logo từ file Word (logo đầu trang lặp lại mỗi trang khi tải Word)
+      name: 'imgBlock', group: 'block', atom: true, selectable: true, draggable: true,
+      addAttributes: function () { return { src: { default: '' }, w: { default: 0, parseHTML: function (el) { return +(el.getAttribute('data-w') || el.getAttribute('width') || 0); } }, h: { default: 0, parseHTML: function (el) { return +(el.getAttribute('data-h') || el.getAttribute('height') || 0); } }, al: { default: '', parseHTML: function (el) { return el.getAttribute('data-al') || ''; } }, hdr: { default: false, parseHTML: function (el) { return el.hasAttribute('data-hdr'); } } }; },
+      parseHTML: function () { return [{ tag: 'img[src]' }]; },
+      renderHTML: function (o) { var a = o.node.attrs, at = { src: a.src, 'data-w': a.w || null, 'data-h': a.h || null, 'data-al': a.al || null, class: 'tpe-img' + (a.hdr ? ' hdr' : ''), style: 'width:' + (a.w || 120) + 'px;max-width:100%;display:block;margin:' + (a.al === 'center' ? '4px auto' : a.al === 'right' ? '4px 0 4px auto' : '4px 0'), title: a.hdr ? 'Logo đầu trang – khi tải Word lặp lại ở mọi trang. Chọn rồi bấm Delete để bỏ.' : 'Ảnh – chọn rồi bấm Delete để bỏ' }; if (a.hdr) at['data-hdr'] = ''; return ['img', at]; }
     });
     var PageBreak = T.Node.create({
       name: 'pageBreak', group: 'block', atom: true, selectable: true,
@@ -8375,7 +8403,7 @@ if (typeof module !== 'undefined') module.exports = XW;
         return [new T.Plugin({ key: new T.PluginKey('tpeFind'), props: { decorations: function (state) { if (!ui.findQ) return null; var ds = findAll(state.doc, ui.findQ).map(function (r, i) { return T.Decoration.inline(r.from, r.to, { class: i === ui.findIx ? 'tpe-hit on' : 'tpe-hit' }); }); return T.DecorationSet.create(state.doc, ds); } } })];
       }
     });
-    TPE = { Field: Field, IfBlock: IfBlock, SignBlock: SignBlock, PageBreak: PageBreak, Fmt: Fmt, TableX: TableX, Slash: Slash, Find: Find };
+    TPE = { Field: Field, IfBlock: IfBlock, SignBlock: SignBlock, PageBreak: PageBreak, ImgBlock: ImgBlock, Fmt: Fmt, TableX: TableX, Slash: Slash, Find: Find };
     return TPE;
   }
   function findAll(doc, q) { var out = [], fq = String(q).toLowerCase(); if (!fq) return out; doc.descendants(function (n, pos) { if (!n.isText) return; var t = n.text.toLowerCase(), i = 0; while ((i = t.indexOf(fq, i)) >= 0) { out.push({ from: pos + i, to: pos + i + fq.length }); i += fq.length; } }); return out; }
@@ -8385,7 +8413,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     alL: '<path d="M4 6h16M4 10h10M4 14h16M4 18h10"/>', alC: '<path d="M4 6h16M7 10h10M4 14h16M7 18h10"/>', alR: '<path d="M4 6h16M10 10h10M4 14h16M10 18h10"/>', alJ: '<path d="M4 6h16M4 10h16M4 14h16M4 18h16"/>',
     ol: '<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 5h1v4M4 9h2M4 15h2l-2 3h2"/>', ul: '<path d="M10 6h10M10 12h10M10 18h10"/><circle cx="5" cy="6" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="5" cy="18" r="1"/>',
     indL: '<path d="M10 6h10M10 12h10M10 18h10M7 9l-3 3 3 3"/>', indR: '<path d="M10 6h10M10 12h10M10 18h10M4 9l3 3-3 3"/>',
-    tbl: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M10 4v16"/>', sign: '<path d="M3 17c3-1 4-8 6-8s0 7 2 7 2-3 4-3 2 2 6 2"/><path d="M3 21h18"/>',
+    tbl: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M10 4v16"/>', pic: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>', sign: '<path d="M3 17c3-1 4-8 6-8s0 7 2 7 2-3 4-3 2 2 6 2"/><path d="M3 21h18"/>',
     pb: '<path d="M6 3v5h12V3M6 21v-5h12v5"/><path d="M3 12h3M9 12h2M13 12h2M18 12h3"/>', cond: '<path d="M4 6h3l4 6-4 6H4"/><path d="M13 7h7M13 12h7M13 17h7"/>',
     find: '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>', fld: '<path d="M8 4H6a2 2 0 0 0-2 2v4l-1 2 1 2v4a2 2 0 0 0 2 2h2M16 4h2a2 2 0 0 1 2 2v4l1 2-1 2v4a2 2 0 0 1-2 2h-2"/>'
   });
@@ -8414,7 +8442,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       '<div class="tpe-g">' + btn('al-left', ic('alL', 17), 'Căn trái') + btn('al-center', ic('alC', 17), 'Căn giữa') + btn('al-right', ic('alR', 17), 'Căn phải') + btn('al-justify', ic('alJ', 17), 'Căn đều hai bên') + '</div>' +
       '<div class="tpe-g">' + btn('ol', ic('ol', 17), 'Danh sách đánh số (tự đánh lại số)') + btn('ul', ic('ul', 17), 'Danh sách gạch đầu dòng') + btn('out', ic('indL', 17), 'Giảm lề') + btn('in', ic('indR', 17), 'Tăng lề') +
       '<select class="tpe-s sm" data-s="lh" title="Giãn dòng">' + TPE_LH.map(function (x) { return '<option value="' + x[0] + '">' + (x[0] ? 'Giãn ' : 'Giãn ') + x[1] + '</option>'; }).join('') + '</select></div>' +
-      '<div class="tpe-g">' + btn('tbl', ic('tbl', 17) + '<span>Bảng</span>', 'Bảng: chèn, thêm/xóa hàng cột, gộp ô, ẩn viền') + '</div>' +
+      '<div class="tpe-g">' + btn('tbl', ic('tbl', 17) + '<span>Bảng</span>', 'Bảng: chèn, thêm/xóa hàng cột, gộp ô, ẩn viền') + btn('pic', ic('pic', 17) + '<span>Ảnh</span>', 'Tải ảnh lên, chèn tại con trỏ (logo, con dấu, sơ đồ…). Bấm vào ảnh để đổi kích thước, căn lề, đặt làm logo đầu trang') + '</div>' +
       '<div class="tpe-g">' + btn('fld', ic('fld', 17) + '<span>Trường</span>', 'Chèn trường thông tin tại con trỏ (hoặc gõ / trong văn bản)', ' data-k="1"') + btn('cond', ic('cond', 17) + '<span>Điều kiện</span>', 'Đoạn chỉ in khi trường có dữ liệu (ví dụ dòng phụ cấp)') + btn('sign', ic('sign', 17), 'Chèn khối chữ ký 2 bên') + btn('pb', ic('pb', 17), 'Ngắt trang') + '</div>' +
       '<div class="tpe-g">' + btn('find', ic('find', 17), 'Tìm và thay thế (Ctrl+F)') + '</div>';
     var body = '<div class="tpe"><div class="tpe-meta"' + (K.doc ? ' hidden' : '') + '><div class="field"><label for="tpN">Tên mẫu <i class="req">*</i></label><input class="input" id="tpN" value="' + esc(tp.ten) + '" maxlength="80"></div>' +
@@ -8431,7 +8459,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       element: $('#tpeHost', m),
       extensions: [T.Document, T.Paragraph, T.Text, T.Bold, T.Italic, T.Underline, T.Heading.configure({ levels: [1, 2, 3] }), T.HardBreak, T.BulletList, T.OrderedList, T.ListItem, T.ListKeymap,
         T.Dropcursor.configure({ color: '#0F766E', width: 2 }), T.Gapcursor, T.UndoRedo, T.TextStyle, T.FontSize, T.TextAlign.configure({ types: ['heading', 'paragraph'], alignments: ['left', 'center', 'right', 'justify'] }),
-        X.TableX.configure({ resizable: true }), T.TableRow, T.TableHeader, T.TableCell, X.Field, X.IfBlock, X.SignBlock, X.PageBreak, X.Fmt, X.Slash.configure({ ui: ui }), X.Find.configure({ ui: ui })],
+        X.TableX.configure({ resizable: true }), T.TableRow, T.TableHeader, T.TableCell, X.Field, X.IfBlock, X.SignBlock, X.PageBreak, X.ImgBlock, X.Fmt, X.Slash.configure({ ui: ui }), X.Find.configure({ ui: ui })],
       content: tplDoc(tp), parseOptions: { preserveWhitespace: 'full' },
       editorProps: { attributes: { class: 'tpe-doc', spellcheck: 'false' } }
     });
@@ -8451,6 +8479,14 @@ if (typeof module !== 'undefined') module.exports = XW;
       var st = $('#tpeSt', m), n = 0; ed.state.doc.descendants(function (x) { if (x.type.name === 'field') n++; }); st.textContent = n + ' trường ghép · ' + ed.state.doc.textContent.length.toLocaleString('vi-VN') + ' ký tự' + (dirty() ? ' · chưa lưu' : '');
     }
     var tmr; ed.on('transaction', function () { sync(); if (view === 'p') { clearTimeout(tmr); tmr = setTimeout(side, 350); } });
+    $('#tpeHost', m).addEventListener('click', function (ev) { // 19/11/2026: bấm vào ảnh → kích thước, căn lề, logo đầu trang
+      var el = ev.target.closest && ev.target.closest('img.tpe-img'); if (!el) return;
+      var pos = ed.view.posAtDOM(el, 0), node = ed.state.doc.nodeAt(pos); if (!node || node.type.name !== 'imgBlock') return; var a = node.attrs, rt = (a.h && a.w) ? a.h / a.w : 0.5;
+      var pm = modal('Ảnh trong văn bản', 'Kích thước, căn lề, vị trí', '<div class="form-grid"><div class="field"><label for="imW">Chiều rộng (px, khổ trang ~600)</label><input class="input" id="imW" inputmode="numeric" value="' + (a.w || 120) + '"></div><div class="field"><label for="imA">Căn lề</label><select class="input" id="imA"><option value="">Trái</option><option value="center"' + (a.al === 'center' ? ' selected' : '') + '>Giữa</option><option value="right"' + (a.al === 'right' ? ' selected' : '') + '>Phải</option></select></div></div>' +
+        '<label class="radio" style="margin:6px 0 10px"><input type="checkbox" id="imH"' + (a.hdr ? ' checked' : '') + '> Logo đầu trang – lặp lại ở mọi trang khi tải Word</label><div class="link-row" style="justify-content:space-between"><button class="btn btn-danger-ghost" id="imDel">Xóa ảnh</button><span class="link-row" style="margin:0"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="imOk">Áp dụng</button></span></div>', true);
+      $('#imOk', pm).addEventListener('click', function () { var w = Math.max(20, Math.min(600, +($('#imW', pm).value || '').replace(/\D/g, '') || 120)); ed.view.dispatch(ed.state.tr.setNodeMarkup(pos, undefined, Object.assign({}, a, { w: w, h: Math.round(w * rt), al: $('#imA', pm).value, hdr: $('#imH', pm).checked }))); pm.close(); });
+      $('#imDel', pm).addEventListener('click', function () { ed.view.dispatch(ed.state.tr.delete(pos, pos + node.nodeSize)); pm.close(); });
+    });
     // ---- thụt lề đoạn (ngoài danh sách)
     function indent(d) {
       var s = ed.state.selection, tr = ed.state.tr, ch = false;
@@ -8520,6 +8556,18 @@ if (typeof module !== 'undefined') module.exports = XW;
       else if (c === 'out') { if (ed.isActive('listItem')) ch.liftListItem('listItem').run(); else indent(-1); }
       else if (c === 'sign') ch.insertContent({ type: 'signBlock' }).run();
       else if (c === 'pb') ch.insertContent({ type: 'pageBreak' }).run();
+      else if (c === 'pic') { // 19/11/2026 (anh): tải ảnh lên chèn vào văn bản – thu nhỏ tối đa 1200px, lưu trong mẫu
+        var inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/png,image/jpeg,image/gif,image/webp';
+        inp.addEventListener('change', function () { var f = inp.files[0]; if (!f) return; if (f.size > 10 * 1024 * 1024) { toast('Ảnh lớn hơn 10 MB', 'err'); return; }
+          var rd = new FileReader(); rd.onload = function () { var im = new Image(); im.onload = function () {
+            var k = Math.min(1, 1200 / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.round(im.width * k); cv.height = Math.round(im.height * k); var cx = cv.getContext('2d');
+            var png = /png|gif/.test(f.type); if (!png) { cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); } cx.drawImage(im, 0, 0, cv.width, cv.height);
+            var src = cv.toDataURL(png ? 'image/png' : 'image/jpeg', 0.85); if (src.length > 900 * 1024) src = cv.toDataURL('image/jpeg', 0.75);
+            var w = Math.min(300, Math.round(im.width)), h = Math.round(w * im.height / Math.max(im.width, 1));
+            ed.chain().focus().insertContent({ type: 'imgBlock', attrs: { src: src, w: w, h: h, al: '' } }).run(); toast('Đã chèn ảnh', 'ok', 'Bấm vào ảnh để đổi kích thước, căn lề hoặc đặt làm logo đầu trang.');
+          }; im.onerror = function () { toast('Không đọc được ảnh', 'err'); }; im.src = rd.result; }; rd.readAsDataURL(f); });
+        inp.click();
+      }
       else if (c === 'fld') pickField(b.getBoundingClientRect(), 'Chèn trường thông tin tại con trỏ', '', function (k) { ed.chain().focus().insertContent({ type: 'field', attrs: { k: k } }).run(); });
       else if (c === 'cond') {
         if (ed.isActive('ifBlock')) { ch.lift('ifBlock').run(); toast('Đã bỏ điều kiện', 'ok', 'Đoạn sẽ luôn được in.'); return; }
@@ -8892,16 +8940,40 @@ if (typeof module !== 'undefined') module.exports = XW;
       [].forEach.call(nd.getElementsByTagNameNS(W, 'abstractNum'), function (a) { var lv = {}; kids(a, 'lvl').forEach(function (l) { lv[gv(l, 'ilvl')] = { f: gv(kid(l, 'numFmt'), 'val'), t: gv(kid(l, 'lvlText'), 'val'), s: +(gv(kid(l, 'start'), 'val') || 1) }; }); abs[gv(a, 'abstractNumId')] = lv; });
       [].forEach.call(nd.getElementsByTagNameNS(W, 'num'), function (n) { NUM[gv(n, 'numId')] = abs[gv(kid(n, 'abstractNumId'), 'val')] || null; }); } } catch (e) { }
     var CNT = {};
+    // 19/11/2026: cỡ chữ (mặc định tài liệu → kiểu đoạn → từng đoạn chữ), giãn dòng, ảnh/logo (thân văn bản + đầu trang)
+    var SZ0 = 22, PSZ = {}; try { var sx = z['word/styles.xml']; if (sx) { var sd = new DOMParser().parseFromString(fflate.strFromU8(sx), 'application/xml'), dd = sd.getElementsByTagNameNS(W, 'rPrDefault')[0], ds = dd && dd.getElementsByTagNameNS(W, 'sz')[0]; if (ds) SZ0 = +gv(ds, 'val') || SZ0;
+      [].forEach.call(sd.getElementsByTagNameNS(W, 'style'), function (st) { var rp = kid(st, 'rPr'), s0 = kid(rp, 'sz'); if (s0) PSZ[gv(st, 'styleId')] = +gv(s0, 'val'); if (gv(st, 'default') === '1' && gv(st, 'type') === 'paragraph' && s0) SZ0 = +gv(s0, 'val'); }); } } catch (e) { }
+    function relsOf(part) { var o = {}; try { var rx = z['word/_rels/' + part + '.rels']; if (rx) [].forEach.call(new DOMParser().parseFromString(fflate.strFromU8(rx), 'application/xml').getElementsByTagName('Relationship'), function (r) { o[r.getAttribute('Id')] = { t: r.getAttribute('Target'), ty: r.getAttribute('Type') || '' }; }); } catch (e) { } return o; }
+    function imgsIn(el, rels, al) { // ảnh trong 1 đoạn → [{src, w, h, al}]
+      var out2 = []; [].forEach.call(el.getElementsByTagNameNS(W, 'drawing'), function (dr) {
+        var bl = dr.getElementsByTagName('a:blip')[0] || [].filter.call(dr.getElementsByTagName('*'), function (n) { return n.localName === 'blip'; })[0], ex = [].filter.call(dr.getElementsByTagName('*'), function (n) { return n.localName === 'extent'; })[0];
+        var id = bl && (bl.getAttribute('r:embed') || bl.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'embed')), rl = id && rels[id]; if (!rl) return;
+        var path = 'word/' + rl.t.replace(/^\.\//, '').replace(/^\/word\//, ''), bin = z[path], ext = (path.split('.').pop() || '').toLowerCase(); if (!bin || !/^(png|jpe?g|gif)$/.test(ext) || bin.length > 600 * 1024) return;
+        var s = '', CH = 0x8000; for (var i = 0; i < bin.length; i += CH) s += String.fromCharCode.apply(null, bin.subarray(i, i + CH));
+        var w = ex ? Math.round(+ex.getAttribute('cx') / 9525) : 120, h = ex ? Math.round(+ex.getAttribute('cy') / 9525) : 60;
+        out2.push({ src: 'data:image/' + (ext === 'jpg' ? 'jpeg' : ext) + ';base64,' + btoa(s), w: Math.min(w, 600), h: Math.round(h * Math.min(w, 600) / Math.max(w, 1)), al: al || '' });
+      }); return out2;
+    }
+    function imgLine(im, hdr) { return { t: '[ảnh]', html: '<img src="' + im.src + '" data-w="' + im.w + '" data-h="' + im.h + '"' + (im.al ? ' data-al="' + im.al + '"' : '') + (hdr ? ' data-hdr=""' : '') + '>', found: [], c: false, b: false, i: false }; }
+    var DREL = relsOf('document.xml');
+    try { // logo ở đầu trang (header) – lấy header mặc định của văn bản
+      var sp = [].slice.call(body.getElementsByTagNameNS(W, 'sectPr')).pop(), hr = sp && [].filter.call(sp.childNodes, function (n) { return n.localName === 'headerReference'; }), hpick = hr && (hr.filter(function (n) { return gv(n, 'type') === 'default'; })[0] || hr.filter(function (n) { return gv(n, 'type') === 'first'; })[0]);
+      var hid = hpick && (hpick.getAttribute('r:id') || hpick.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id')), hp = hid && DREL[hid] && DREL[hid].t;
+      if (hp && z['word/' + hp]) { var hd = new DOMParser().parseFromString(fflate.strFromU8(z['word/' + hp]), 'application/xml'), hrel = relsOf(hp);
+        [].forEach.call(hd.getElementsByTagNameNS(W, 'p'), function (p) { var jc = gv(kid(kid(p, 'pPr'), 'jc'), 'val'); imgsIn(p, hrel, /center/.test(jc) ? 'center' : /right|end/.test(jc) ? 'right' : '').forEach(function (im) { out.push(imgLine(im, 1)); }); }); }
+    } catch (e) { }
     function letter(n, up) { var s = ''; while (n > 0) { n--; s = String.fromCharCode(97 + n % 26) + s; n = Math.floor(n / 26); } return up ? s.toUpperCase() : s; }
     function roman(n) { var r = '', m = [[1000, 'm'], [900, 'cm'], [500, 'd'], [400, 'cd'], [100, 'c'], [90, 'xc'], [50, 'l'], [40, 'xl'], [10, 'x'], [9, 'ix'], [5, 'v'], [4, 'iv'], [1, 'i']]; m.forEach(function (q) { while (n >= q[0]) { r += q[1]; n -= q[0]; } }); return r; }
     function para(p) {
-      var pp = kid(p, 'pPr'), jc = gv(kid(pp, 'jc'), 'val'), ind = kid(pp, 'ind'), np = kid(pp, 'numPr');
+      var pp = kid(p, 'pPr'), jc = gv(kid(pp, 'jc'), 'val'), ind = kid(pp, 'ind'), np = kid(pp, 'numPr'), psz = PSZ[gv(kid(pp, 'pStyle'), 'val')] || SZ0, spc = kid(pp, 'spacing'), SZW = {};
       var t = '', allB = true, allI = true, any = false;
       [].forEach.call(p.getElementsByTagNameNS(W, 'r'), function (r) {
-        var rp = kid(r, 'rPr'), bb = kid(rp, 'b'), ii = kid(rp, 'i'), isB = bb && !/^(0|false)$/.test(gv(bb, 'val')), isI = ii && !/^(0|false)$/.test(gv(ii, 'val')), rt = '';
+        var rp = kid(r, 'rPr'), bb = kid(rp, 'b'), ii = kid(rp, 'i'), isB = bb && !/^(0|false)$/.test(gv(bb, 'val')), isI = ii && !/^(0|false)$/.test(gv(ii, 'val')), rt = '', rs = +gv(kid(rp, 'sz'), 'val') || psz;
         [].forEach.call(r.childNodes, function (n) { if (n.localName === 't') rt += n.textContent; else if (n.localName === 'tab') rt += '    '; else if (n.localName === 'br') rt += ' '; });
-        if (rt.trim()) { any = true; if (!isB) allB = false; if (!isI) allI = false; } t += rt;
+        if (rt.trim()) { any = true; if (!isB) allB = false; if (!isI) allI = false; SZW[rs] = (SZW[rs] || 0) + rt.length; } t += rt;
       });
+      var fsz = +(Object.keys(SZW).sort(function (a, b) { return SZW[b] - SZW[a]; })[0] || psz), fs = fsz / 2; // cỡ chữ chiếm nhiều nhất trong đoạn (pt)
+      var lr = gv(spc, 'lineRule'), lnv = +gv(spc, 'line') || 0, lh = lnv && (!lr || lr === 'auto') ? Math.round(lnv / 240 * 100) / 100 : 0;
       var al = /center/.test(jc) ? 'center' : /^(right|end)$/.test(jc) ? 'right' : '', lv = 0, li = '';
       var left = ind ? +(gv(ind, 'left') || gv(ind, 'start') || 0) : 0;
       if (np) { var nid = gv(kid(np, 'numId'), 'val'), il = gv(kid(np, 'ilvl'), 'val') || '0', L = NUM[nid] && NUM[nid][il];
@@ -8909,7 +8981,7 @@ if (typeof module !== 'undefined') module.exports = XW;
           var mk = L.f === 'lowerLetter' ? letter(n) : L.f === 'upperLetter' ? letter(n, 1) : L.f === 'lowerRoman' ? roman(n) : L.f === 'upperRoman' ? roman(n).toUpperCase() : String(n);
           t = String(L.t || '%1.').replace(/%\d/g, mk) + ' ' + t.replace(/^\s+/, ''); lv = Math.max(lv, 1); } } }
       else if (left >= 240) lv = Math.min(4, Math.max(1, Math.round(left / 360)));
-      return { t: t.replace(/\s+$/, ''), c: al === 'center', al: al, ind: lv, li: li, b: any && allB, i: any && allI };
+      return { t: t.replace(/\s+$/, ''), c: al === 'center', al: al, ind: lv, li: li, b: any && allB, i: any && allI, fs: fs, lh: lh, imgs: imgsIn(p, DREL, al) };
     }
     function txtOf(n) { return [].map.call(n.getElementsByTagNameNS(W, 't'), function (q) { return q.textContent; }).join(' '); }
     function cellLines(tc) { var L = []; [].forEach.call(tc.childNodes, function (n) { if (n.localName === 'p') L.push(para(n)); else if (n.localName === 'tbl') [].forEach.call(n.getElementsByTagNameNS(W, 'p'), function (p) { L.push(para(p)); }); }); return L; }
@@ -8941,8 +9013,8 @@ if (typeof module !== 'undefined') module.exports = XW;
       rows.forEach(function (r, ri) {
         var t0 = r[0] && r[0].L.map(function (l) { return l.t; }).join(' ').trim(), t1 = r[1] && r[1].L.map(function (l) { return l.t; }).join(' ').trim(), pair = null;
         if (r.length === 2 && t0 && t0.length < 60 && t1 && /^[:：]/.test(t1)) { // "Họ và tên | : …" → nhận diện như "Họ và tên: …"
-          var q = rec([{ t: t0.replace(/[:：]\s*$/, '') + ': ' + t1.replace(/^[:：]\s*/, ''), c: false, b: false, i: false }], ctx), ln = q.md.join(' '), bo = /^\*\*.*\*\*$/.test(ln), raw = bo ? ln.slice(2, -2) : ln, ci = raw.search(/[:：]/);
-          if (ci > 0 && /\{\{/.test(raw)) { found = found.concat(q.found); var wb = function (s) { return bo ? '**' + s + '**' : s; }; pair = [wb(raw.slice(0, ci).trim()), wb(': ' + raw.slice(ci + 1).trim())]; }
+          var q = rec([{ t: t0.replace(/[:：]\s*$/, '') + ': ' + t1.replace(/^[:：]\s*/, ''), c: false, b: false, i: false, fs: r[0].L[0] && r[0].L[0].fs, lh: r[0].L[0] && r[0].L[0].lh }], ctx), ln = q.md.join(' '), mp = (/^§[^§]*§\s?/.exec(ln) || [''])[0], ln = ln.slice(mp.length), bo = /^\*\*.*\*\*$/.test(ln), raw = bo ? ln.slice(2, -2) : ln, ci = raw.search(/[:：]/);
+          if (ci > 0 && /\{\{/.test(raw)) { found = found.concat(q.found); var wb = function (s) { return mp + (bo ? '**' + s + '**' : s); }; pair = [wb(raw.slice(0, ci).trim()), wb(': ' + raw.slice(ci + 1).trim())]; }
         }
         h += '<tr>';
         r.forEach(function (c, ci) {
@@ -8957,7 +9029,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       return { t: '[bảng]', html: h + '</tbody></table>', found: found, c: false, b: false, i: false };
     }
     [].forEach.call(body.childNodes, function (n) {
-      if (n.localName === 'p') { var L = para(n), up = L.t.trim().toUpperCase(); if (/^(BÊN A|NGƯỜI SỬ DỤNG LAO ĐỘNG|BÊN SỬ DỤNG)/.test(up)) ctx = 'A'; else if (/^(BÊN B|NGƯỜI LAO ĐỘNG)/.test(up)) ctx = 'B'; out.push(L); }
+      if (n.localName === 'p') { var L = para(n), up = L.t.trim().toUpperCase(); (L.imgs || []).forEach(function (im) { out.push(imgLine(im)); }); if (L.imgs && L.imgs.length && !L.t.trim()) return; if (/^(BÊN A|NGƯỜI SỬ DỤNG LAO ĐỘNG|BÊN SỬ DỤNG)/.test(up)) ctx = 'A'; else if (/^(BÊN B|NGƯỜI LAO ĐỘNG)/.test(up)) ctx = 'B'; out.push(L); }
       else if (n.localName === 'tbl') { var T = table(n); if (T) { out.push(T); return; }
         [].forEach.call(n.getElementsByTagNameNS(W, 'tr'), function (tr) { var cells = [].map.call(tr.getElementsByTagNameNS(W, 'tc'), function (tc) { return [].map.call(tc.getElementsByTagNameNS(W, 'p'), function (p) { return para(p).t.trim(); }).filter(Boolean); }); var mx = Math.max.apply(null, cells.map(function (c) { return c.length; }).concat([0])); for (var i = 0; i < mx; i++) out.push({ t: cells.map(function (c) { return c[i] || ''; }).join('    '), c: true, b: false, i: false, tbl: 1 }); }); }
     });
@@ -9015,8 +9087,9 @@ if (typeof module !== 'undefined') module.exports = XW;
     lines.forEach(function (L, idx) {
       var n0 = out.length; one(L, idx);
       if (L.html) return;
-      if (out.length === n0 + 1 && out[n0] && !/^(#|\^|\[CHU_KY\]|---$)/.test(out[n0])) { // 19/11: căn lề, thụt lề, gạch đầu dòng theo file Word
-        var mt = []; if (L.al && !/^~\s/.test(out[n0])) mt.push('al=' + L.al); if (L.ind) mt.push('ind=' + L.ind); if (L.li) mt.push('li=' + L.li);
+      if (out.length === n0 + 1 && out[n0] && !/^(\[CHU_KY\]|---$)/.test(out[n0])) { // 19/11: căn lề, thụt lề, gạch đầu dòng, cỡ chữ, giãn dòng theo file Word
+        var mt = [], hd = /^(#|\^)/.test(out[n0]); if (!hd) { if (L.al && !/^~\s/.test(out[n0])) mt.push('al=' + L.al); if (L.ind) mt.push('ind=' + L.ind); if (L.li) mt.push('li=' + L.li); }
+        if (L.fs && L.fs !== 13) mt.push('fs=' + L.fs); if (L.lh && L.lh !== 1.25 && L.lh >= 0.8 && L.lh <= 3) mt.push('lh=' + L.lh);
         if (mt.length) out[n0] = '§' + mt.join(';') + '§ ' + out[n0];
       }
     });
@@ -21714,9 +21787,10 @@ var cur = ndSnap(u), out = cur, sd = { n: 0, kept: 0 };
   function ndAfterRender() {
     var sel = $('#ndgU'); if (sel && !sel._nd) { sel._nd = 1; sel.addEventListener('change', function () { ps('ndg', { u: '' }).u = sel.value; render(); }); }
     var k = ND_PAGE[curPage], hd = $('#page .page-head'); if (!k || !hd || !S.units.length || $('#page [data-ndbtn]')) return;
+    if (k === 'HD' && typeof PS !== 'undefined' && PS.hd2 && PS.hd2.tab === 'mau') return; // 19/11 (anh): Kho hợp đồng mẫu đã có "Tải lên mẫu (Word / PDF)" – không hiện nút nạp sổ hợp đồng từ Excel cho khỏi nhầm
     var box = hd.children.length > 1 ? hd.lastElementChild : null; if (!box || box === hd.firstElementChild) { box = document.createElement('div'); box.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap'; hd.appendChild(box); }
     var b = document.createElement('button'); b.className = 'btn'; b.setAttribute('data-ndbtn', '1'); b.setAttribute('data-act', 'nd-pick'); b.setAttribute('data-type', k); b.setAttribute('data-id', S.settings.unit !== 'all' ? S.settings.unit : ''); b.title = 'Tải file ' + ND_T[k].t.toLowerCase() + ' đang có lên, phần mềm tự ghép cột';
-    b.innerHTML = ic('nhap', 15) + 'Nhập từ file'; box.insertBefore(b, box.firstChild);
+    b.innerHTML = ic('nhap', 15) + (k === 'HD' ? 'Nhập sổ hợp đồng từ Excel' : 'Nhập từ file'); if (k === 'HD') b.title = 'Nạp danh sách hợp đồng đang có (file Excel, CSV). Mẫu văn bản hợp đồng (Word) tải lên ở Kho hợp đồng mẫu.'; box.insertBefore(b, box.firstChild);
   }
   (function () { var t = null; try { new MutationObserver(function () { if (t) return; t = setTimeout(function () { t = null; try { ndAfterRender(); } catch (e) { } }, 60); }).observe(document.getElementById('page'), { childList: true }); } catch (e) { } })();
   ACTS['nd-pick'] = function (a, id) { ndPick(id || null, a && a.getAttribute ? a.getAttribute('data-type') : ''); };
