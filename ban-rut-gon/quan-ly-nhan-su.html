@@ -2948,8 +2948,8 @@ var HR = (function () {
       cols: ['Mã NV', 'Họ và tên', 'Giới tính', 'Ngày sinh', 'Số CCCD/Mã số thuế', 'Ngày cấp CCCD', 'Dân tộc', 'Quê quán',
         'Địa chỉ thường trú', 'Số điện thoại', 'Email công ty', 'Phòng ban', 'Chức vụ', 'Chức danh công việc', 'Tổ/Ca', 'Ngày vào làm',
         'Trình độ', 'Tình trạng hôn nhân', 'Số người phụ thuộc', 'Số con từ 6 tuổi trở xuống', 'Người thân liên hệ', 'Quan hệ với người thân', 'SĐT người thân liên hệ',
-        'Số sổ BHXH', 'Ngân hàng', 'Số tài khoản', 'Trạng thái', 'Ngày nghỉ việc', 'Lý do nghỉ việc', 'Mã chấm công', 'Loại lao động'],
-      opt: ['Số con từ 6 tuổi trở xuống', 'Người thân liên hệ', 'Quan hệ với người thân', 'SĐT người thân liên hệ', 'Lý do nghỉ việc', 'Mã chấm công', 'Loại lao động'] }, // 09/11 0.3.2: Loại lao động = Toàn thời gian (trống) / Bán thời gian / Cộng tác viên
+        'Số sổ BHXH', 'Ngân hàng', 'Số tài khoản', 'Trạng thái', 'Ngày nghỉ việc', 'Lý do nghỉ việc', 'Mã chấm công', 'Loại lao động', 'Tên hay gọi'],
+      opt: ['Tên hay gọi', 'Số con từ 6 tuổi trở xuống', 'Người thân liên hệ', 'Quan hệ với người thân', 'SĐT người thân liên hệ', 'Lý do nghỉ việc', 'Mã chấm công', 'Loại lao động'] }, // 09/11 0.3.2: Loại lao động = Toàn thời gian (trống) / Bán thời gian / Cộng tác viên
     { k: 'PB', name: 'Danh mục phòng ban', need: ['Mã phòng ban', 'Tên phòng ban'], key: 'Mã phòng ban',
       cols: ['Mã phòng ban', 'Tên phòng ban', 'Mã NV trưởng bộ phận', 'Trưởng bộ phận', 'Định biên', 'Nhân sự hiện có', 'Lịch làm việc'] },
     { k: 'CV', name: 'Danh mục chức vụ', need: ['Mã chức vụ', 'Tên chức vụ'], key: 'Mã chức vụ',
@@ -4553,6 +4553,7 @@ if (typeof module !== 'undefined') module.exports = XW;
   }
   function avatarOf(e, isSample) { var a = e['Ảnh đại diện']; if (a && /^(data:image|https?:)/.test(String(a))) return String(a); return isSample ? sampleAvatar(e) : null; }
   function shortName(n) { var p = String(n || '').trim().split(/\s+/); return p.length >= 3 ? p.slice(-2).join(' ') : p.join(' '); }
+  function nickName(e) { var t = String(e && e['Tên hay gọi'] || '').trim(); return t || shortName(e && e['Họ và tên']); } // 19/11/2026: tên hiển thị trên sơ đồ tổ chức – người dùng tự đặt ở hồ sơ
   // ĐỘI NGŨ – mỗi người 1 "chỗ ngồi" theo bộ phận; chỗ trống theo định biên; >48 người thì thu thành chấm nhỏ
   function teamCard(d, us, R) {
     var r = HR.dnum(R), multi = us.length > 1, prob = {}, isNew = {}, smp = {};
@@ -6509,8 +6510,8 @@ if (typeof module !== 'undefined') module.exports = XW;
     var sub = (p.cd || e['Chức danh công việc'] || e['Chức vụ'] || '') + (p.xco ? ' · ' + shortUnit(pu.name) : '');
     var stx = p.st === 'maternity' ? 'Nghỉ thai sản' : p.prob ? 'Thử việc' : p.st === 'left' ? 'Đã nghỉ ' + vn(e['Ngày nghỉ việc']) : '';
     return '<button type="button" class="' + cls + '" draggable="' + (p.st !== 'left') + '" data-op="' + esc(pu.id + '|' + p.id) + '" title="' + esc(e['Họ và tên'] + ' · ' + sub + (stx ? ' · ' + stx : '') + ' – bấm để mở hồ sơ, kéo sang phòng khác để chuyển') + '">' +
-      '<span class="op-av">' + (src ? '<img src="' + src + '" alt="">' : esc(givenName(e['Họ và tên']).charAt(0).toUpperCase())) + '</span>' +
-      '<span class="op-tx"><b>' + esc(opt.full ? e['Họ và tên'] : shortName(e['Họ và tên'])) + tags + '</b><small>' + esc(sub) + '</small>' + (stx ? '<small class="op-st">' + esc(stx) + '</small>' : '') + '</span></button>';
+      '<span class="op-av">' + (src ? '<img src="' + src + '" alt="">' : esc(givenName(String(e['Tên hay gọi'] || '').trim() || e['Họ và tên']).charAt(0).toUpperCase())) + '</span>' +
+      '<span class="op-tx"><b>' + esc(opt.full ? e['Họ và tên'] : nickName(e)) + tags + '</b><small>' + esc(sub) + '</small>' + (stx ? '<small class="op-st">' + esc(stx) + '</small>' : '') + '</span></button>';
   }
   function orgDept(o, x, f) {
     var fill = x.plan ? Math.min(100, Math.round(x.members.length / x.plan * 100)) : 100;
@@ -7024,7 +7025,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       field('fCa', 'Tổ/Ca', e['Tổ/Ca']) + field('fMcc', 'Mã chấm công', e['Mã chấm công'], ' title="Mã trên máy chấm công, nếu khác Mã NV"') +
       sel('fLd', 'Loại lao động', LD_T, ldOf(e)) + (isNew ? '' : dbox('fDcNg', HR.isoToday(), 'Ngày hiệu lực nếu đổi phòng ban / chức danh')) + '</div><div class="faint ld-hint" id="fLdH" style="font-size:12px;margin-top:6px">' + ldHint(ldOf(e)) + '</div></div>' +
       '<div class="dr-sec"><h4>Thông tin cá nhân</h4><div class="form-grid g3">' +
-      field('fName', 'Họ và tên <i class="req">*</i>', e['Họ và tên'], ' autocomplete="off"') + sel('fGt', 'Giới tính', ['Nam', 'Nữ'], e['Giới tính']) + dbox('fNs', e['Ngày sinh'], 'Ngày sinh') +
+      field('fName', 'Họ và tên <i class="req">*</i>', e['Họ và tên'], ' autocomplete="off"') + field('fNick', 'Tên hay gọi <span class="faint" style="font-weight:400">· hiển thị trên sơ đồ tổ chức</span>', e['Tên hay gọi'], ' maxlength="30" autocomplete="off"') + sel('fGt', 'Giới tính', ['Nam', 'Nữ'], e['Giới tính']) + dbox('fNs', e['Ngày sinh'], 'Ngày sinh') +
       field('fCccd', 'Số CCCD / MST', e['Số CCCD/Mã số thuế'], ' inputmode="numeric" maxlength="13"') + dbox('fNc', e['Ngày cấp CCCD'], 'Ngày cấp CCCD') + sel('fDt', 'Dân tộc', uniq(u, 'Dân tộc').concat(['Kinh']).filter(function (v, i, a) { return a.indexOf(v) === i; }), e['Dân tộc'], 1) +
       field('fQq', 'Quê quán', e['Quê quán']) + '<div class="field span2"><label for="fDc">Địa chỉ thường trú</label><input class="input" id="fDc" value="' + esc(e['Địa chỉ thường trú'] || '') + '"></div>' +
       field('fSdt', 'Số điện thoại', e['Số điện thoại'], ' inputmode="tel" maxlength="13"') + field('fEm', 'Email công ty', e['Email công ty'], ' type="email"') +
@@ -7150,7 +7151,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     if (ntS && !v('fNt')) return bad('fNt', 'Chưa có họ tên người thân', 'Có số điện thoại thì cần ghi người đó là ai.');
     var bh = v('fBh'); if (bh && /[\x00-\x1f<>"`\\]/.test(bh)) return bad('fBh', 'Số sổ BHXH có ký tự không dùng được'); // 18/11 (góp ý): bỏ bắt buộc 10 số – nhập đúng như trên sổ
     var tk = v('fTk').replace(/[\s.\-]/g, ''); if (tk && !/^\d{6,20}$/.test(tk)) return bad('fTk', 'Số tài khoản chỉ gồm số');
-    var row = { 'Mã NV': id, 'Họ và tên': name, 'Giới tính': v('fGt'), 'Ngày sinh': ns || '', 'Số CCCD/Mã số thuế': cccd, 'Ngày cấp CCCD': nc || '', 'Dân tộc': v('fDt'), 'Quê quán': v('fQq'), 'Địa chỉ thường trú': v('fDc'), 'Số điện thoại': sdt, 'Email công ty': em,
+    var row = { 'Mã NV': id, 'Họ và tên': name, 'Tên hay gọi': v('fNick'), 'Giới tính': v('fGt'), 'Ngày sinh': ns || '', 'Số CCCD/Mã số thuế': cccd, 'Ngày cấp CCCD': nc || '', 'Dân tộc': v('fDt'), 'Quê quán': v('fQq'), 'Địa chỉ thường trú': v('fDc'), 'Số điện thoại': sdt, 'Email công ty': em,
       'Phòng ban': v('fPb'), 'Chức vụ': v('fCv'), 'Chức danh công việc': v('fCd'), 'Tổ/Ca': v('fCa'), 'Loại lao động': v('fLd') === 'Toàn thời gian' && !(e && e['Loại lao động']) ? '' : v('fLd'), 'Ngày vào làm': vao, 'Trình độ': v('fTd'), 'Tình trạng hôn nhân': v('fHn'), 'Số người phụ thuộc': npt === '' ? '' : +npt, 'Số con từ 6 tuổi trở xuống': con6 === '' ? '' : +con6, 'Người thân liên hệ': v('fNt').replace(/(^|\s)(\S)/g, function (x, a, b) { return a + b.toUpperCase(); }), 'Quan hệ với người thân': v('fNtQh'), 'SĐT người thân liên hệ': ntS, 'Số sổ BHXH': bh, 'Ngân hàng': v('fNh'), 'Số tài khoản': tk, 'Mã chấm công': v('fMcc') };
     if (isNew) {
       row['Trạng thái'] = 'Đang làm việc'; row['Ngày nghỉ việc'] = '';
@@ -20436,6 +20437,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     'Trình độ': ['trinh do', 'hoc van', 'trinh do hoc van', 'bang cap', 'trinh do chuyen mon'],
     'Tình trạng hôn nhân': ['hon nhan', 'tinh trang hon nhan'],
     'Số người phụ thuộc': ['nguoi phu thuoc', 'so nguoi phu thuoc', 'npt', 'so npt'],
+    'Tên hay gọi': ['ten hay goi', 'ten goi', 'ten thuong goi', 'biet danh', 'nickname', 'ten hien thi'],
     'Số sổ BHXH': ['bhxh', 'so so bhxh', 'so bhxh', 'ma so bhxh', 'ma bhxh', 'so so bao hiem'],
     'Ngân hàng': ['ngan hang', 'bank', 'ten ngan hang', 'mo tai'],
     'Số tài khoản': ['so tai khoan', 'stk', 'so tk', 'tai khoan', 'tk ngan hang', 'account', 'tai khoan ngan hang'],
