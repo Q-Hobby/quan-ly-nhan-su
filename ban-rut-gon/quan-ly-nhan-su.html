@@ -2341,7 +2341,25 @@ button.qa-add{margin-left:8px!important;border:none!important;background:none!im
 .td-logo-pv{width:auto;min-width:46px;height:46px;border-radius:10px;border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;background:#fff;padding:3px;overflow:hidden}.td-logo-pv img{max-height:40px;max-width:150px;object-fit:contain}.td-logo-pv em{font-style:normal;font-weight:800;color:#fff;background:var(--c,#0B5F5A);width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center}
 .td-swc{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.td-swc input[type=color]{width:52px;height:38px;padding:3px}.td-swb{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
 .td-seg button{white-space:nowrap}
+.tdl-g{display:grid;grid-template-columns:minmax(0,400px) minmax(0,1fr);gap:20px;align-items:start}.tdl-g .td-g2{grid-template-columns:minmax(0,1fr)}.tdl-g .td-seg{display:flex;flex-wrap:wrap}.tdl-p{position:sticky;top:0;display:flex;flex-direction:column;gap:8px}.tdl-pg{align-self:flex-start}.tdl-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between}.tdl-box{height:min(560px,62vh);border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;position:relative}.tdl-box.mob{background:var(--bg,#f4f4f0);display:flex;justify-content:center}.tdl-fr{border:0;display:block;transform-origin:0 0;background:#fff}.tdl-box.mob .tdl-fr{border-left:1px solid var(--line);border-right:1px solid var(--line)}
+@media(max-width:900px){.tdl-g{grid-template-columns:minmax(0,1fr)}.tdl-f,.tdl-p{min-width:0}.tdl-g .td-swc input[type=color]{width:44px}.tdl-p{position:static}.tdl-box{height:440px}}
 .modal.lw-dlg{width:min(640px,100%)}.lw-bac{width:100%}.lw-bac th{font-size:12.5px;text-align:center}.lw-bac td{padding:5px 8px}.lw-bac td.c{text-align:center;width:52px}.lw-bac td:last-child{width:130px}.lw-bac .input{width:100%;text-align:right}.lw-dlg .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* 20/11/2026 19h: bảng Giao diện cổng tuyển dụng – nhóm mục gấp/mở, mẫu dựng sẵn, khối, ảnh */
+.tdl-f{max-height:min(640px,66vh);overflow:auto;padding-right:6px}
+.tdl-s{border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--card,#fff)}.tdl-s>summary{cursor:pointer;padding:10px 12px;font-weight:700;font-size:13.5px;list-style:none;display:flex;justify-content:space-between;align-items:center}.tdl-s>summary::-webkit-details-marker{display:none}.tdl-s>summary:after{content:"+";font-size:16px;opacity:.6}.tdl-s[open]>summary:after{content:"–"}.tdl-sb{padding:0 12px 12px}.tdl-sb .field{margin-bottom:10px}.tdl-sb .field:last-child{margin-bottom:0}
+.tdl-tps{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;margin-bottom:6px}.tdl-tp{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:var(--ink)}.tdl-tp:hover{border-color:var(--pri)}.tdl-tp.on{border-color:var(--pri);box-shadow:0 0 0 2px color-mix(in srgb,var(--pri) 25%,transparent)}.tdl-tp b{font-size:13px}.tdl-tp small{font-size:11px;opacity:.7}.tdl-dots{display:flex;gap:3px;margin-bottom:2px}.tdl-dots i{width:16px;height:16px;border-radius:50%;display:block}
+.td-swb.on{box-shadow:0 0 0 2px var(--ink,#222)}
+.tdl-warn{display:flex;gap:6px;align-items:flex-start;margin-top:6px;font-size:12px;line-height:1.45;color:#7A4A00;background:#FFF4D6;border-radius:8px;padding:6px 8px}.tdl-warn svg{flex:none;margin-top:1px}
+.tdl-cov{display:flex;flex-direction:column;gap:6px}.tdl-cov img{width:100%;max-height:120px;object-fit:cover;border-radius:8px}.tdl-cov em{font-size:12.5px;opacity:.75}
+.tdl-rg{width:100%}
+.tdl-blks{display:flex;flex-direction:column;gap:4px}.tdl-blk{display:flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:8px;padding:3px 6px}.tdl-blk label{flex:1;display:flex;gap:6px;align-items:center;font-size:13px;margin:0;font-weight:500;cursor:pointer}.tdl-blk .btn{min-width:30px;padding:0 6px}
+.tdl-gal{display:flex;flex-wrap:wrap;gap:8px}.tdl-gal span{position:relative;width:72px;height:54px}.tdl-gal img{width:100%;height:100%;object-fit:cover;border-radius:6px}.tdl-gal span button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#B91C1C;color:#fff;cursor:pointer;line-height:1;padding:0;font-size:14px}.tdl-gadd{width:72px;height:54px;border:1.5px dashed var(--line);border-radius:6px;background:none;cursor:pointer;font-size:12px;color:var(--ink)}
+.tdl-row{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12.5px}.tdl-row .input{width:auto}
+.tdl-sb .td-chk{display:flex;gap:6px;align-items:center;font-size:13px;margin:4px 0}
+.tdl-og img{width:100%;max-width:380px;aspect-ratio:1200/630;border-radius:8px;border:1px solid var(--line);margin:8px 0 4px;display:block;background:#f3f3f3}
+.tdl-note{font-size:12px;background:var(--bg,#f4f4f0);border-radius:8px;padding:6px 8px;margin-bottom:8px}
+.tdl-foot{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px;border-top:1px solid var(--line);padding-top:12px}.tdl-fl{margin:0}.tdl-apl{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;font-size:12.5px}.tdl-apl .td-chk{margin:0;display:flex;gap:5px;align-items:center}.tdl-fr2{margin:0 0 0 auto;justify-content:flex-end}
+@media(max-width:900px){.tdl-f{max-height:none;overflow:visible;padding-right:0}.tdl-fr2{margin-left:0;width:100%}}
 .tl-years{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.tl-ypick{width:auto;min-width:180px}
 .dh-tbl td.c{text-align:center;width:72px}.dh-tbl tr.dh-off td:not(:first-child){opacity:.5}
 .tg-sw{position:relative;display:inline-block;width:38px;height:22px;cursor:pointer;vertical-align:middle}.tg-sw input{opacity:0;width:0;height:0;position:absolute}.tg-sw i{position:absolute;inset:0;border-radius:99px;background:var(--line-2,#cbd5e1);transition:.2s}.tg-sw i:after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}.tg-sw input:checked+i{background:var(--pri)}.tg-sw input:checked+i:after{transform:translateX(16px)}
@@ -14301,11 +14319,15 @@ if (typeof module !== 'undefined') module.exports = XW;
   function tdThuPush(u, again) {
     var cf = tdOf(u).cfg, own = tdSrvOwn(); if (!cf.thu || !cf.thu.tok || !cf.thu.key || !!cf.thu.own !== own) cf.thu = { tok: tdRand(10), key: tdRand(32), own: own ? 1 : 0 };
     var th = cf.thu, D = tdPortalData(u, 'live'); D.api = TDB(); D.tok = th.tok; D.thu = own ? 0 : 1; D.base = own ? location.origin + '/tuyen-dung/' + cf.slug : TD_THU + '/t/' + th.tok + '/' + cf.slug;
-    return fetch(TDB() + '/api/cong', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key, slug: cf.slug, ten: cf.short, html: tdPortalHtml(D, {}), jobs: D.jobs.map(function (j) { return j.slug; }), ids: D.jobs.map(function (j) { return j.id; }) }) })
+    if (own) D.og = D.base + '/anh-chia-se.jpg?v=' + Date.now().toString(36); // 20/11/2026: ảnh khi chia sẻ link (máy chủ của công ty)
+    var html = tdPortalHtml(D, {}), lim = own ? 1700000 : 590000, cut = []; // trang cổng có ảnh bìa, hình ảnh công ty → nặng; quá giới hạn máy chủ thì bớt ảnh
+    if (html.length > lim && D.co.gal && D.co.gal.length) { D.co.gal = []; html = tdPortalHtml(D, {}); cut.push('hình ảnh công ty'); }
+    if (html.length > lim && D.co.cover) { D.co.cover = ''; html = tdPortalHtml(D, {}); cut.push('ảnh bìa'); }
+    return (own ? tdOgMake(u, tdLookOf(u)).catch(function () { return ''; }) : Promise.resolve('')).then(function (og) { return fetch(TDB() + '/api/cong', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tok: th.tok, key: th.key, slug: cf.slug, ten: cf.short, html: html, og: own ? og : undefined, jobs: D.jobs.map(function (j) { return j.slug; }), ids: D.jobs.map(function (j) { return j.id; }) }) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) {
         if (r.status === 403 && !again) { cf.thu = null; return tdThuPush(u, true); }
         if (!r.ok || !j.ok) throw new Error(j.msg || ('Máy chủ trả lỗi ' + r.status));
-        th.at = Date.now(); th.exp = j.het_han; tdSave(u, 'Đưa cổng tuyển dụng lên máy chủ thử (' + D.jobs.length + ' vị trí)'); tdThuTimer(); return j; }); });
+        th.at = Date.now(); th.exp = j.het_han; tdSave(u, 'Đưa cổng tuyển dụng lên máy chủ thử (' + D.jobs.length + ' vị trí)'); tdThuTimer(); if (cut.length) toast('Trang cổng nặng quá giới hạn máy chủ', 'warn', 'Chưa đưa ' + cut.join(', ') + ' lên cổng. Bớt số ảnh ở Giao diện cổng rồi cập nhật lại.'); return j; }); }); });
   }
   // Lấy hồ sơ ứng viên nộp trên cổng thử về Ngân hàng ứng viên (kèm CV), lấy xong máy chủ xóa ngay
   var TD_PULLING = {}, TD_SKIP = {};
@@ -14884,7 +14906,7 @@ if (typeof module !== 'undefined') module.exports = XW;
     });
     var ab = cf.ab || tdAbout0(u), nNv = (u.data && u.data.NV || []).filter(function (e) { try { return HR.isActive(e, R); } catch (x) { return false; } }).length, nPb = (u.data && u.data.PB || []).length;
     var abD = { story: ab.story || '', mission: ab.mission || '', env: ab.env || '', values: tdLines(ab.values).map(function (l) { var k = l.indexOf(':'); return k > 0 ? [l.slice(0, k).trim(), l.slice(k + 1).trim()] : [l, '']; }), perks: tdLines(ab.perks), stats: ab.stats === false ? [] : [[nNv, 'nhân sự đang làm việc'], [nPb, 'phòng ban, bộ phận'], [jobs.length, 'vị trí đang tuyển']].filter(function (x) { return x[0] > 0; }) };
-    return { mode: mode || 'preview', u: u.id, ab: abD, co: { name: cf.name, short: cf.short, tag: cf.tag, intro: cf.intro, addr: cf.addr, email: cf.email, phone: tdPhoneFmt(cf.phone), contact: cf.contact, policy: cf.policy, keep: cf.keep, color: cf.color, logo: cf.logo || '', hero: cf.hero || 'grad', lay: cf.lay || 'list', heroT: cf.heroT || '', why: cf.why || [], steps: tdLines(cf.steps) }, jobs: jobs, base: tdPortalLink(u), api: cf.srv && cf.srv.on ? cf.srv.url : '' };
+    return tdLookFix({ mode: mode || 'preview', u: u.id, ab: abD, co: { name: cf.name, short: cf.short, tag: cf.tag, intro: cf.intro, addr: cf.addr, email: cf.email, phone: tdPhoneFmt(cf.phone), contact: cf.contact, policy: cf.policy, keep: cf.keep, color: cf.color, logo: cf.logo || '', hero: cf.hero || 'grad', lay: cf.lay || 'list', heroT: cf.heroT || '', why: cf.why || [], steps: tdLines(cf.steps) }, jobs: jobs, base: tdPortalLink(u), api: cf.srv && cf.srv.on ? cf.srv.url : '' }, u);
   }
   /* eslint-disable no-undef */
   function tdAboutPage(nn) {
@@ -14904,6 +14926,7 @@ if (typeof module !== 'undefined') module.exports = XW;
   /* eslint-enable no-undef */
   // Favicon trang cổng = hình Đốm của phần mềm (11/11 20:42 anh: link mở từ cổng đang để favicon mặc định)
   function tdFav() { var l = document.querySelector('link[rel~="icon"]'); return (l && l.href) || 'https://quantritute.com/favicon.svg'; }
+  function tdOgMeta(D) { if (!D.og) return ''; var t = 'Tuyển dụng – ' + D.co.name, d = D.co.heroT || D.co.tag || ('Các vị trí đang tuyển tại ' + D.co.name); return '<meta property="og:type" content="website"><meta property="og:site_name" content="' + esc(D.co.short) + '"><meta property="og:title" content="' + esc(t) + '"><meta property="og:description" content="' + esc(d) + '"><meta property="og:image" content="' + esc(D.og) + '"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">'; }
   function tdPortalHtml(D, start) {
     var SC = '<' + '/script>';
     /* 20/11/2026 (anh): cổng tuyển dụng – logo riêng, kiểu ảnh bìa (h-grad / h-solid / h-light), bố cục danh sách vị trí (l-list / l-grid), tiêu đề lớn tự đặt */
@@ -14945,16 +14968,16 @@ if (typeof module !== 'undefined') module.exports = XW;
       'var I={pin:\'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>\',money:\'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>\',clock:\'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>\',team:\'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6"/></svg>\',cal:\'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>\',arr:\'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>\',chk:\'<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>\',star:\'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>\'};' +
       'var ini=(D.co.short||D.co.name).split(/\\s+/).filter(function(w){return w.length}).slice(-2).map(function(w){return w.charAt(0)}).join("").toUpperCase();' +
       'var app=document.getElementById("app"),cur=null,q="",pb="";' +
-      'function head(){return(D.thu?\'<div class="pv">Trang thử nghiệm của Phần mềm quản lý nhân sự toàn diện (Quản trị tử tế) – dữ liệu mẫu hư cấu. Vui lòng không nhập thông tin thật; hồ sơ tự xóa sau 24 giờ.</div>\':"")+(D.mode==="preview"?\'<div class="pv">Bản xem trước của cổng tuyển dụng – hồ sơ gửi ở đây được lưu thẳng vào phần mềm trên máy này (chưa kết nối máy chủ)</div>\':"")+\'<header class="top"><div class="wrap">\'+(D.co.logo?\'<img class="logo" src="\'+esc(D.co.logo)+\'" alt="\'+esc(D.co.short)+\'">\':\'<div class="logo">\'+esc(ini)+\'</div>\')+\'<div class="brand"><b>\'+esc(D.co.short)+\'</b><small>Tuyển dụng</small></div><span class="sp"></span><nav><a href="#" data-home>Vị trí đang tuyển</a><a href="#ve-chung-toi" data-about>Về chúng tôi</a></nav></div></header>\'}' +
-      'function foot(){return\'<footer><div class="wrap"><span>© \'+new Date().getFullYear()+" "+esc(D.co.name)+(D.co.addr?" · "+esc(D.co.addr):"")+\'</span><span>\'+(D.co.phone?"☎ "+esc(D.co.phone)+" · ":"")+(D.co.email?esc(D.co.email)+" · ":"")+(D.co.policy?\'<a href="\'+esc(D.co.policy)+\'" target="_blank" rel="noopener">Chính sách xử lý dữ liệu cá nhân</a>\':"")+\'</span></div></footer>\'}' +
+      'function head(){return tdpAnn()+(D.thu?\'<div class="pv">Trang thử nghiệm của Phần mềm quản lý nhân sự toàn diện (Quản trị tử tế) – dữ liệu mẫu hư cấu. Vui lòng không nhập thông tin thật; hồ sơ tự xóa sau 24 giờ.</div>\':"")+(D.mode==="preview"?\'<div class="pv">Bản xem trước của cổng tuyển dụng – hồ sơ gửi ở đây được lưu thẳng vào phần mềm trên máy này (chưa kết nối máy chủ)</div>\':"")+\'<header class="top"><div class="wrap">\'+(D.co.logo?\'<img class="logo" src="\'+esc(D.co.logo)+\'" alt="\'+esc(D.co.short)+\'">\':\'<div class="logo">\'+esc(ini)+\'</div>\')+\'<div class="brand"><b>\'+esc(D.co.short)+\'</b><small>Tuyển dụng</small></div><span class="sp"></span><nav><a href="#" data-home>Vị trí đang tuyển</a><a href="#ve-chung-toi" data-about>Về chúng tôi</a></nav></div></header>\'}' +
+      'function foot(){return tdpFab()+\'<footer><div class="wrap"><span>© \'+new Date().getFullYear()+" "+esc(D.co.name)+(D.co.addr?" · "+esc(D.co.addr):"")+\'</span><span>\'+(D.co.phone?"☎ "+esc(D.co.phone)+" · ":"")+(D.co.email?esc(D.co.email)+" · ":"")+(D.co.policy?\'<a href="\'+esc(D.co.policy)+\'" target="_blank" rel="noopener">Chính sách xử lý dữ liệu cá nhân</a>\':"")+\'</span></div></footer>\'}' +
       'function chips(j){return\'<div class="chips"><span>\'+I.team+esc(j.pb)+\'</span><span class="sal">\'+I.money+esc(j.sal)+\'</span><span>\'+I.clock+esc(j.ld)+\'</span>\'+(j.deadline?\'<span>\'+I.cal+"Hạn nộp "+esc(j.deadline)+\'</span>\':"")+\'</div>\'}' +
       'function list(nn){cur=null;if(!nn)nav("");var pbs={};D.jobs.forEach(function(j){pbs[j.pb]=1});var Q=q.toLowerCase();var js=D.jobs.filter(function(j){return(!pb||j.pb===pb)&&(!Q||(j.pos+" "+j.pb+" "+j.desc.join(" ")).toLowerCase().indexOf(Q)>=0)});' +
       'app.innerHTML=head()+\'<section class="hero"><div class="wrap"><small>Cơ hội nghề nghiệp</small><h1>\'+esc(D.co.heroT||("Cùng "+D.co.short+" làm nên những điều tử tế"))+\'</h1><p>\'+esc(D.co.tag||"")+\'</p><div class="find"><input id="q" placeholder="Tìm vị trí, ví dụ: nhân sự, giảng viên…" value="\'+esc(q)+\'"><select id="pb"><option value="">Tất cả bộ phận</option>\'+Object.keys(pbs).map(function(p){return\'<option\'+(p===pb?" selected":"")+\'>\'+esc(p)+\'</option>\'}).join("")+\'</select></div></div></section>\'+' +
-      '\'<main><div class="wrap"><div class="sec-t"><h2>Vị trí đang tuyển</h2><span>\'+js.length+" vị trí"+\'</span></div>\'+(js.length?\'<div class="jobs">\'+js.map(function(j){return\'<button class="job" data-job="\'+esc(j.id)+\'"><div><h3>\'+esc(j.pos)+(j.left!==null&&j.left<=5?\'<span class="new hot">Sắp hết hạn</span>\':"")+(j.sl>1?\'<span class="new">Cần \'+j.sl+" người</span>":"")+\'</h3>\'+chips(j)+\'</div><span class="go">Xem chi tiết \'+I.arr+\'</span></button>\'}).join("")+\'</div>\':\'<div class="empty">\'+(D.jobs.length?"Không có vị trí phù hợp với tìm kiếm.":"Hiện chưa có vị trí đang tuyển. Bạn quay lại sau nhé!")+\'</div>\')+' +
-      '\'<div class="why">\'+D.co.why.map(function(w){return\'<div><b>\'+I.star+\'</b>\'+esc(w)+\'</div>\'}).join("")+\'</div>\'+\'<div class="about"><h2>Về \'+esc(D.co.short)+\'</h2><p style="margin:0">\'+esc(D.co.intro||(D.ab&&D.ab.story)||D.co.tag||"")+\'</p><button class="go" data-about>Tìm hiểu về chúng tôi →</button></div>\'+\'</div></main>\'+foot();' +
+      '\'<main><div class="wrap"><div class="sec-t"><h2>Vị trí đang tuyển</h2><span>\'+js.length+" vị trí"+\'</span></div>\'+(js.length?\'<div class="jobs">\'+js.map(function(j){return\'<button class="job" data-job="\'+esc(j.id)+\'"><div><h3>\'+esc(j.pos)+(j.left!==null&&j.left<=5?\'<span class="new hot">Sắp hết hạn</span>\':"")+(j.sl>1?\'<span class="new">Cần \'+j.sl+" người</span>":"")+\'</h3>\'+chips(j)+\'</div><span class="go">\'+esc(D.co.btnJob||"Xem chi tiết")+" "+I.arr+\'</span></button>\'}).join("")+\'</div>\':\'<div class="empty">\'+(D.jobs.length?"Không có vị trí phù hợp với tìm kiếm.":"Hiện chưa có vị trí đang tuyển. Bạn quay lại sau nhé!")+\'</div>\')+' +
+      'tdpBlks()+\'</div></main>\'+foot();' +
       'var qi=$("#q");qi.addEventListener("input",function(){q=qi.value;var p=qi.selectionStart;list();var n=$("#q");n.focus();try{n.setSelectionRange(p,p)}catch(e){}});$("#pb").addEventListener("change",function(){pb=this.value;list()});window.scrollTo(0,0)}' +
       'function blk(t,l){return l&&l.length?\'<div class="card blk"><h2>\'+t+\'</h2><ul>\'+l.map(function(x){return"<li>"+esc(x)+"</li>"}).join("")+\'</ul></div>\':""}' +
-      'function nav(x){if(D.mode!=="live"||!history.pushState)return;var b=D.base.replace(/^https?:\\/\\/[^\\/]+/,""),pth=b+(x?"/"+x:"");try{if(location.pathname!==pth)history.pushState(null,"",pth)}catch(e){}}window.addEventListener("popstate",function(){route()});function route(){var seg=location.pathname.split("/").filter(Boolean),bn=D.base?D.base.replace(/^https?:\\/\\/[^\\/]+/,"").split("/").filter(Boolean).length:3,js=seg.length>bn?seg[bn]:"",j=D.jobs.filter(function(x){return x.slug===js})[0];if(js==="ve-chung-toi")about(1);else if(j)job(j,1);else list(1)}' + String(tdAboutPage).replace(/^function tdAboutPage/, 'function about') + ';' +
+      'function nav(x){if(D.mode!=="live"||!history.pushState)return;var b=D.base.replace(/^https?:\\/\\/[^\\/]+/,""),pth=b+(x?"/"+x:"");try{if(location.pathname!==pth)history.pushState(null,"",pth)}catch(e){}}window.addEventListener("popstate",function(){route()});function route(){var seg=location.pathname.split("/").filter(Boolean),bn=D.base?D.base.replace(/^https?:\\/\\/[^\\/]+/,"").split("/").filter(Boolean).length:3,js=seg.length>bn?seg[bn]:"",j=D.jobs.filter(function(x){return x.slug===js})[0];if(js==="ve-chung-toi")about(1);else if(j)job(j,1);else list(1)}' + String(tdAboutPage).replace(/^function tdAboutPage/, 'function about') + ';' + String(tdpBlks) + ';' + String(tdpAnn) + ';' + String(tdpFab) + ';' + String(tdpInit) + ';tdpInit();' +
       'function job(j,nn){cur=j;if(!nn)nav(j.slug);app.innerHTML=head()+\'<main><div class="wrap"><div class="crumb"><button data-home>← Tất cả vị trí</button></div><div class="dt"><div><div class="card"><h1>\'+esc(j.pos)+\'</h1>\'+chips(j)+\'<div class="facts"><div><small>Số lượng</small><b>\'+j.sl+" người</b></div><div><small>Thu nhập</small><b>"+esc(j.sal)+\'</b></div><div><small>Địa điểm</small><b>\'+esc(j.place)+\'</b></div><div><small>Thời gian làm việc</small><b>\'+esc(j.time||"")+\'</b></div><div><small>Hạn nhận hồ sơ</small><b>\'+esc(j.deadline||"Đến khi đủ người")+\'</b></div><div><small>Thử việc</small><b>\'+(j.prob?"Tối đa "+j.prob+(j.prob===6?" ngày làm việc":" ngày"):"Không")+\'</b></div></div><div class="share"><button data-share="copy">Sao chép link</button><button data-share="fb">Chia sẻ Facebook</button><button data-share="zalo">Gửi qua Zalo</button></div></div>\'+' +
       'blk("Mô tả công việc",j.desc)+blk("Yêu cầu",j.reqs)+blk("Quyền lợi",j.bens)+(D.co.steps.length?\'<div class="card blk"><h2>Quy trình tuyển dụng</h2><div class="steps">\'+D.co.steps.map(function(s){return"<div>"+esc(s)+"</div>"}).join("")+\'</div></div>\':"")+\'</div><div class="card apply" id="ung-tuyen">\'+form(j)+\'</div></div></div></main><div class="mob-apply"><button class="sub" data-goapply>Ứng tuyển ngay</button></div>\'+foot();bindForm(j);window.scrollTo(0,0)}' +
       'function form(j){return\'<h2>Ứng tuyển vị trí này</h2><p class="s">Điền thông tin và đính kèm CV. Chúng tôi sẽ liên hệ trong vài ngày làm việc.</p><form id="fm" novalidate>\'+' +
@@ -14962,7 +14985,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       '\'<div class="f" id="f-cv"><label>CV / hồ sơ xin việc *</label><div class="drop" id="drop">Bấm để chọn file <b>PDF hoặc ảnh</b> (tối đa 5 MB)</div><input type="file" id="cv" accept=".pdf,image/*" hidden><div class="err" id="cvErr">Vui lòng đính kèm CV (PDF hoặc ảnh, tối đa 5 MB)</div></div>\'+' +
       '\'<div class="f"><label for="fx">Giới thiệu ngắn về kinh nghiệm</label><textarea id="fx" placeholder="Không bắt buộc"></textarea></div><div class="f"><label for="fs">Bạn biết tin tuyển dụng qua đâu?</label><select id="fs"><option>Cổng tuyển dụng</option><option>Fanpage công ty</option><option>Nhóm Facebook / Zalo</option><option>Trang việc làm</option><option>Người quen giới thiệu</option><option>Khác</option></select></div>\'+' +
       '\'<label class="cons" id="cons"><input type="checkbox" id="fc"><span>Tôi đồng ý để \'+esc(D.co.name)+\' xử lý dữ liệu cá nhân trong hồ sơ này (họ tên, số điện thoại, email, CV) cho mục đích tuyển dụng; hồ sơ được lưu tối đa \'+(D.co.keep||6)+\' tháng kể từ khi có kết quả, tôi có thể yêu cầu xóa bất cứ lúc nào\'+(D.co.email?" qua "+esc(D.co.email):"")+\'. \'+(D.co.policy?\'<a href="\'+esc(D.co.policy)+\'" target="_blank" rel="noopener">Xem chính sách xử lý dữ liệu cá nhân</a>\':\'<em>(Công ty chưa đăng chính sách xử lý dữ liệu cá nhân.)</em>\')+\'</span></label>\'+' +
-      '\'<button class="sub" type="submit" id="sb">Gửi hồ sơ ứng tuyển</button><p class="fine">Công ty không thu bất kỳ khoản phí nào khi tuyển dụng.</p></form>\'}' +
+      '\'<button class="sub" type="submit" id="sb">\'+esc(D.co.btnApply||"Gửi hồ sơ ứng tuyển")+\'</button><p class="fine">Công ty không thu bất kỳ khoản phí nào khi tuyển dụng.</p></form>\'}' +
       'function fl(id,l,t,ph,er){return\'<div class="f" id="f-\'+id+\'"><label for="\'+id+\'">\'+l+\'</label><input id="\'+id+\'" type="\'+t+\'" placeholder="\'+ph+\'"\'+(t==="tel"?\' inputmode="tel"\':"")+\'><div class="err">\'+er+\'</div></div>\'}' +
       'var FILE=null;function bindForm(j){FILE=null;var cv=$("#cv"),dr=$("#drop");dr.addEventListener("click",function(){cv.click()});cv.addEventListener("change",function(){var f=cv.files&&cv.files[0];if(!f)return;var okT=/^image\\/|application\\/pdf/.test(f.type)||/\\.(pdf|jpe?g|png|webp)$/i.test(f.name);if(!okT||f.size>' + TD_CV_MAX + '){FILE=null;dr.className="drop";dr.innerHTML=(okT?"File lớn hơn 5 MB":"Chỉ nhận file PDF hoặc ảnh")+" – bấm để chọn lại";$("#f-cv").classList.add("bad");return}FILE=f;dr.className="drop ok";dr.innerHTML="✓ "+esc(f.name)+" · "+Math.max(1,Math.round(f.size/1024))+" KB";$("#f-cv").classList.remove("bad")});' +
       '["fn","fp","fe"].forEach(function(k){$("#"+k).addEventListener("input",function(){$("#f-"+k).classList.remove("bad")})});$("#fc").addEventListener("change",function(){$("#cons").classList.remove("bad")});' +
@@ -14970,7 +14993,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       'function B(k,c){if(c){$("#f-"+k).classList.add("bad");if(!bad)$("#"+(k==="cv"?"drop":k)).scrollIntoView({block:"center"});bad++}}B("fn",n.split(" ").length<2);B("fp",!/^0\\d{9}$/.test(p));B("fe",!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(m));B("cv",!FILE);if(!$("#fc").checked){$("#cons").classList.add("bad");bad++}if(bad)return;' +
       'var sb=$("#sb");sb.disabled=true;sb.textContent="Đang gửi…";var data={job:j.id,name:n,phone:p,email:m,exp:$("#fx").value.trim(),src:$("#fs").value,consent:true,consentText:$("#cons span").textContent};' +
       'function done(code){$("#ung-tuyen").innerHTML=\'<div class="ok"><i>\'+I.chk+\'</i><h2>Đã nhận hồ sơ!</h2><p>Cảm ơn \'+esc(n)+\' đã ứng tuyển vị trí <b>\'+esc(j.pos)+\'</b>.<br>Mã hồ sơ: <code>\'+esc(code)+\'</code></p><p class="s" style="color:var(--mut);font-size:13.5px">\'+esc(D.co.contact)+\' sẽ liên hệ qua số điện thoại hoặc email bạn đã để lại.</p><button class="share" style="border:none;background:none;color:var(--c);font-weight:700;cursor:pointer" data-home>← Xem các vị trí khác</button></div>\';window.scrollTo(0,0)}' +
-      'function fail(t){sb.disabled=false;sb.textContent="Gửi hồ sơ ứng tuyển";alertBox(t)}' +
+      'function fail(t){sb.disabled=false;sb.textContent=D.co.btnApply||"Gửi hồ sơ ứng tuyển";alertBox(t)}' +
       'FILE.arrayBuffer().then(function(buf){var TG=window.parent&&window.parent!==window?window.parent:(window.opener&&!window.opener.closed?window.opener:null);if(D.mode==="preview"&&!TG){fail("Tab phần mềm đã đóng nên chưa nhận được hồ sơ. Mở lại link từ phần mềm (Cổng tuyển dụng → Mở link).");return}if(TG&&D.mode==="preview"){var tm=setTimeout(function(){fail("Phần mềm chưa nhận được hồ sơ – giữ tab phần mềm đang mở rồi thử lại.")},6000);window.__tdok=function(c){clearTimeout(tm);done(c)};TG.postMessage({type:"qtt-td-apply",u:D.u,d:data,file:{name:FILE.name,type:FILE.type,size:FILE.size,buf:buf}},"*",[buf])}' +
       'else if(D.api){var fd=new FormData();Object.keys(data).forEach(function(k){fd.append(k,data[k])});if(D.tok)fd.append("tok",D.tok);fd.append("cv",FILE);fetch(D.api.replace(/\\/$/,"")+"/api/ung-tuyen",{method:"POST",body:fd}).then(function(r){return r.json()}).then(function(r){if(r&&r.ok)done(r.code);else fail((r&&r.msg)||"Chưa gửi được hồ sơ, vui lòng thử lại.")}).catch(function(){fail("Mất kết nối, vui lòng thử lại.")})}' +
       'else fail("Đây là trang mẫu, chưa kết nối máy chủ nên hồ sơ chưa được gửi đi.")})})}' +
@@ -14980,7 +15003,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       'if(t.hasAttribute("data-job")){var j=D.jobs.filter(function(x){return x.id===t.getAttribute("data-job")})[0];if(j)job(j)}else if(t.hasAttribute("data-home"))list();else if(t.hasAttribute("data-goapply"))$("#ung-tuyen").scrollIntoView({behavior:"smooth"});' +
       'else{var link=D.base+"/"+cur.slug;if(D.mode==="preview")alertBox(t.getAttribute("data-share")==="copy"?"Link dự kiến: "+link+" (mở được khi cổng kết nối máy chủ)":"Chia sẻ hoạt động khi cổng đã có link thật trên máy chủ");else if(t.getAttribute("data-share")==="copy"){try{navigator.clipboard.writeText(location.href);alertBox("Đã sao chép link")}catch(x){}}else if(t.getAttribute("data-share")==="fb")window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(location.href));else window.open("https://zalo.me/share?u="+encodeURIComponent(location.href))}});' +
       'if(D.mode==="live"){route()}else{var sj=START.job&&D.jobs.filter(function(x){return x.id===START.job})[0];if(START.about)about(1);else if(sj)job(sj);else list()}})();';
-    return '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tuyển dụng – ' + esc(D.co.short) + '</title><link rel="icon" href="' + esc(tdFav()) + '"><meta name="description" content="' + esc('Các vị trí đang tuyển tại ' + D.co.name) + '"><link rel="stylesheet" href="https://quantritute.com/assets/fonts/fonts.css?v=20261103"><style>' + css + '</style></head><body class="h-' + esc(D.co.hero || 'grad') + ' l-' + esc(D.co.lay || 'list') + '"><div id="app"></div><script>' + js + SC + '</body></html>';
+    return '<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tuyển dụng – ' + esc(D.co.short) + '</title><link rel="icon" href="' + esc(tdFav()) + '"><meta name="description" content="' + esc('Các vị trí đang tuyển tại ' + D.co.name) + '"><link rel="stylesheet" href="https://quantritute.com/assets/fonts/fonts.css?v=20261103">' + tdOgMeta(D) + '<style>' + css + tdCss3(D.co) + '</style></head><body class="h-' + esc(D.co.hero === 'photo' && !D.co.cover ? 'grad' : D.co.hero || 'grad') + ' l-' + esc(D.co.lay || 'list') + ' d-' + esc(D.co.dens || 'roomy') + '"><div id="app"></div><script>' + js + SC + '</body></html>';
   }
   // Nhận hồ sơ gửi từ bản xem trước (iframe) → thêm vào Ứng viên, lưu CV vào kho file
   window.addEventListener('message', function (e) {
@@ -15011,15 +15034,15 @@ if (typeof module !== 'undefined') module.exports = XW;
       '<div class="field"><label>Trang</label><div class="seg"><button class="' + (f.page === 'list' ? 'on' : '') + '" data-act="td-cp" data-id="list">Danh sách vị trí</button><button class="' + (f.page === 'job' ? 'on' : '') + '" data-act="td-cp" data-id="job"' + (live.length ? '' : ' disabled') + '>Trang vị trí</button><button class="' + (f.page === 'about' ? 'on' : '') + '" data-act="td-cp" data-id="about">Về chúng tôi</button></div></div>' +
       (f.page === 'job' && live.length ? '<div class="field"><label for="tdCJ">Vị trí</label><select class="input" id="tdCJ">' + live.map(function (r) { return opt(r.id, r.pos, f.job); }).join('') + '</select></div>' : '') +
       '<div class="field"><label>Thiết bị</label><div class="seg"><button class="' + (f.dev === 'pc' ? 'on' : '') + '" data-act="td-cd" data-id="pc">' + ic('td_pc', 15) + ' Máy tính</button><button class="' + (f.dev === 'mob' ? 'on' : '') + '" data-act="td-cd" data-id="mob">' + ic('td_phone', 15) + ' Điện thoại</button></div></div><span class="sp"></span>' +
-      '<button class="btn" data-act="td-cfull">' + ic('td_full', 15) + 'Xem toàn màn hình</button></div>';
+      '<button class="btn btn-primary" data-act="td-look" data-u="' + u.id + '">' + ic('td_edit', 15) + 'Giao diện cổng</button><button class="btn" data-act="td-cfull">' + ic('td_full', 15) + 'Xem toàn màn hình</button></div>';
     var prev = '<div class="td-browser"><div class="td-bbar"><i></i><i></i><i></i><span class="td-url" title="Link chính thức khi cổng kết nối máy chủ – bấm Mở link để mở trang này ở tab mới">🔒 ' + esc(url.replace(/^https:\/\//, '')) + '</span><span class="tag tag-warn">Xem trước</span><button class="btn btn-sm" data-act="td-olink" data-u="' + u.id + '" data-id="' + (f.page === 'job' ? esc(f.job || '') : f.page === 'about' ? '@about' : '') + '">' + ic('td_link', 14) + 'Mở link</button></div><div class="td-stage' + (f.dev === 'mob' ? ' mob' : ' pc') + '" id="tdStage"><iframe class="td-frame" id="tdFrame" title="Bản xem trước cổng tuyển dụng" sandbox="allow-scripts allow-forms allow-popups"></iframe></div></div>';
     var links = '<div class="card card-pad"><div class="card-head"><div><h3>Link chia sẻ</h3><p>' + live.length + ' vị trí đang hiện trên cổng. Bấm Mở link để mở trang ở tab mới – nộp thử hồ sơ ở đó, hồ sơ vào thẳng Ngân hàng ứng viên. Địa chỉ bên dưới là link chính thức khi cổng kết nối máy chủ.</p></div></div><div class="td-links"><div class="td-link"><b>Trang danh sách vị trí</b><code>' + esc(tdPortalLink(u)) + '</code><div class="link-row"><button class="btn btn-sm btn-primary" data-act="td-olink" data-u="' + u.id + '">' + ic('td_link', 14) + 'Mở link</button></div></div>' +
       '<div class="td-link"><b>Trang Về chúng tôi</b><code>' + esc(tdPortalLink(u) + '/ve-chung-toi') + '</code><div class="link-row"><button class="btn btn-sm btn-primary" data-act="td-olink" data-u="' + u.id + '" data-id="@about">' + ic('td_link', 14) + 'Mở link</button><button class="btn btn-sm" data-act="td-cfg" data-u="' + u.id + '">' + ic('td_edit', 14) + 'Sửa nội dung</button></div></div>' +
       live.map(function (r) { return '<div class="td-link"><b>' + esc(r.pos) + '</b><code>' + esc(tdPortalLink(u, r)) + '</code><div class="link-row"><button class="btn btn-sm btn-primary" data-act="td-olink" data-u="' + u.id + '" data-id="' + r.id + '">' + ic('td_link', 14) + 'Mở link</button><button class="btn btn-sm" data-act="td-req-post" data-u="' + u.id + '" data-id="' + r.id + '">' + ic('td_copy', 14) + 'Tin đăng</button></div></div>'; }).join('') +
       (live.length ? '' : '<p class="muted" style="margin:0">Chưa có vị trí nào hiện trên cổng. Vào <a href="#tdnhucau" data-go="tdnhucau">Nhu cầu tuyển dụng</a> → bật “Hiện trên cổng”.</p>') + '</div></div>';
-    var info = '<div class="card card-pad"><div class="card-head"><div><h3>Thông tin công ty trên cổng</h3><p>Tên, logo, màu, bố cục, giới thiệu, liên hệ, chính sách dữ liệu, thời hạn lưu hồ sơ</p></div></div>' +
+    var info = '<div class="card card-pad"><div class="card-head"><div><h3>Thông tin công ty trên cổng</h3><p>Giao diện cổng: logo, màu, ảnh bìa, bố cục. Sửa thông tin: tên, giới thiệu, liên hệ, chính sách dữ liệu, thời hạn lưu hồ sơ</p></div></div>' +
       '<dl class="td-kv"><dt>Tên hiển thị</dt><dd>' + esc(cf.short) + '</dd><dt>Liên hệ</dt><dd>' + esc(cf.contact) + (cf.phone ? '<br>' + esc(tdPhoneFmt(cf.phone)) : '') + (cf.email ? '<br>' + esc(cf.email) : '') + '</dd><dt>Chính sách dữ liệu</dt><dd>' + (cf.policy ? '<a href="' + esc(cf.policy) + '" target="_blank" rel="noopener">' + esc(cf.policy) + '</a>' : '<span class="miss">Chưa có – cần thêm trước khi nhận hồ sơ</span>') + '</dd><dt>Lưu hồ sơ</dt><dd>' + (cf.keep || 6) + ' tháng sau khi có kết quả</dd></dl>' +
-      '<div class="link-row" style="margin-top:12px"><button class="btn btn-sm btn-primary" data-act="td-cfg" data-u="' + u.id + '">' + ic('td_edit', 14) + 'Sửa thông tin</button></div></div>';
+      '<div class="link-row" style="margin-top:12px"><button class="btn btn-sm btn-primary" data-act="td-look" data-u="' + u.id + '">' + ic('td_edit', 14) + 'Giao diện cổng</button><button class="btn btn-sm" data-act="td-cfg" data-u="' + u.id + '">' + ic('td_edit', 14) + 'Sửa thông tin</button></div></div>';
     var th = tdThu(u), hh = th ? new Date(th.at + TD_THU_TTL) : null;
     var server = SV ? '<div class="card card-pad td-srv"><div class="card-head"><div><h3>Cổng tuyển dụng của công ty</h3><p>Trang tuyển dụng ngay trên tên miền của công ty: <b>' + esc(location.host) + '/tuyen-dung/' + esc(cf.slug) + '</b> – ứng viên mở trên điện thoại, nộp CV, hồ sơ tự về Ngân hàng ứng viên.</p></div></div>' +
       '<div class="td-srv-st' + (th ? ' on' : '') + '"><i></i>' + (th ? 'Đang mở – cập nhật lần cuối ' + (th.at ? p2(new Date(th.at).getHours()) + ':' + p2(new Date(th.at).getMinutes()) + ' ngày ' + p2(new Date(th.at).getDate()) + '/' + p2(new Date(th.at).getMonth() + 1) : '') : 'Chưa mở – bấm Đưa vị trí lên cổng') + '</div>' +
@@ -15062,39 +15085,234 @@ if (typeof module !== 'undefined') module.exports = XW;
     toast('Đã lưu thông tin kết nối', 'info', 'Máy chủ cổng tuyển dụng chưa dựng xong – phần kết nối sẽ làm ở bước sau. Hiện vẫn dùng bản xem trước trên máy này.');
   };
   ACTS['td-cfg'] = function (a) { var u = unitById(a.getAttribute('data-u')); if (u) tdCfgForm(u); };
-  /* ---- 20/11/2026 (anh): Giao diện cổng tuyển dụng – logo, màu thương hiệu, kiểu ảnh bìa, tiêu đề lớn, bố cục danh sách vị trí ---- */
+  /* ---- 20/11/2026 (anh): Giao diện cổng tuyển dụng – bảng riêng "Giao diện cổng", xem trước đổi ngay.
+     19h: thêm mẫu dựng sẵn, ảnh bìa bằng ảnh thật + lớp phủ, phông chữ, màu nhấn, góc bo, các khối (bật/tắt, sắp xếp), hình ảnh công ty, mật độ,
+     chữ trên nút, nút Zalo / gọi điện nổi, thanh thông báo, ảnh khi chia sẻ link, khôi phục mặc định / quay lại lần lưu trước, áp dụng cho công ty khác, kiểm tra độ tương phản ---- */
   var TD_SW = ['#0B5F5A', '#2F6B3A', '#1E5BA8', '#B4730E', '#C2410C', '#B91C1C', '#A21C5C', '#6D28D9', '#334155'];
   var TD_BRHEX = { ngoc: '#0B5F5A', reu: '#3E5F33', duong: '#1E5BA8', vang: '#9C6510', kem: '#A6844F', hongdam: '#A62660', hongnhat: '#C25B8A' };
-  function tdLookForm(u, cf) {
-    var bl = typeof uLogoOf === 'function' ? uLogoOf(u) : '', bc = typeof uColorKey === 'function' ? TD_BRHEX[uColorKey(u)] : '';
-    var opt3 = function (id, cur, L) { return '<div class="seg td-seg" id="' + id + '">' + L.map(function (x) { return '<button type="button" data-v="' + x[0] + '" class="' + (cur === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>'; };
-    return '<h4>Giao diện cổng</h4><div class="td-look"><div class="td-g2">' +
-      '<div class="field" style="grid-column:1/-1"><label>Logo trên đầu trang</label><div class="td-logo"><span class="td-logo-pv" id="cLogoPv"></span><span class="link-row" style="margin:0"><button type="button" class="btn btn-sm" id="cLogoUp">' + ic('up', 14) + 'Tải logo lên</button>' + (bl ? '<button type="button" class="btn btn-sm" id="cLogoBr">Dùng logo công ty</button>' : '') + '<button type="button" class="btn btn-sm" id="cLogoX">Không dùng logo</button></span><small class="faint">PNG, JPG, SVG – nền trong suốt đẹp nhất; không có logo thì hiện chữ viết tắt tên công ty.</small></div></div>' +
-      '<div class="field" style="grid-column:1/-1"><label for="cColor">Màu thương hiệu</label><div class="td-swc"><input class="input" id="cColor" type="color" value="' + esc(cf.color) + '">' + TD_SW.map(function (c) { return '<button type="button" class="td-swb" data-c="' + c + '" style="background:' + c + '" title="' + c + '"></button>'; }).join('') + (bc ? '<button type="button" class="btn btn-sm" data-c="' + bc + '" id="cColBr">Theo màu thương hiệu công ty</button>' : '') + '</div></div>' +
-      '<div class="field"><label>Kiểu ảnh bìa</label>' + opt3('cHero', cf.hero || 'grad', [['grad', 'Màu chuyển sắc'], ['solid', 'Màu phẳng'], ['light', 'Nền sáng']]) + '</div>' +
-      '<div class="field"><label>Danh sách vị trí</label>' + opt3('cLay', cf.lay || 'list', [['list', 'Dạng danh sách'], ['grid', 'Dạng thẻ lưới']]) + '</div>' +
-      '<div class="field" style="grid-column:1/-1"><label for="cHeroT">Tiêu đề lớn trên ảnh bìa</label><input class="input" id="cHeroT" value="' + esc(cf.heroT || '') + '" maxlength="90"><small class="faint">Để trống: "Cùng ' + esc(cf.short || '') + ' làm nên những điều tử tế"</small></div>' +
-      '</div></div>';
+  // Phông có tiếng Việt: 3 phông đặt sẵn ở quantritute.com/assets/fonts (không dùng Google Fonts – build.js chặn), 1 phông có chân của hệ thống
+  var TD_FONT = { bvp: ['Be Vietnam Pro', 'hiện đại, dễ đọc'], lexend: ['Lexend', 'tròn, thân thiện'], noto: ['Noto Sans', 'gọn, cổ điển'], serif: ['Có chân', 'trang trọng (phông hệ thống)', '"Noto Serif","Times New Roman",Georgia,serif'] };
+  var TD_BLK = { why: 'Lý do nên làm việc ở đây', gal: 'Hình ảnh công ty', about: 'Giới thiệu ngắn', steps: 'Quy trình tuyển dụng', perks: 'Chế độ cho người lao động', contact: 'Liên hệ tuyển dụng' };
+  var TD_BLK0 = [['why', 1], ['gal', 1], ['about', 1], ['steps', 0], ['perks', 0], ['contact', 0]];
+  var TD_TPL = [
+    ['chuyen-nghiep', 'Chuyên nghiệp', { color: '#1E5BA8', acc: '', font: 'bvp', rad: 's', hero: 'grad', dens: 'roomy' }],
+    ['tre-trung', 'Trẻ trung', { color: '#6D28D9', acc: '#C2410C', font: 'lexend', rad: 'p', hero: 'grad', dens: 'roomy' }],
+    ['am-ap', 'Ấm áp', { color: '#9C5A0B', acc: '#B91C1C', font: 'bvp', rad: 'p', hero: 'light', dens: 'roomy' }],
+    ['toi-gian', 'Tối giản', { color: '#334155', acc: '', font: 'noto', rad: 's', hero: 'light', dens: 'compact' }],
+    ['tu-nhien', 'Tự nhiên', { color: '#2F6B3A', acc: '#9C5A0B', font: 'serif', rad: 'm', hero: 'solid', dens: 'roomy' }]
+  ];
+  var TD_LK = ['tpl', 'logo', 'color', 'acc', 'font', 'rad', 'hero', 'cover', 'ov', 'lay', 'dens', 'heroT', 'blocks', 'gal', 'btnJob', 'btnApply', 'fab', 'ann', 'annTo', 'og', 'ogImg'];
+  var TD_IMG = ['logo', 'cover', 'gal', 'ogImg']; // không lưu vào bản "lần lưu trước" cho nhẹ
+  var TD_STY = ['tpl', 'color', 'acc', 'font', 'rad', 'hero', 'ov', 'lay', 'dens', 'blocks']; // áp dụng cho công ty khác: chỉ phần kiểu dáng, không chép logo, ảnh, chữ
+  function tdClone(x) { return x == null ? x : JSON.parse(JSON.stringify(x)); }
+  function tdBrHex(u) { try { return typeof uColorKey === 'function' ? TD_BRHEX[uColorKey(u)] || '' : ''; } catch (e) { return ''; } }
+  function tdLook0(u) { return { tpl: '', logo: '', color: tdBrHex(u) || '#0B5F5A', acc: '', font: 'bvp', rad: 'm', hero: 'grad', cover: '', ov: 45, lay: 'list', dens: 'roomy', heroT: '', blocks: tdClone(TD_BLK0), gal: [], btnJob: '', btnApply: '', fab: { z: 0, zalo: '', call: 0 }, ann: '', annTo: '', og: 'auto', ogImg: '' }; }
+  function tdBlkNorm(b) { var out = [], seen = {}; (Array.isArray(b) ? b : []).forEach(function (x) { if (x && TD_BLK[x[0]] && !seen[x[0]]) { seen[x[0]] = 1; out.push([x[0], x[1] ? 1 : 0]); } }); TD_BLK0.forEach(function (x) { if (!seen[x[0]]) out.push([x[0], x[1]]); }); return out; }
+  function tdLookOf(u) {
+    var cf = tdOf(u).cfg, d = tdLook0(u), L = {};
+    TD_LK.forEach(function (k) { L[k] = cf[k] === undefined || cf[k] === null ? d[k] : tdClone(cf[k]); });
+    L.blocks = tdBlkNorm(L.blocks); L.gal = Array.isArray(L.gal) ? L.gal.slice(0, 6) : []; L.fab = Object.assign({ z: 0, zalo: '', call: 0 }, L.fab || {}); L.ov = isFinite(+L.ov) ? +L.ov : 45;
+    return L;
   }
-  function tdLookBind(m, u, cf) {
-    var logo = cf.logo || '';
-    function pv() { $('#cLogoPv', m).innerHTML = logo ? '<img src="' + esc(logo) + '" alt="">' : '<em>' + esc((cf.short || '').split(/\s+/).slice(-2).map(function (w) { return w.charAt(0); }).join('').toUpperCase()) + '</em>'; $('#cLogoPv', m).style.setProperty('--c', $('#cColor', m).value); }
-    pv(); m._logo = function () { return logo; };
-    $('#cLogoUp', m).addEventListener('click', function () {
-      var fi = document.createElement('input'); fi.type = 'file'; fi.accept = 'image/png,image/jpeg,image/webp,image/svg+xml';
-      fi.addEventListener('change', function () { var f = fi.files[0]; if (!f) return; if (f.size > 5 * 1024 * 1024) { toast('Ảnh lớn quá', 'warn', 'Chọn ảnh dưới 5 MB'); return; }
-        var rd = new FileReader(); rd.onload = function () { var url = rd.result; if (/svg/.test(f.type)) { if (url.length > 150000) { toast('File SVG lớn quá', 'warn', 'Chọn file dưới 100 KB'); return; } logo = url; pv(); return; }
-          var im = new Image(); im.onload = function () { var k = Math.min(1, 320 / Math.max(im.width, im.height)), w = Math.max(1, Math.round(im.width * k)), h = Math.max(1, Math.round(im.height * k)), cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(im, 0, 0, w, h); var out = cv.toDataURL('image/png'); if (out.length > 160000) out = cv.toDataURL('image/webp', 0.9); logo = out; pv(); };
-          im.onerror = function () { toast('Không đọc được ảnh này', 'err'); }; im.src = url; }; rd.readAsDataURL(f); });
-      fi.click();
+  function tdLookInto(co, L) { TD_LK.forEach(function (k) { co[k] = L[k]; }); return co; }
+  // Kiểm tra độ tương phản chữ trắng trên màu (chuẩn WCAG: chữ thường cần từ 4,5:1)
+  function tdLum(h) { h = String(h || '').replace('#', ''); if (h.length === 3) h = h.replace(/(.)/g, '$1$1'); if (!/^[0-9a-f]{6}$/i.test(h)) return 0; var c = [0, 2, 4].map(function (i) { var v = parseInt(h.substr(i, 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function tdCr(a, b) { var x = tdLum(a), y = tdLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function tdCrMsg(c, what) { var r = tdCr(c, '#ffffff'), t = r.toFixed(1).replace('.', ','); return r >= 4.5 ? '' : r >= 3 ? what + ' hơi nhạt: chữ trắng trên nền này chỉ đạt ' + t + ':1, chữ nhỏ sẽ khó đọc. Nên chọn màu đậm hơn.' : what + ' quá nhạt: chữ trắng trên nền này chỉ đạt ' + t + ':1, người xem rất khó đọc. Nên chọn màu đậm hơn.'; }
+  function tdShade(h, k) { h = String(h || '#0B5F5A').replace('#', ''); return '#' + [0, 2, 4].map(function (i) { return ('0' + Math.round(parseInt(h.substr(i, 2), 16) * (1 - k)).toString(16)).slice(-2); }).join(''); }
+  // Chọn ảnh → thu nhỏ, nén (ảnh bìa, hình ảnh công ty, ảnh chia sẻ, logo)
+  function tdImgPick(o, cb) {
+    var fi = document.createElement('input'); fi.type = 'file'; fi.accept = o.png ? 'image/png,image/jpeg,image/webp,image/svg+xml' : 'image/png,image/jpeg,image/webp'; if (o.multi > 1) fi.multiple = true;
+    fi.addEventListener('change', function () { [].slice.call(fi.files || [], 0, o.multi || 1).forEach(function (f) { tdImgLoad(f, o, cb); }); });
+    fi.click();
+  }
+  function tdImgLoad(f, o, cb) {
+    if (f.size > 15 * 1024 * 1024) { toast('Ảnh lớn quá', 'warn', 'Chọn ảnh dưới 15 MB'); return; }
+    var rd = new FileReader(); rd.onload = function () {
+      var url = rd.result;
+      if (o.png && /svg/.test(f.type)) { if (url.length > 150000) { toast('File SVG lớn quá', 'warn', 'Chọn file dưới 100 KB'); return; } cb(url); return; }
+      var im = new Image(); im.onload = function () {
+        var W = im.width, H = im.height, sx = 0, sy = 0, sw = W, sh = H, w, h;
+        if (o.crop) { var r = o.w / o.h; if (W / H > r) { sw = Math.round(H * r); sx = Math.round((W - sw) / 2); } else { sh = Math.round(W / r); sy = Math.round((H - sh) / 2); } w = Math.min(o.w, sw); h = Math.max(1, Math.round(w / r)); }
+        else { var k = Math.min(1, o.w / W, o.h / H); w = Math.max(1, Math.round(W * k)); h = Math.max(1, Math.round(H * k)); }
+        var cv = document.createElement('canvas'); cv.width = w; cv.height = h; var g = cv.getContext('2d'); if (!o.png) { g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); } g.drawImage(im, sx, sy, sw, sh, 0, 0, w, h);
+        var out, q = o.q || 0.8;
+        if (o.png) { out = cv.toDataURL('image/png'); if (out.length > o.max) out = cv.toDataURL('image/webp', 0.9); if (out.length > o.max) out = cv.toDataURL('image/jpeg', 0.85); }
+        else { do { out = cv.toDataURL('image/jpeg', q); q -= 0.08; } while (out.length > o.max && q > 0.35); }
+        cb(out);
+      };
+      im.onerror = function () { toast('Không đọc được ảnh này', 'err'); }; im.src = url;
+    }; rd.readAsDataURL(f);
+  }
+  // Ảnh khi chia sẻ link (1200×630): ảnh riêng, hoặc tự tạo từ ảnh bìa / màu + logo + tên + tiêu đề
+  function tdRR(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  function tdWrap(g, t, mw) { var ws = String(t).split(/\s+/), L = [], c = ''; ws.forEach(function (w) { var n = c ? c + ' ' + w : w; if (g.measureText(n).width > mw && c) { L.push(c); c = w; } else c = n; }); if (c) L.push(c); return L; }
+  function tdOgMake(u, L) {
+    if (L.og === 'own' && L.ogImg) return Promise.resolve(L.ogImg);
+    var cf = tdOf(u).cfg, nJob = tdPortalData(u, 'live').jobs.length, nm = cf.short || cf.name || '';
+    function img(src) { return new Promise(function (ok) { if (!src) return ok(null); var i = new Image(); i.onload = function () { ok(i); }; i.onerror = function () { ok(null); }; i.src = src; }); }
+    function draw(bg, lg) {
+      var W = 1200, H = 630, cv = document.createElement('canvas'); cv.width = W; cv.height = H; var g = cv.getContext('2d'), FT = TD_FONT[L.font] || TD_FONT.bvp, FF = FT[2] || '"' + FT[0] + '","Be Vietnam Pro","Segoe UI",Arial,sans-serif';
+      if (bg) { var k = Math.max(W / bg.width, H / bg.height), w = bg.width * k, h = bg.height * k; g.drawImage(bg, (W - w) / 2, (H - h) / 2, w, h); g.fillStyle = 'rgba(0,0,0,' + Math.max(0.4, (+L.ov || 0) / 100) + ')'; g.fillRect(0, 0, W, H); }
+      else { var gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, L.color); gr.addColorStop(1, tdShade(L.color, 0.35)); g.fillStyle = gr; g.fillRect(0, 0, W, H); }
+      var x = 80, y = 70;
+      if (lg) { var lh = 76, lw = Math.min(280, lg.width * lh / lg.height); g.fillStyle = '#fff'; tdRR(g, x - 12, y - 12, lw + 24, lh + 24, 16); g.fill(); g.drawImage(lg, x, y, lw, lh); }
+      else { g.fillStyle = '#fff'; tdRR(g, x, y, 84, 84, 18); g.fill(); g.fillStyle = L.color; g.font = '800 34px ' + FF; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(nm.split(/\s+/).slice(-2).map(function (w) { return w.charAt(0); }).join('').toUpperCase(), x + 42, y + 44); g.textAlign = 'left'; }
+      g.textBaseline = 'alphabetic'; g.fillStyle = 'rgba(255,255,255,.88)'; g.font = '700 30px ' + FF; g.fillText(nm + ' · Tuyển dụng', x, 236);
+      g.fillStyle = '#fff'; g.font = '800 60px ' + FF; var ls = tdWrap(g, L.heroT || ('Cùng ' + nm + ' làm nên những điều tử tế'), 1040).slice(0, 3); ls.forEach(function (l, i) { g.fillText(l, x, 318 + i * 72); });
+      var pill = (nJob ? nJob + ' vị trí đang tuyển' : 'Cơ hội nghề nghiệp') + ' · Ứng tuyển ngay →'; g.font = '700 28px ' + FF; var pw = g.measureText(pill).width + 48; g.fillStyle = L.acc || '#fff'; tdRR(g, x, 528, pw, 58, 29); g.fill(); g.fillStyle = L.acc ? '#fff' : L.color; g.fillText(pill, x + 24, 567);
+      return cv.toDataURL('image/jpeg', 0.85);
+    }
+    return Promise.all([img(L.hero === 'photo' ? L.cover : ''), img(L.logo)]).then(function (r) { try { return draw(r[0], r[1]); } catch (e) { try { return draw(r[0], null); } catch (e2) { return ''; } } });
+  }
+  function tdAutoPush(u, msg) {
+    if (!tdThu(u)) { toast(msg, 'ok'); return; }
+    toast(msg, 'ok', 'Đang cập nhật lên cổng tuyển dụng…');
+    tdThuPush(u).then(function () { toast('Đã cập nhật lên cổng tuyển dụng', 'ok', 'Ứng viên mở link sẽ thấy giao diện mới.'); render(); }).catch(function (e) { toast('Đã lưu trên phần mềm, chưa đưa được lên cổng', 'warn', String(e && e.message || e) + ' – bấm Cập nhật vị trí lên cổng để thử lại.'); });
+  }
+  ACTS['td-look'] = function (a) { var u = unitById(a.getAttribute('data-u')); if (u) tdLookDlg(u); };
+  function tdLookDlg(u) {
+    var cf = tdOf(u).cfg, L = tdLookOf(u), pg = 'list', dv = 'pc', tm = 0, tmo = 0, nJob = tdPortalData(u, 'preview').jobs.length, others = tdUnitsAll().filter(function (x) { return x.id !== u.id; }), opn = { tpl: 1, br: 1 };
+    var ini = String(cf.short || cf.name || '').split(/\s+/).filter(Boolean).slice(-2).map(function (w) { return w.charAt(0); }).join('').toUpperCase();
+    var m = modal('Giao diện cổng tuyển dụng', shortUnit(u.name) + ' · chọn đến đâu, khung xem trước đổi đến đó',
+      '<div class="tdl-g"><div class="tdl-f"></div>' +
+      '<div class="tdl-p"><div class="tdl-bar"><div class="seg tdl-pg"><button type="button" class="on" data-pg="list">Danh sách vị trí</button><button type="button" data-pg="about">Về chúng tôi</button></div><div class="seg tdl-dv"><button type="button" class="on" data-dv="pc">' + ic('td_pc', 14) + ' Máy tính</button><button type="button" data-dv="mob">' + ic('td_phone', 14) + ' Điện thoại</button></div></div>' +
+      '<div class="tdl-box"><iframe class="tdl-fr" sandbox="allow-scripts" title="Xem trước cổng tuyển dụng"></iframe></div></div></div>' +
+      '<div class="tdl-foot"><div class="link-row tdl-fl"><button type="button" class="btn btn-sm" data-a2="reset">Khôi phục mặc định</button>' + (cf.lookPrev ? '<button type="button" class="btn btn-sm" data-a2="undo">Quay lại lần lưu trước</button>' : '') + '</div>' +
+      (others.length ? '<div class="tdl-apl"><span>Áp dụng màu, phông, góc bo, ảnh bìa, bố cục cho cả:</span>' + others.map(function (o) { return '<label class="td-chk"><input type="checkbox" data-apl="' + o.id + '"> ' + esc(shortUnit(o.name)) + '</label>'; }).join('') + '</div>' : '') +
+      '<div class="link-row tdl-fr2">' + (tdThu(u) ? '<span class="muted" style="font-size:12.5px;margin-right:auto">Cổng đang mở – bấm Lưu là tự cập nhật lên cổng</span>' : '') + '<button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="tdlSave">Lưu giao diện</button></div></div>');
+    m.querySelector('.modal').classList.add('xl');
+    var F = $('.tdl-f', m), fr = $('.tdl-fr', m), box = $('.tdl-box', m);
+    function sec(id, t, body) { return '<details class="tdl-s"' + (opn[id] ? ' open' : '') + ' data-s="' + id + '"><summary>' + t + '</summary><div class="tdl-sb">' + body + '</div></details>'; }
+    function seg(k, cur, A) { return '<div class="seg td-seg" data-k="' + k + '">' + A.map(function (x) { return '<button type="button" data-v="' + x[0] + '" class="' + (String(cur) === x[0] ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>'; }
+    function fld(lab, inner, note) { return '<div class="field"><label>' + lab + '</label>' + inner + (note ? '<small class="faint">' + note + '</small>' : '') + '</div>'; }
+    function warn(t) { return t ? '<div class="tdl-warn">' + ic('info', 14) + '<span>' + esc(t) + '</span></div>' : ''; }
+    function fh() {
+      var bl = typeof uLogoOf === 'function' ? uLogoOf(u) : '', bc = tdBrHex(u);
+      return sec('tpl', 'Mẫu giao diện', '<div class="tdl-tps">' + TD_TPL.map(function (t) { return '<button type="button" class="tdl-tp' + (L.tpl === t[0] ? ' on' : '') + '" data-tpl="' + t[0] + '"><span class="tdl-dots"><i style="background:' + t[2].color + '"></i><i style="background:' + (t[2].acc || t[2].color) + '"></i></span><b>' + t[1] + '</b><small>' + TD_FONT[t[2].font][0] + '</small></button>'; }).join('') + '</div><small class="faint">Bấm một mẫu để đổi cùng lúc màu, phông chữ, góc bo, ảnh bìa, mật độ. Sau đó vẫn chỉnh tiếp từng mục bên dưới được.</small>') +
+        sec('br', 'Thương hiệu',
+          fld('Logo trên đầu trang', '<div class="td-logo"><span class="td-logo-pv" style="--c:' + esc(L.color) + '">' + (L.logo ? '<img src="' + esc(L.logo) + '" alt="">' : '<em>' + esc(ini) + '</em>') + '</span><span class="link-row" style="margin:0"><button type="button" class="btn btn-sm" data-a="logo">' + ic('up', 14) + 'Tải logo lên</button>' + (bl && bl !== L.logo ? '<button type="button" class="btn btn-sm" data-a="logoBr">Dùng logo công ty</button>' : '') + (L.logo ? '<button type="button" class="btn btn-sm" data-a="logoX">Không dùng logo</button>' : '') + '</span></div>', 'PNG, JPG, SVG – nền trong suốt đẹp nhất; không có logo thì hiện chữ viết tắt tên công ty') +
+          fld('Màu chính', '<div class="td-swc"><input class="input" type="color" data-k="color" value="' + esc(L.color) + '">' + TD_SW.map(function (c) { return '<button type="button" class="td-swb' + (c.toLowerCase() === String(L.color).toLowerCase() ? ' on' : '') + '" data-sw="' + c + '" style="background:' + c + '" title="' + c + '"></button>'; }).join('') + (bc ? '<button type="button" class="btn btn-sm" data-sw="' + bc + '">Theo màu thương hiệu công ty</button>' : '') + '</div>' + warn(tdCrMsg(L.color, 'Màu chính')), 'Dùng cho ảnh bìa, tiêu đề, đường viền, biểu tượng') +
+          fld('Màu nhấn', '<div class="td-swc"><label class="td-chk" style="margin:0"><input type="checkbox" data-k="accOn"' + (L.acc ? ' checked' : '') + '> Dùng màu riêng cho nút gửi hồ sơ, thanh thông báo</label>' + (L.acc ? '<input class="input" type="color" data-k="acc" value="' + esc(L.acc) + '">' : '') + '</div>' + (L.acc ? warn(tdCrMsg(L.acc, 'Màu nhấn')) : ''), L.acc ? '' : 'Đang dùng chung màu chính') +
+          fld('Phông chữ', '<select class="input" data-k="font">' + Object.keys(TD_FONT).map(function (k) { return '<option value="' + k + '"' + (L.font === k ? ' selected' : '') + '>' + TD_FONT[k][0] + ' – ' + TD_FONT[k][1] + '</option>'; }).join('') + '</select>') +
+          fld('Góc bo', seg('rad', L.rad, [['s', 'Vuông vức'], ['m', 'Bo vừa'], ['p', 'Bo tròn']]))) +
+        sec('hero', 'Ảnh bìa',
+          fld('Kiểu ảnh bìa', seg('hero', L.hero, [['grad', 'Chuyển sắc'], ['solid', 'Màu phẳng'], ['light', 'Nền sáng'], ['photo', 'Ảnh thật']])) +
+          (L.hero === 'photo' ? fld('Ảnh bìa', '<div class="tdl-cov">' + (L.cover ? '<img src="' + esc(L.cover) + '" alt="">' : '<em>Chưa có ảnh – đang tạm dùng màu chuyển sắc</em>') + '<span class="link-row" style="margin:0"><button type="button" class="btn btn-sm" data-a="cover">' + ic('up', 14) + (L.cover ? 'Đổi ảnh' : 'Tải ảnh lên') + '</button>' + (L.cover ? '<button type="button" class="btn btn-sm" data-a="coverX">Bỏ ảnh</button>' : '') + '</span></div>', 'Ảnh ngang (văn phòng, đội ngũ). Phần mềm tự thu nhỏ, nén') +
+            fld('Độ tối lớp phủ: <b data-ovt>' + L.ov + '%</b>', '<input type="range" class="tdl-rg" min="0" max="80" step="5" data-k="ov" value="' + L.ov + '">', 'Tăng lên nếu chữ trắng khó đọc trên ảnh') : '') +
+          fld('Tiêu đề lớn trên ảnh bìa', '<input class="input" data-k="heroT" maxlength="90" value="' + esc(L.heroT) + '">', 'Để trống: "Cùng ' + esc(cf.short || '') + ' làm nên những điều tử tế"')) +
+        sec('lay', 'Bố cục',
+          fld('Danh sách vị trí', seg('lay', L.lay, [['list', 'Dạng danh sách'], ['grid', 'Dạng thẻ lưới']]), nJob ? '' : 'Chưa có vị trí nào hiện trên cổng nên chưa thấy khác biệt.') +
+          fld('Mật độ', seg('dens', L.dens, [['roomy', 'Rộng rãi'], ['compact', 'Gọn']])) +
+          fld('Các khối dưới danh sách vị trí', '<div class="tdl-blks">' + L.blocks.map(function (b, i) { return '<div class="tdl-blk"><label><input type="checkbox" data-blk="' + b[0] + '"' + (b[1] ? ' checked' : '') + '> ' + TD_BLK[b[0]] + '</label><button type="button" class="btn btn-sm" data-up="' + i + '"' + (i ? '' : ' disabled') + ' title="Đưa lên" aria-label="Đưa lên">↑</button><button type="button" class="btn btn-sm" data-dn="' + i + '"' + (i < L.blocks.length - 1 ? '' : ' disabled') + ' title="Đưa xuống" aria-label="Đưa xuống">↓</button></div>'; }).join('') + '</div>', 'Nội dung các khối lấy từ nút Sửa thông tin (lý do, giới thiệu, quy trình, chế độ, liên hệ)') +
+          fld('Hình ảnh công ty (tối đa 6 ảnh)', '<div class="tdl-gal">' + L.gal.map(function (s, i) { return '<span><img src="' + esc(s) + '" alt=""><button type="button" data-gx="' + i + '" title="Bỏ ảnh" aria-label="Bỏ ảnh">×</button></span>'; }).join('') + (L.gal.length < 6 ? '<button type="button" class="tdl-gadd" data-a="gal">+ Thêm ảnh</button>' : '') + '</div>', 'Văn phòng, hoạt động, đào tạo… Hiện ở khối "Hình ảnh công ty"')) +
+        sec('cta', 'Nút bấm và liên hệ nhanh',
+          fld('Chữ trên nút ở mỗi vị trí', '<input class="input" data-k="btnJob" maxlength="30" placeholder="Xem chi tiết" value="' + esc(L.btnJob) + '">') +
+          fld('Chữ trên nút gửi hồ sơ', '<input class="input" data-k="btnApply" maxlength="30" placeholder="Gửi hồ sơ ứng tuyển" value="' + esc(L.btnApply) + '">') +
+          fld('Nút nổi ở góc màn hình', '<label class="td-chk"><input type="checkbox" data-k="fabZ"' + (L.fab.z ? ' checked' : '') + '> Nút nhắn Zalo</label>' + (L.fab.z ? '<input class="input" data-k="fabZalo" inputmode="tel" placeholder="Số Zalo, ví dụ 0912345678" value="' + esc(L.fab.zalo) + '">' : '') +
+            '<label class="td-chk"><input type="checkbox" data-k="fabC"' + (L.fab.call && cf.phone ? ' checked' : '') + (cf.phone ? '' : ' disabled') + '> Nút gọi điện' + (cf.phone ? ' (' + esc(tdPhoneFmt(cf.phone)) + ')' : ' – cần nhập Số điện thoại ở Sửa thông tin') + '</label>') +
+          fld('Thanh thông báo đầu trang', '<input class="input" data-k="ann" maxlength="140" placeholder="Ví dụ: Đang tuyển gấp 5 vị trí, nhận hồ sơ đến 15/12" value="' + esc(L.ann) + '"><div class="tdl-row"><span>Tự ẩn sau ngày</span><input class="input" type="date" data-k="annTo" value="' + esc(L.annTo) + '"></div>', 'Để trống ô chữ thì không hiện; không chọn ngày thì hiện đến khi xóa chữ')) +
+        sec('og', 'Ảnh khi chia sẻ link (Facebook, Zalo)', (tdSrvOwn() ? '' : '<div class="tdl-note">Ảnh này dùng khi cổng chạy trên máy chủ của công ty (bản đầy đủ). Ở bản này chỉ xem trước được.</div>') +
+          seg('og', L.og, [['auto', 'Tự tạo từ ảnh bìa, logo'], ['own', 'Dùng ảnh riêng']]) +
+          (L.og === 'own' ? '<div class="link-row" style="margin:8px 0 0"><button type="button" class="btn btn-sm" data-a="og">' + ic('up', 14) + (L.ogImg ? 'Đổi ảnh' : 'Tải ảnh lên') + '</button><small class="faint">Khổ ngang 1200×630, phần mềm tự cắt phần giữa</small></div>' : '') +
+          '<div class="tdl-og"><img alt="Ảnh khi chia sẻ link" data-ogpv></div><small class="faint">Đổi ảnh xong, dán link vào Facebook Sharing Debugger, bấm "Thu thập lại" để Facebook cập nhật.</small>');
+    }
+    function paint() { var st = F.scrollTop; F.innerHTML = fh(); F.scrollTop = st; chg(); }
+    function fit() { var W = dv === 'pc' ? 1280 : 390, bw = box.clientWidth || 800, k = dv === 'pc' ? Math.min(1, bw / W) : 1, bh = box.clientHeight || 520; fr.style.width = W + 'px'; fr.style.height = Math.round(bh / k) + 'px'; fr.style.transform = k < 1 ? 'scale(' + k + ')' : ''; box.classList.toggle('mob', dv === 'mob'); }
+    function draw() { fit(); var D = tdPortalData(u, 'preview'); tdLookInto(D.co, L); fr.srcdoc = tdPortalHtml(D, pg === 'about' ? { about: 1 } : {}); clearTimeout(tmo); tmo = setTimeout(ogPv, 300); }
+    function ogPv() { var im = $('[data-ogpv]', F); if (!im) return; tdOgMake(u, L).then(function (s) { if (s) im.src = s; }); }
+    function chg() { clearTimeout(tm); tm = setTimeout(draw, 180); }
+    function mark() { L.tpl = ''; $$('.tdl-tp', F).forEach(function (x) { x.classList.remove('on'); }); }
+    F.addEventListener('toggle', function (e) { var d = e.target; if (d.getAttribute && d.getAttribute('data-s')) opn[d.getAttribute('data-s')] = d.open ? 1 : 0; }, true);
+    F.addEventListener('click', function (e) {
+      var t = e.target.closest('button'); if (!t || !F.contains(t)) return;
+      var sg = t.closest('.td-seg'), a = t.getAttribute('data-a');
+      if (t.hasAttribute('data-tpl')) { var tp = TD_TPL.filter(function (x) { return x[0] === t.getAttribute('data-tpl'); })[0]; Object.assign(L, tp[2]); L.tpl = tp[0]; paint(); return; }
+      if (sg && t.hasAttribute('data-v')) { var k = sg.getAttribute('data-k'); L[k] = t.getAttribute('data-v'); if (k === 'rad' || k === 'hero' || k === 'dens') mark(); if (k === 'hero' || k === 'og') { paint(); return; } $$('button', sg).forEach(function (x) { x.classList.toggle('on', x === t); }); chg(); return; }
+      if (t.hasAttribute('data-sw')) { L.color = t.getAttribute('data-sw'); L.tpl = ''; paint(); return; }
+      if (t.hasAttribute('data-up') || t.hasAttribute('data-dn')) { var i = +(t.getAttribute('data-up') || t.getAttribute('data-dn')), j = t.hasAttribute('data-up') ? i - 1 : i + 1, x = L.blocks[i]; L.blocks[i] = L.blocks[j]; L.blocks[j] = x; paint(); return; }
+      if (t.hasAttribute('data-gx')) { L.gal.splice(+t.getAttribute('data-gx'), 1); paint(); return; }
+      if (a === 'logo') tdImgPick({ w: 480, h: 160, png: 1, max: 160000 }, function (s) { L.logo = s; paint(); });
+      else if (a === 'logoBr') { L.logo = uLogoOf(u); paint(); }
+      else if (a === 'logoX') { L.logo = ''; paint(); }
+      else if (a === 'cover') tdImgPick({ w: 1600, h: 1000, q: 0.78, max: 260000 }, function (s) { L.cover = s; paint(); });
+      else if (a === 'coverX') { L.cover = ''; paint(); }
+      else if (a === 'gal') tdImgPick({ multi: 6 - L.gal.length, w: 1000, h: 1000, q: 0.75, max: 120000 }, function (s) { if (L.gal.length < 6) L.gal.push(s); paint(); });
+      else if (a === 'og') tdImgPick({ w: 1200, h: 630, crop: 1, q: 0.82, max: 220000 }, function (s) { L.ogImg = s; paint(); });
     });
-    var br = $('#cLogoBr', m); if (br) br.addEventListener('click', function () { logo = uLogoOf(u); pv(); });
-    $('#cLogoX', m).addEventListener('click', function () { logo = ''; pv(); });
-    $$('[data-c]', m).forEach(function (b) { b.addEventListener('click', function () { $('#cColor', m).value = b.getAttribute('data-c'); pv(); }); });
-    $('#cColor', m).addEventListener('input', pv);
-    $$('.td-seg button', m).forEach(function (b) { b.addEventListener('click', function () { $$('button', b.parentNode).forEach(function (x) { x.classList.toggle('on', x === b); }); }); });
+    F.addEventListener('input', function (e) {
+      var t = e.target, k = t.getAttribute('data-k'); if (!k) return;
+      if (k === 'color' || k === 'acc') { L[k] = t.value; if (k === 'color') L.tpl = ''; chg(); }
+      else if (k === 'ov') { L.ov = +t.value; var ov = $('[data-ovt]', F); if (ov) ov.textContent = L.ov + '%'; chg(); }
+      else if (k === 'fabZalo') { L.fab.zalo = t.value; chg(); }
+      else if (/^(heroT|btnJob|btnApply|ann|annTo)$/.test(k)) { L[k] = t.value; chg(); }
+    });
+    F.addEventListener('change', function (e) {
+      var t = e.target, k = t.getAttribute('data-k');
+      if (t.hasAttribute('data-blk')) { L.blocks.forEach(function (b) { if (b[0] === t.getAttribute('data-blk')) b[1] = t.checked ? 1 : 0; }); chg(); return; }
+      if (k === 'font') { L.font = t.value; mark(); chg(); }
+      else if (k === 'color' || k === 'acc') paint(); // đóng bảng chọn màu → vẽ lại để cập nhật cảnh báo độ tương phản
+      else if (k === 'accOn') { L.acc = t.checked ? (L.acc || '#C2410C') : ''; mark(); paint(); }
+      else if (k === 'fabZ') { L.fab.z = t.checked ? 1 : 0; if (t.checked && !L.fab.zalo) L.fab.zalo = cf.phone ? tdPhone(cf.phone) : ''; paint(); }
+      else if (k === 'fabC') { L.fab.call = t.checked ? 1 : 0; chg(); }
+    });
+    $$('.tdl-pg button', m).forEach(function (b) { b.addEventListener('click', function () { pg = b.getAttribute('data-pg'); $$('.tdl-pg button', m).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }); });
+    $$('.tdl-dv button', m).forEach(function (b) { b.addEventListener('click', function () { dv = b.getAttribute('data-dv'); $$('.tdl-dv button', m).forEach(function (x) { x.classList.toggle('on', x === b); }); draw(); }); });
+    $$('[data-a2]', m).forEach(function (b) { b.addEventListener('click', function () {
+      if (b.getAttribute('data-a2') === 'reset') { L = Object.assign(tdLook0(u), { logo: L.logo, cover: L.cover, gal: L.gal, ogImg: L.ogImg }); toast('Đã đưa về giao diện mặc định', 'info', 'Logo và ảnh đã tải lên vẫn giữ. Bấm Lưu giao diện để dùng.'); }
+      else { L = Object.assign(L, tdClone(cf.lookPrev)); L.blocks = tdBlkNorm(L.blocks); toast('Đã nạp lại giao diện của lần lưu trước', 'info', 'Bấm Lưu giao diện để dùng.'); }
+      paint();
+    }); });
+    window.addEventListener('resize', fit); var cl = m.close; m.close = function () { window.removeEventListener('resize', fit); return cl.apply(m, arguments); };
+    paint(); draw();
+    $('#tdlSave', m).addEventListener('click', function () {
+      if (L.fab.z && String(L.fab.zalo || '').replace(/\D/g, '').length < 9) { toast('Số Zalo chưa đúng', 'err', 'Nhập số điện thoại đăng ký Zalo, ví dụ 0912345678'); return; }
+      var cur = tdLookOf(u), prev = {}; TD_LK.forEach(function (k) { if (TD_IMG.indexOf(k) < 0) prev[k] = cur[k]; }); cf.lookPrev = prev;
+      TD_LK.forEach(function (k) { cf[k] = tdClone(L[k]); });
+      tdSave(u, 'Sửa giao diện cổng tuyển dụng');
+      var ap = $$('[data-apl]', m).filter(function (x) { return x.checked; }).map(function (x) { return unitById(x.getAttribute('data-apl')); }).filter(Boolean);
+      ap.forEach(function (o) { var c2 = tdOf(o).cfg; TD_STY.forEach(function (k) { c2[k] = tdClone(L[k]); }); if (c2.hero === 'photo' && !c2.cover) c2.hero = 'grad'; tdSave(o, 'Áp dụng giao diện cổng tuyển dụng từ ' + shortUnit(u.name)); });
+      m.close(); render(); tdAutoPush(u, 'Đã lưu giao diện cổng' + (ap.length ? ' (và ' + ap.length + ' công ty khác)' : ''));
+      ap.forEach(function (o) { if (tdThu(o)) tdThuPush(o).catch(function () { }); });
+    });
   }
-  function tdLookGet(m) { var sv = function (id) { var b = $('#' + id + ' button.on', m); return b ? b.getAttribute('data-v') : ''; }; return { logo: m._logo ? m._logo() : '', color: $('#cColor', m).value || '#0B5F5A', hero: sv('cHero') || 'grad', lay: sv('cLay') || 'list', heroT: ($('#cHeroT', m).value || '').trim() }; }
+  // Phần chạy bên trong trang cổng (chép nguyên hàm vào trang qua String()) – dùng D, esc, I của trang cổng
+  /* eslint-disable no-undef */
+  function tdpBlks() {
+    var C = D.co, A = D.ab || { perks: [] }, R = {
+      why: function () { return C.why && C.why.length ? '<div class="why">' + C.why.map(function (w) { return '<div><b>' + I.star + '</b>' + esc(w) + '</div>'; }).join('') + '</div>' : ''; },
+      gal: function () { return C.gal && C.gal.length ? '<div class="gal"><h2>Hình ảnh ' + esc(C.short) + '</h2><div class="gal-g">' + C.gal.map(function (s, i) { return '<button type="button" data-gal="' + i + '"><img src="' + esc(s) + '" alt="Hình ảnh ' + esc(C.short) + ' ' + (i + 1) + '" loading="lazy"></button>'; }).join('') + '</div></div>' : ''; },
+      about: function () { return '<div class="about"><h2>Về ' + esc(C.short) + '</h2><p style="margin:0">' + esc(C.intro || (D.ab && D.ab.story) || C.tag || '') + '</p><button class="go" data-about>Tìm hiểu về chúng tôi →</button></div>'; },
+      steps: function () { return C.steps && C.steps.length ? '<div class="about blk"><h2>Quy trình tuyển dụng</h2><div class="steps">' + C.steps.map(function (s) { return '<div>' + esc(s) + '</div>'; }).join('') + '</div></div>' : ''; },
+      perks: function () { return A.perks && A.perks.length ? '<div class="about blk"><h2>Chế độ cho người lao động</h2><ul>' + A.perks.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' : ''; },
+      contact: function () { var ct = [C.contact, C.addr, C.phone ? '☎ ' + C.phone : '', C.email].filter(Boolean).map(esc).join(' · '); return ct ? '<div class="about"><h2>Liên hệ tuyển dụng</h2><p style="margin:0">' + ct + '</p></div>' : ''; }
+    };
+    return (C.blocks || [['why', 1], ['about', 1]]).map(function (b) { return b[1] && R[b[0]] ? R[b[0]]() : ''; }).join('');
+  }
+  function tdpAnn() { var C = D.co; if (!C.ann) return ''; var d = new Date(), t = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); return C.annTo && t > C.annTo ? '' : '<div class="ann">' + esc(C.ann) + '</div>'; }
+  function tdpFab() {
+    var C = D.co, f = C.fab || {}, z = f.z ? String(f.zalo || '').replace(/\D/g, '') : '', p = f.call ? String(C.phone || '').replace(/[^\d+]/g, '') : '';
+    return z || p ? '<div class="fab">' + (z ? '<a class="fz" href="https://zalo.me/' + z + '" target="_blank" rel="noopener" aria-label="Nhắn Zalo">Zalo</a>' : '') + (p ? '<a class="fc" href="tel:' + p + '" aria-label="Gọi điện"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></a>' : '') + '</div>' : '';
+  }
+  function tdpInit() {
+    if (D.co.hero === 'photo' && D.co.cover) { var st = document.createElement('style'); st.textContent = 'body.h-photo .hero{background-image:url("' + D.co.cover + '")}'; document.head.appendChild(st); }
+    document.addEventListener('click', function (e) { var g = e.target.closest('[data-gal]'); if (!g) return; var d = document.createElement('div'); d.className = 'lbx'; d.innerHTML = '<img src="' + esc(D.co.gal[+g.getAttribute('data-gal')]) + '" alt="">'; d.addEventListener('click', function () { d.remove(); }); document.body.appendChild(d); });
+  }
+  /* eslint-enable no-undef */
+  function tdCss3(C) {
+    var F = TD_FONT[C.font] || TD_FONT.bvp, r = { s: [6, 6], m: [14, 10], p: [22, 14] }[C.rad] || [14, 10], ov = Math.max(0, Math.min(0.8, (+C.ov || 0) / 100));
+    return 'body{font-family:' + (F[2] || '"' + F[0] + '","Be Vietnam Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif') + '}:root{--a:' + (C.acc || 'var(--c)') + ';--ov:' + ov + '}' +
+      '.job,.why div,.about,.card,.empty,.ab .stats div,.vals div,.cta,.gal-g button{border-radius:' + r[0] + 'px}.go,.sub,.find input,.find select,.share button,.f input,.f select,.f textarea,.drop{border-radius:' + r[1] + 'px}' +
+      '.sub{background:var(--a)}.job:hover .go{background:var(--a)}' +
+      'body.h-photo .hero{background-color:#1d2329;background-size:cover;background-position:center}body.h-photo .hero:after{display:block;left:0;top:0;right:0;bottom:0;width:auto;height:auto;border-radius:0;background:rgba(0,0,0,var(--ov))}.hero .wrap{z-index:1}' +
+      'body.d-compact .hero .wrap{padding:30px 20px 26px}body.d-compact main{padding:20px 0 32px}body.d-compact .job{padding:12px 16px}body.d-compact .jobs{gap:8px}body.d-compact .why,body.d-compact .about,body.d-compact .gal{margin-top:20px}body.d-compact .why div{padding:12px 14px}body.d-compact .about{padding:16px 18px}body.d-compact .card{padding:16px}' +
+      '.gal{margin-top:36px}.gal h2{margin:0 0 12px;font-size:18px}.gal-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}.gal-g button{padding:0;border:none;overflow:hidden;cursor:zoom-in;aspect-ratio:4/3;background:#eee;display:block;width:100%}.gal-g img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}.gal-g button:hover img{transform:scale(1.04)}' +
+      '.lbx{position:fixed;inset:0;background:rgba(0,0,0,.86);display:flex;align-items:center;justify-content:center;z-index:60;cursor:zoom-out;padding:20px}.lbx img{max-width:100%;max-height:100%;border-radius:8px}' +
+      '.ann{background:var(--a);color:#fff;text-align:center;font-size:14px;font-weight:600;padding:9px 16px;line-height:1.45}' +
+      '.fab{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:10px;z-index:8}.fab a{width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-weight:800;font-size:13px;box-shadow:0 8px 20px -6px rgba(0,0,0,.45)}.fab .fz{background:#0068FF}.fab .fc{background:#1F9D55}.fab svg{width:24px;height:24px}' +
+      '@media (max-width:820px){.fab{bottom:84px;right:14px}.fab a{width:48px;height:48px}.gal-g{grid-template-columns:repeat(2,1fr)}}';
+  }
+  function tdLookFix(D, u) { tdLookInto(D.co, tdLookOf(u)); return D; }
   function tdCfgForm(u) {
     var cf = tdOf(u).cfg;
     var m = modal('Thông tin công ty trên cổng tuyển dụng', shortUnit(u.name), '<div class="td-form"><div class="td-g2">' + field('cName', 'Tên đầy đủ', cf.name) + field('cShort', 'Tên ngắn hiển thị', cf.short) +
@@ -15104,7 +15322,7 @@ if (typeof module !== 'undefined') module.exports = XW;
       '<div class="field" style="grid-column:1/-1"><label for="cSteps">Quy trình tuyển dụng (mỗi dòng 1 bước)</label><textarea class="input" id="cSteps" style="min-height:76px">' + esc(cf.steps || '') + '</textarea></div>' +
       field('cAddr', 'Địa chỉ', cf.addr) + field('cContact', 'Người / bộ phận liên hệ', cf.contact) + field('cPhone', 'Số điện thoại', cf.phone) + field('cEmail', 'Email nhận yêu cầu', cf.email) +
       field('cSlug', 'Đường dẫn cổng', cf.slug) + '</div>' +
-      tdLookForm(u, cf) +
+      '<p class="muted" style="margin:14px 0 0;font-size:12.5px">Logo, màu thương hiệu, kiểu ảnh bìa, bố cục: bấm nút <b>Giao diện cổng</b> ở đầu trang Cổng tuyển dụng.</p>' +
       '<h4>Trang Về chúng tôi <button type="button" class="btn btn-sm" id="cAb0" style="margin-left:8px">Điền lại văn bản mẫu</button></h4><p class="muted" style="margin:-4px 0 8px;font-size:12.5px">Trang con riêng trên cổng tuyển dụng. Văn bản mẫu viết chung – sửa cho đúng thực tế công ty, không ghi số liệu, thành tích chưa có căn cứ.</p><div class="td-g2">' +
       '<div class="field" style="grid-column:1/-1"><label for="abStory">Câu chuyện của chúng tôi</label><textarea class="input" id="abStory" style="min-height:76px">' + esc(cf.ab.story) + '</textarea></div>' +
       '<div class="field" style="grid-column:1/-1"><label for="abMission">Sứ mệnh</label><textarea class="input" id="abMission" style="min-height:60px">' + esc(cf.ab.mission) + '</textarea></div>' +
@@ -15115,15 +15333,15 @@ if (typeof module !== 'undefined') module.exports = XW;
       '<h4>Dữ liệu cá nhân ứng viên</h4><div class="td-g2">' + field('cPolicy', 'Link chính sách xử lý dữ liệu cá nhân *', cf.policy, ' placeholder="https://…/chinh-sach-du-lieu"') + field('cKeep', 'Thời hạn lưu hồ sơ không trúng tuyển (tháng)', cf.keep, ' inputmode="numeric"') + '</div>' +
       '<div class="notice" style="margin-top:10px">' + ic('info') + '<div>Form ứng tuyển thu họ tên, số điện thoại, email, CV. Ứng viên phải đọc được chính sách và tích đồng ý trước khi gửi (Luật Bảo vệ dữ liệu cá nhân 91/2025/QH15 – em chưa trích được điều cụ thể, cần đối chiếu văn bản gốc). Thời hạn lưu do công ty quyết định, ghi rõ trong ô đồng ý và thư cảm ơn.</div></div></div>' +
       '<div class="link-row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Hủy</button><button class="btn btn-primary" id="cSave">Lưu</button></div>');
-    m.querySelector('.modal').classList.add('lg'); tdLookBind(m, u, cf);
+    m.querySelector('.modal').classList.add('lg');
     $('#cAb0', m).addEventListener('click', function () { var d = tdAbout0(u); $('#abStory', m).value = d.story; $('#abMission', m).value = d.mission; $('#abValues', m).value = d.values; $('#abEnv', m).value = d.env; $('#abPerks', m).value = d.perks; toast('Đã điền lại văn bản mẫu', 'info', 'Bấm Lưu để dùng.'); });
     $('#cSave', m).addEventListener('click', function () {
       var v = function (k) { return ($('#' + k, m).value || '').trim(); };
       var pol = v('cPolicy'); if (pol && !/^https?:\/\//i.test(pol)) { toast('Link chính sách cần bắt đầu bằng https://', 'err'); return; }
       var kp = +v('cKeep'); if (!(kp >= 1 && kp <= 60)) { toast('Thời hạn lưu là số tháng từ 1 đến 60', 'err'); return; }
       var em = v('cEmail'); if (em && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { toast('Email chưa đúng', 'err'); return; }
-      Object.assign(cf, tdLookGet(m)); Object.assign(cf, { name: v('cName') || cf.name, short: v('cShort') || cf.short, tag: v('cTag'), intro: v('cIntro'), why: tdLines(v('cWhy')).slice(0, 6), steps: v('cSteps'), addr: v('cAddr'), contact: v('cContact'), phone: tdPhone(v('cPhone')), email: em, slug: tdSlug(v('cSlug') || cf.short), policy: pol, keep: kp, ab: { story: v('abStory'), mission: v('abMission'), values: v('abValues'), env: v('abEnv'), perks: v('abPerks'), stats: $('#abStats', m).checked } });
-      tdSave(u, 'Sửa thông tin công ty trên cổng tuyển dụng'); m.close(); render(); toast('Đã lưu thông tin cổng tuyển dụng', 'ok');
+      Object.assign(cf, { name: v('cName') || cf.name, short: v('cShort') || cf.short, tag: v('cTag'), intro: v('cIntro'), why: tdLines(v('cWhy')).slice(0, 6), steps: v('cSteps'), addr: v('cAddr'), contact: v('cContact'), phone: tdPhone(v('cPhone')), email: em, slug: tdSlug(v('cSlug') || cf.short), policy: pol, keep: kp, ab: { story: v('abStory'), mission: v('abMission'), values: v('abValues'), env: v('abEnv'), perks: v('abPerks'), stats: $('#abStats', m).checked } });
+      tdSave(u, 'Sửa thông tin công ty trên cổng tuyển dụng'); m.close(); render(); tdAutoPush(u, 'Đã lưu thông tin cổng tuyển dụng');
     });
   }
 

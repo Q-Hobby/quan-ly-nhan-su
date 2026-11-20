@@ -269,6 +269,8 @@ function tdPage(title, body, st = 200) {
   return new Response('<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + htmlEsc(title) + '</title><style>body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:#F4EFE5;color:#231E19;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:20px}.b{max-width:560px;background:#fff;border:1px solid #E3D9C6;border-radius:18px;padding:28px;line-height:1.6}h1{font-size:21px;margin:0 0 10px}a{color:#2F7D4F}li{margin:6px 0}</style></head><body><div class="b">' + body + '</div></body></html>', { status: st, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
 }
 async function tdTrang(db, url) { // GET /tuyen-dung[/<slug>[/<vị trí>|/ve-chung-toi]]
+  const ma = /^\/tuyen-dung\/([a-z0-9-]{1,80})\/anh-chia-se\.jpg$/.exec(url.pathname); // 20/11/2026: ảnh khi chia sẻ link (og:image)
+  if (ma) { const a = await db.prepare('SELECT a.v FROM td_anh a JOIN td_cong c ON c.tok = a.tok WHERE c.slug = ?').bind(ma[1]).first(); if (!a || !a.v) return new Response('Không có ảnh', { status: 404 }); const bin = Uint8Array.from(atob(a.v), ch => ch.charCodeAt(0)); return new Response(bin, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'public, max-age=600', 'x-content-type-options': 'nosniff' } }); }
   const m = /^\/tuyen-dung(?:\/([a-z0-9-]{1,80}))?(?:\/([a-z0-9-]{1,120}))?\/?$/.exec(url.pathname); if (!m) return null;
   if (!m[1]) { const L = (await db.prepare("SELECT slug, ten FROM td_cong WHERE html IS NOT NULL AND html != '' ORDER BY ten").all()).results;
     if (L.length === 1) return Response.redirect(url.origin + '/tuyen-dung/' + L[0].slug, 302);
@@ -302,13 +304,16 @@ async function tdCongApi(db, req, url, p) { // phần mềm: đưa trang lên, l
   if (req.method === 'POST' && p === '/api/cong') {
     const b = await req.json().catch(() => ({})), tok = String(b.tok || ''), key = String(b.key || '');
     if (!tdOkTok(tok) || key.length < 20) return tdJ({ ok: false, msg: 'Mã cổng không đúng' }, 400);
-    const html = String(b.html || ''); if (!html || html.length > 600000) return tdJ({ ok: false, msg: 'Trang cổng trống hoặc quá lớn' }, 400);
+    const html = String(b.html || ''); if (!html || html.length > 1700000 || new TextEncoder().encode(html).length > 1900000) return tdJ({ ok: false, msg: 'Trang cổng trống hoặc quá lớn (D1 giới hạn 2 MB mỗi dòng) – bớt ảnh ở Giao diện cổng' }, 400); // 20/11/2026: trang có ảnh bìa, hình ảnh công ty
     const slug = String(b.slug || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 80) || 'cong-ty', jobs = (Array.isArray(b.jobs) ? b.jobs : []).concat(Array.isArray(b.ids) ? b.ids : []).map(x => String(x).toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 120)).filter(Boolean).slice(0, 160); // slug (link trang) + mã phiếu (ô job khi nộp)
     const cur = await tdAuth(db, tok, key); if (cur === false) return tdJ({ ok: false, msg: 'Mã cổng đã được dùng ở máy khác' }, 403);
     const dup = await db.prepare('SELECT tok FROM td_cong WHERE slug = ? AND tok != ?').bind(slug, tok).first(); if (dup) return tdJ({ ok: false, msg: 'Tên rút gọn trên link (' + slug + ') đang được đơn vị khác dùng trên máy chủ này – đổi ở Cổng tuyển dụng → Sửa thông tin.' }, 409);
     const now = Date.now();
     if (cur) await db.prepare('UPDATE td_cong SET slug=?, ten=?, html=?, jobs=?, cap_nhat=? WHERE tok=?').bind(slug, String(b.ten || '').slice(0, 120), html, JSON.stringify(jobs), now, tok).run();
     else await db.prepare('INSERT INTO td_cong (tok, key_hash, slug, ten, html, jobs, tao, cap_nhat) VALUES (?,?,?,?,?,?,?,?)').bind(tok, await tdSha(key), slug, String(b.ten || '').slice(0, 120), html, JSON.stringify(jobs), now, now).run();
+    const og = typeof b.og === 'string' ? b.og : null; // 20/11/2026: ảnh khi chia sẻ link
+    if (og && og.length < 500000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(og)) await db.prepare('INSERT INTO td_anh (tok, v, at) VALUES (?, ?, ?) ON CONFLICT(tok) DO UPDATE SET v = excluded.v, at = excluded.at').bind(tok, og.slice(23), now).run();
+    else if (og === '') await db.prepare('DELETE FROM td_anh WHERE tok = ?').bind(tok).run();
     return tdJ({ ok: true, base: url.origin + '/tuyen-dung/' + slug, het_han: 0 });
   }
   if (req.method === 'GET' && p === '/api/cong/ho-so') {
@@ -326,7 +331,7 @@ async function tdCongApi(db, req, url, p) { // phần mềm: đưa trang lên, l
   if (req.method === 'POST' && (p === '/api/cong/da-lay' || p === '/api/cong/tat')) {
     const b = await req.json().catch(() => ({})), c = await tdAuth(db, b.tok, b.key); if (!c) return tdJ({ ok: false }, 403);
     if (p === '/api/cong/da-lay') { const mas = (Array.isArray(b.ma) ? b.ma : []).map(String).slice(0, 50); const own = mas.length ? (await db.prepare('SELECT ma FROM td_ho_so WHERE tok = ? AND ma IN (' + mas.map(() => '?').join(',') + ')').bind(c.tok, ...mas).all()).results.map(r => r.ma) : []; await tdDelHs(db, own); return tdJ({ ok: true, xoa: own.length }); }
-    const all = (await db.prepare('SELECT ma FROM td_ho_so WHERE tok = ?').bind(c.tok).all()).results.map(r => r.ma); await tdDelHs(db, all); await db.prepare('DELETE FROM td_cong WHERE tok = ?').bind(c.tok).run(); return tdJ({ ok: true });
+    const all = (await db.prepare('SELECT ma FROM td_ho_so WHERE tok = ?').bind(c.tok).all()).results.map(r => r.ma); await tdDelHs(db, all); await db.prepare('DELETE FROM td_cong WHERE tok = ?').bind(c.tok).run(); await db.prepare('DELETE FROM td_anh WHERE tok = ?').bind(c.tok).run(); return tdJ({ ok: true });
   }
   return tdJ({ ok: false, msg: 'Không có API này' }, 404);
 }
@@ -629,6 +634,7 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS bc_nd (id TEXT PRIMARY KEY, cty TEXT, du_lieu TEXT, at INTEGER)`,
   // 17/11/2026: CỔNG TUYỂN DỤNG CỦA CÔNG TY (cùng tên miền, /tuyen-dung/<tên rút gọn>) – chuyển từ máy chủ thử recruit.quantritute.com, không tự xóa sau 24 giờ
   `CREATE TABLE IF NOT EXISTS td_cong (tok TEXT PRIMARY KEY, key_hash TEXT NOT NULL, slug TEXT, ten TEXT, html TEXT, jobs TEXT, tao INTEGER, cap_nhat INTEGER)`,
+  `CREATE TABLE IF NOT EXISTS td_anh (tok TEXT PRIMARY KEY, v TEXT, at INTEGER)`, // 20/11/2026: ảnh khi chia sẻ link cổng tuyển dụng (JPEG base64)
   `CREATE TABLE IF NOT EXISTS td_ho_so (ma TEXT PRIMARY KEY, tok TEXT NOT NULL, job TEXT, du_lieu TEXT, cv_ten TEXT, cv_loai TEXT, cv_size INTEGER, cv_parts INTEGER DEFAULT 0, ip TEXT, tao INTEGER)`,
   `CREATE INDEX IF NOT EXISTS td_ho_so_tok ON td_ho_so (tok, tao)`,
   `CREATE TABLE IF NOT EXISTS td_cv_part (ma TEXT NOT NULL, i INTEGER NOT NULL, data BLOB, PRIMARY KEY (ma, i))`

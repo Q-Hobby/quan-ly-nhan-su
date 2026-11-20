@@ -14,7 +14,14 @@
 - **Giới hạn còn lại (ghi rõ trên trang Phân quyền tài khoản)**: quyền xem từng tính năng trong cùng một công ty (ví dụ ẩn bảng lương với vai trò Nhân sự) vẫn áp ở giao diện – chỉ giao công ty cho người được phép xem toàn bộ dữ liệu của công ty đó, hoặc giới hạn họ theo phòng ban.
 - **Công ty chỉ có 1 khối**: Thiết lập chấm công → Thiết lập chung → Phân khối phòng ban có mục **Công ty có những khối nào** – bỏ chọn khối không có (VD chỉ có khối văn phòng); trang thiết lập khối đó, bộ lọc Khối ở Danh sách nhân sự, Tổng hợp công, Cơ cấu nhân sự, Bảng lương không hiện nữa. Phòng ban đang thuộc khối bị bỏ tự chuyển sang khối còn lại (có hỏi trước).
 - **Thiết bị, tài sản**: rê chuột vào tên tài sản hiện đủ thông tin (mã, tên đầy đủ, nhóm, cấu hình, ngày mua, nguyên giá, tình trạng, người đang sử dụng) – không còn bị cắt khi tên dài.
-- **Cổng tuyển dụng – giao diện riêng**: tải logo lên (hoặc dùng logo công ty), chọn màu thương hiệu (bảng màu gợi ý, theo màu thương hiệu công ty), kiểu ảnh bìa (màu chuyển sắc / màu phẳng / nền sáng), tiêu đề lớn tự đặt, danh sách vị trí dạng danh sách hoặc thẻ lưới.
+- **Cổng tuyển dụng – nút Giao diện cổng riêng** ở đầu trang Cổng tuyển dụng: bảng chỉnh gọn chia nhóm, khung xem trước đổi ngay (trang danh sách / Về chúng tôi, máy tính / điện thoại).
+  - **Mẫu giao diện dựng sẵn**: Chuyên nghiệp, Trẻ trung, Ấm áp, Tối giản, Tự nhiên – bấm là đổi cùng lúc màu, phông, góc bo, ảnh bìa, mật độ.
+  - **Thương hiệu**: logo, màu chính, màu nhấn (nút gửi hồ sơ, thanh thông báo), 4 kiểu phông chữ có tiếng Việt, góc bo; tự cảnh báo khi màu quá nhạt làm chữ khó đọc.
+  - **Ảnh bìa**: chuyển sắc / màu phẳng / nền sáng / **ảnh thật** (tự nén, chỉnh độ tối lớp phủ), tiêu đề lớn tự đặt.
+  - **Bố cục**: danh sách hoặc thẻ lưới, mật độ rộng rãi / gọn, bật tắt và sắp xếp các khối (lý do nên làm việc, hình ảnh công ty, giới thiệu, quy trình tuyển dụng, chế độ, liên hệ), khối **Hình ảnh công ty** tối đa 6 ảnh, bấm xem lớn.
+  - **Nút bấm và liên hệ**: tự đặt chữ trên nút, nút nổi **nhắn Zalo / gọi điện**, **thanh thông báo đầu trang** tự ẩn sau ngày chọn.
+  - **Ảnh khi chia sẻ link** lên Facebook, Zalo (bản đầy đủ): tự tạo từ ảnh bìa, logo, tiêu đề hoặc tải ảnh riêng.
+  - **Khôi phục mặc định**, **quay lại lần lưu trước**, **áp dụng cùng kiểu giao diện cho các công ty khác**; cổng đang mở thì bấm Lưu là tự cập nhật lên cổng.
 - **Giao diện điện thoại gọn hơn**: thanh đầu trang còn 2 dòng – dòng 1 menu, đơn vị, công ty, ngày, tài khoản; dòng 2 ô tìm kiếm và các nút công cụ nhỏ; trạng thái lưu máy chủ thành dòng chữ nhỏ.
 - **Tạo nhanh phòng ban, chức vụ**: khi thêm / sửa nhân sự có nút **+ Tạo mới** cạnh ô Phòng ban, Chức vụ – tạo xong tự vào danh sách chọn. Sơ đồ tổ chức → **Bảng phòng ban** có nút Thêm phòng ban, Sửa, Xóa từng dòng; tab **Chức vụ** có Thêm chức vụ, Sửa (đổi tên thì hồ sơ đổi theo), Xóa (chặn khi còn người đang giữ chức vụ).
 - **Sửa lỗi Bảng lương**: sửa tay Đoàn phí công đoàn của người chưa đánh dấu đoàn viên, bấm Enter bị trở về 0 – nay giữ đúng số sửa tay.
