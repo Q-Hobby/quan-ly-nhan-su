@@ -1,5 +1,16 @@
 # Lịch sử phiên bản
 
+## 1.0.4 – ký hiệu công tự đặt, quỹ phép năm chọn cột, Wi-Fi theo chi nhánh, mẫu phiếu tài sản; sửa lỗi lập hợp đồng, đọc được C12 mẫu cũ (22/11/2026)
+- **Tự đặt ký hiệu chấm công**: ở Thiết lập chấm công → Thiết lập chung → Ký hiệu công, sửa được cả ký hiệu mặc định (ví dụ P thành PN). File chấm công cũ ghi ký hiệu cũ vẫn được hiểu đúng; ký hiệu mới không được trùng ký hiệu khác, ca làm việc hay ngày nghỉ N.
+- **Mỗi loại nghỉ chọn Có phép / Không xin phép**: nghỉ không xin phép không cần đơn, được đếm riêng ở cột "Nghỉ không phép" trong Tổng hợp công.
+- **Bảng quỹ phép năm tự chỉnh**: kéo mép phải tiêu đề để đổi độ rộng cột, nút **Chọn cột hiển thị** để ẩn, hiện cột. Phần mềm nhớ thiết lập cho lần sau.
+- **Chấm công Wi-Fi theo chi nhánh, địa điểm** (bản đầy đủ): khi thêm IP văn phòng, đặt tên chi nhánh, địa điểm hoặc chọn tên đã có; 1 địa điểm có nhiều IP. IP được xếp theo địa điểm, đổi tên địa điểm 1 lần cho mọi IP. Trang Mã QR chấm công đặt tên địa điểm cho thiết bị, IP mới tự gắn đúng địa điểm.
+- **Kho mẫu phiếu tài sản**: nút **Kho mẫu phiếu** ở trang Thiết bị, tài sản. Sửa Phiếu bàn giao, Phiếu thu hồi như Word (câu chữ, điều khoản, bố cục, logo, trường thông tin) 1 lần, mọi phiếu in sau dùng mẫu đã sửa; bấm **Về mẫu gốc** để quay lại mẫu của phần mềm.
+- **Sửa lỗi lập hợp đồng (phát sinh từ bản 1.0.3)**: khi đang chọn 1 công ty, chọn người lao động xong thì ô Người lao động bị trả về "— Chọn —", bấm Lưu báo "Chưa chọn người lao động". Nay chọn người, đổi loại hợp đồng và lưu bình thường. Đứng ở Tổng các công ty không bị lỗi này.
+- **Đối chiếu C12 đọc được mẫu C12-TS cũ theo QĐ 595/QĐ-BHXH** (BHXH gộp 1 cột, cột BHTNLĐ – một số BHXH tỉnh vẫn dùng): số tiền BHXH trên C12 so với tổng ốm đau, thai sản + hưu trí, tử tuất của bảng lương; màn kết quả hiện 1 cột BHXH; kiểm tra tỷ lệ BHXH theo tổng 2 quỹ. Mẫu mới theo QĐ 505 đọc như cũ.
+- Đọc đúng tên đơn vị khi file ghi "Kính gửi :" (có dấu cách) và dòng "đã đóng BHTNLD, BNN cho … lao động" (không có chữ "bắt buộc").
+- **Bảo mật cổng tuyển dụng** (bản đầy đủ): máy chủ chỉ nhận CV là file PDF, JPG, PNG, WebP thật (kiểm tra nội dung file, không tin đuôi file), file tải về không chạy được mã; ảnh trong thông báo nội bộ cũng chặn chạy mã.
+
 ## 1.0.3 – nhập hợp đồng đã ký, máy chủ kiểm tra phân quyền và các góp ý của người dùng (20/11/2026)
 - **Nhập hợp đồng đã ký từ bản scan / PDF**: tải 1 hoặc nhiều file (PDF, ảnh chụp), phần mềm đọc chữ ngay trên máy và gợi ý công ty, người lao động (theo số CCCD, họ tên, ngày sinh), số và loại hợp đồng, ngày ký, hiệu lực, hết hạn, chức danh, phòng ban, mức lương, phụ cấp. Màn rà soát đặt bản scan cạnh các ô đã điền, đánh dấu ô đọc được / cần xem lại / chưa đọc được để sửa tay. Lưu xong: hợp đồng vào Sổ hợp đồng và hồ sơ nhân sự, file vào Kho hợp đồng đã ký; hợp đồng còn hiệu lực thì dòng nhắc "Cần ký hợp đồng" của người đó tự mất.
 - **Thông tin khác đọc được** (địa điểm làm việc, thời giờ làm việc, hình thức trả lương, nơi cấp CCCD…) lưu vào ghi chú của hợp đồng; thông tin hồ sơ (ngày sinh, CCCD, địa chỉ, số điện thoại, tài khoản ngân hàng) khác hoặc còn trống thì có ô tích **Cập nhật vào hồ sơ**. Số CCCD trên bản ký khác hồ sơ thì phần mềm nhắc kiểm tra đúng người.

@@ -885,6 +885,7 @@ td.ipbox,td.num{white-space:nowrap;word-break:normal}
 .bcr-t{overflow-x:auto;-webkit-overflow-scrolling:touch}.bcr-t table{width:100%;border-collapse:collapse;font-size:12.5px}.bcr-t th{text-align:left;position:sticky;top:0;background:var(--mcard);border-bottom:1px solid var(--mline);padding:5px 6px;font-weight:600;white-space:nowrap}.bcr-t td{border-bottom:1px solid var(--mline);padding:5px 6px}
 .bcr-e{color:var(--mmut);font-size:13px;margin:4px 0}.bcr-g{display:block;color:var(--mmut);font-size:11.5px;margin-top:6px;line-height:1.4}
 .tb-tabs{display:flex;gap:4px;margin:0 0 10px;padding:3px;border-radius:10px;background:var(--surface-3)}.tb-tabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border:0;background:none;padding:8px 6px;border-radius:8px;font:inherit;font-size:13px;color:inherit;opacity:.75}.tb-tabs button.on{background:var(--surface);opacity:1;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}.tb-find{display:flex;gap:6px;margin:0 0 8px}.tb-find input{flex:1;min-width:0;padding:9px 10px;border:1px solid var(--border-strong);border-radius:8px;font:inherit;background:var(--surface);color:inherit}.tba-m{font-size:12.5px;opacity:.8;margin:4px 0 8px}.tb-when{opacity:.7}
+.ipadd{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:8px}.ipadd>div{min-width:200px}.ipadd-b{min-width:0!important}.ipgrp{margin-top:14px;border-top:1px solid var(--line,#e5e7eb);padding-top:10px}.ipgrp h4{font-size:15px}.dd-in{padding:4px 8px;font-size:13px}
 </style>
 </head>
 <body>
@@ -2231,7 +2232,7 @@ function boot(msg) {
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && (ROUTE === 'nv' || ROUTE === 'q') && $('#b-main') && !$('#b-main').disabled) boot(); });
 
 /* ================= MÀN HÌNH CHUNG (/tram) ================= */
-var tramTimer = null, wakeLock = null, tramData = null;
+var tramTimer = null, wakeLock = null, tramData = null, tramDdEdit = false;
 function tramActivate() {
   app.innerHTML = '<div class="wrap">' + hdr('Trang Mã QR') + '<div class="card"><h2 style="font-size:19px">Kích hoạt trang Mã QR chấm công</h2>' +
     '<p class="muted">Thiết bị này sẽ đặt cố định ở văn phòng, dùng Wi-Fi văn phòng. Nhập mật khẩu tài khoản quản trị hệ thống (quantri) để kích hoạt (chỉ làm một lần).</p>' +
@@ -2245,7 +2246,7 @@ function tramActivate() {
   };
 }
 function tramRender(d) {
-  tramData = d; DEMO = !!d.demo;
+  tramData = d; DEMO = !!d.demo; if (tramDdEdit) return; /* 22/11: đang đặt tên địa điểm – không vẽ lại */
   var q = vp(d.now);
   var list = d.hom_nay.length ? d.hom_nay.map(function (o) {
     return '<div class="who"><div><b>' + esc(o.ten) + '</b> <span class="faint small">' + esc(o.ma) + '</span></div><div class="luot">' + o.luot.map(function (r) {
@@ -2260,7 +2261,8 @@ function tramRender(d) {
     (d.qr ? '<div class="qrbox" id="qr">' + d.qr + '</div><div class="bar"><i id="bar" style="width:100%"></i></div>' +
       '<p class="muted" style="max-width:380px">Không chấm được qua Wi-Fi? Mở <b>camera</b> điện thoại và quét mã này. Mã đổi sau mỗi 30 giây, mã cũ hết hiệu lực ngay.</p>'
       : '<div class="card" style="margin-top:16px">Đơn vị đang dùng chế độ <b>chỉ chấm qua Wi-Fi</b> – không hiện mã QR.</div>') +
-    '<p class="ipbox">IP văn phòng (' + esc(d.ip_loai) + '): ' + esc(d.ip) + ' · đã báo lúc ' + fTimeS(d.now) + '</p></div>' +
+    '<p class="ipbox">IP văn phòng (' + esc(d.ip_loai) + '): ' + esc(d.ip) + ' · đã báo lúc ' + fTimeS(d.now) + '</p>' +
+    '<p class="small" id="tdd-box">Địa điểm: <b>' + esc(d.dd || 'chưa đặt tên') + '</b> · <a href="#" id="tdd-ed">' + (d.dd ? 'Đổi' : 'Đặt tên chi nhánh, địa điểm') + '</a></p></div>' +
     '<div>' +
     guide('tram', 'Mã QR chấm công – mở trên một thiết bị cố định ở văn phòng', 'Cách chấm chính là bấm Vào ca / Ra ca trên điện thoại khi bắt Wi‑Fi văn phòng. Trang này là <b>cách dự phòng</b>: hiện mã QR đổi mỗi 30 giây. Dùng khi: <b>điện thoại nhân viên không bắt được Wi‑Fi văn phòng</b> (Wi‑Fi lỗi, quá tải, đứng xa bộ phát, đang ở khu vực khác của công ty) → mở camera quét mã để chấm; đồng thời thiết bị này <b>tự báo IP Wi‑Fi văn phòng</b> cho máy chủ mỗi khi router đổi IP. Trang cũng cho biết ai đã chấm hôm nay.',
       ['Mở trang này trên <b>máy đang bắt Wi‑Fi muốn thử</b> → IP của Wi‑Fi đó tự được ghi là mạng văn phòng (xem dòng "IP văn phòng" dưới mã QR).',
@@ -2268,6 +2270,9 @@ function tramRender(d) {
        'Tắt Wi‑Fi điện thoại (dùng 4G), mở <b>camera</b> quét mã QR này → bấm <b>Ra ca</b> → được nhận bằng QR. Ảnh chụp mã cũ quá 30 giây sẽ bị từ chối.']) + (vua ? '<div class="vuabox"><div class="small" style="font-weight:600">Vừa chấm</div>' + vua + '</div>' : '') + '<div class="card"><div class="row" style="justify-content:space-between"><h2 style="font-size:19px">Hôm nay</h2><span class="badge ok">' + d.hom_nay.length + '/' + d.so_nv + ' người</span></div>' + list + '</div>' +
     '<p class="faint small">Mở trang này trên một thiết bị cố định ở văn phòng mỗi khi bắt đầu ngày làm việc (hoặc để luôn bật). ' + (DEMO ? '' : '<a href="#" id="tout" class="faint">Gỡ kích hoạt</a>') + '</p></div></div>';
   guideBind();
+  if ($('#tdd-ed')) $('#tdd-ed').onclick = function (e) { e.preventDefault(); tramDdEdit = true; $('#tdd-box').innerHTML = '<datalist id="tdd-l">' + (d.dds || []).map(function (n) { return '<option value="' + esc(n) + '">'; }).join('') + '</datalist><input id="tdd-v" list="tdd-l" maxlength="60" value="' + esc(d.dd || '') + '" placeholder="VD: Trụ sở Hà Nội" style="max-width:240px"> <button class="btn sm pri" id="tdd-ok">Lưu</button> <button class="btn sm" id="tdd-no">Hủy</button>'; $('#tdd-v').focus();
+    $('#tdd-ok').onclick = function () { try { localStorage.setItem('qtt-tram-dd', $('#tdd-v').value.trim()); } catch (x) { } tramDdEdit = false; tramLoad(); };
+    $('#tdd-no').onclick = function () { tramDdEdit = false; tramRender(tramData); }; };
   if ($('#tout')) $('#tout').onclick = function (e) { e.preventDefault(); if (confirmBox('Gỡ kích hoạt trang Mã QR chấm công trên thiết bị này?')) api('/api/dang-xuat', { vai: 'tram' }).then(function () { tramBoot(); }); };
 }
 function tramTick() {
@@ -2280,7 +2285,8 @@ function tramTick() {
 var tramLoading = false;
 function tramLoad() {
   if (tramLoading) return; tramLoading = true;
-  api('/api/tram').then(function (d) {
+  var tdd = ''; try { tdd = localStorage.getItem('qtt-tram-dd') || ''; } catch (e) { }
+  api('/api/tram' + (tdd ? '?dd=' + encodeURIComponent(tdd) : '')).then(function (d) {
     tramLoading = false;
     if (d._status === 401) { tramData = null; return tramActivate(); }
     if (!d.ok) { var b = $('#bar'); if (b) b.style.background = 'var(--danger)'; return; }
@@ -2370,7 +2376,7 @@ function tabNgay() {
   h += '<div class="card"><h3 style="font-size:16px;margin-bottom:6px">Tóm tắt ngày ' + esc(QL.ngay) + ' · ' + sum.length + '/' + d.nv.filter(function (x) { return x.active; }).length + ' người có chấm</h3><div class="tblw"><table><thead><tr><th>Mã</th><th>Họ tên</th><th>Vào đầu tiên</th><th>Ra cuối cùng</th><th>Số lượt</th><th>Cách chấm</th></tr></thead><tbody>' +
     (sum.length ? sum.map(function (o) { return '<tr><td>' + esc(o.ma) + '</td><td>' + esc(o.ten) + '</td><td class="num">' + (o.vao ? fTime(o.vao) : '–') + '</td><td class="num">' + (o.ra ? fTime(o.ra) : '–') + '</td><td class="num">' + o.n + '</td><td>' + Object.keys(o.cach).join(', ') + '</td></tr>'; }).join('') : '<tr><td colspan="6" class="empty">Không có lượt chấm</td></tr>') + '</tbody></table></div></div>';
   h += '<div class="card"><h3 style="font-size:16px;margin-bottom:6px">Chi tiết từng lượt</h3><div class="tblw"><table><thead><tr><th>Giờ</th><th>Nhân viên</th><th>Loại</th><th>Cách</th><th>IP</th><th>Thiết bị</th><th>Ghi chú</th><th></th></tr></thead><tbody>' +
-    (rows.length ? rows.map(function (r) { return '<tr class="' + (r.huy ? 'strike' : '') + '"><td class="num">' + fTimeS(r.t) + '</td><td>' + esc(r.ten || r.ma) + shBadge(sh, r) + '</td><td>' + (r.loai === 'vao' ? 'Vào' : 'Ra') + '</td><td><span class="badge ' + (r.cach === 'wifi' ? 'ok' : r.cach === 'qr' ? '' : 'no') + '">' + CACH[r.cach] + '</span></td><td class="ipbox">' + esc(r.ip || '') + '</td><td class="small">' + esc(r.tb || '') + '</td><td class="small">' + esc(r.ghi || '') + '</td><td><button class="btn sm" data-huy="' + r.id + '" data-kp="' + (r.huy ? 1 : 0) + '">' + (r.huy ? 'Khôi phục' : 'Hủy') + '</button></td></tr>'; }).join('') : '<tr><td colspan="8" class="empty">Không có lượt chấm</td></tr>') + '</tbody></table></div></div>';
+    (rows.length ? rows.map(function (r) { return '<tr class="' + (r.huy ? 'strike' : '') + '"><td class="num">' + fTimeS(r.t) + '</td><td>' + esc(r.ten || r.ma) + shBadge(sh, r) + '</td><td>' + (r.loai === 'vao' ? 'Vào' : 'Ra') + '</td><td><span class="badge ' + (r.cach === 'wifi' ? 'ok' : r.cach === 'qr' ? '' : 'no') + '">' + CACH[r.cach] + '</span></td><td class="ipbox">' + esc(r.ip || '') + (r.ip && ipDdOf(r.ip) ? '<div class="small" style="font-family:inherit">' + esc(ipDdOf(r.ip)) + '</div>' : '') + '</td><td class="small">' + esc(r.tb || '') + '</td><td class="small">' + esc(r.ghi || '') + '</td><td><button class="btn sm" data-huy="' + r.id + '" data-kp="' + (r.huy ? 1 : 0) + '">' + (r.huy ? 'Khôi phục' : 'Hủy') + '</button></td></tr>'; }).join('') : '<tr><td colspan="8" class="empty">Không có lượt chấm</td></tr>') + '</tbody></table></div></div>';
   h += '<div class="card"><h3 style="font-size:16px">Chấm bổ sung (quên chấm)</h3><div class="grid2" style="margin-top:6px"><div><label class="lbl">Nhân viên</label><select id="bs-ma">' + d.nv.map(function (x) { return '<option value="' + esc(x.ma) + '">' + esc(x.ma + ' – ' + x.ten) + '</option>'; }).join('') + '</select></div>' +
     '<div class="grid2"><div><label class="lbl">Giờ (HH:MM)</label><input id="bs-gio" type="text" inputmode="numeric" placeholder="08:00"></div><div><label class="lbl">Loại</label><select id="bs-loai"><option value="vao">Vào</option><option value="ra">Ra</option></select></div></div></div>' +
     '<label class="lbl">Lý do (bắt buộc)</label><input id="bs-ghi" type="text" placeholder="VD: Quên chấm, đã xác nhận với trưởng phòng"><div style="margin-top:10px"><button class="btn pri" id="bs-go"' + (d.nv.length ? '' : ' disabled') + '>Thêm lượt cho ngày ' + esc(QL.ngay) + '</button></div></div>';
@@ -2428,17 +2434,27 @@ function tabNv() {
     };
   });
 }
+/* 22/11/2026 (1.0.4, anh): IP văn phòng theo chi nhánh / địa điểm – đặt tên mới hoặc chọn tên đã có; 1 địa điểm nhiều IP */
+function ipDdOf(ip) { var L = (QL.d && QL.d.ip_vp) || [], v6 = function (x) { return String(x).split(':').slice(0, 4).join(':').toLowerCase(); }; ip = String(ip || ''); var r = L.filter(function (x) { return x.ip === ip; })[0] || (ip.indexOf(':') >= 0 ? L.filter(function (x) { return x.ip.indexOf(':') >= 0 && v6(x.ip) === v6(ip); })[0] : null); return r && r.dd ? r.dd : ''; }
 function tabIp() {
-  var d = QL.d;
-  var h = '<div class="card"><h3 style="font-size:16px">IP văn phòng</h3><p class="muted small">Lượt bấm của nhân viên được chấp nhận khi IP trùng một IP còn hiệu lực dưới đây. IPv4 so trùng hoàn toàn; IPv6 so theo dải mạng (4 nhóm đầu). IP do trang Mã QR chấm công báo còn hiệu lực ' + esc(d.cfg.ip_gio) + ' giờ kể từ lần báo cuối; IP nhập tay luôn hiệu lực đến khi xóa.</p>' +
-    '<div class="tblw"><table><thead><tr><th>IP</th><th>Loại</th><th>Nguồn</th><th>Lần cuối</th><th>Hiệu lực</th><th></th></tr></thead><tbody>' +
-    (d.ip_vp.length ? d.ip_vp.map(function (r) { return '<tr><td class="ipbox">' + esc(r.ip) + '</td><td>' + (r.ip.indexOf(':') >= 0 ? 'IPv6' : 'IPv4') + '</td><td>' + (r.nguon === 'tay' ? 'Nhập tay' : 'Trang Mã QR') + '</td><td class="num small">' + fTime(r.last) + ' ' + fDate(r.last) + '</td><td>' + (r.hieu_luc ? '<span class="badge ok">Còn</span>' : '<span class="badge">Hết</span>') + '</td><td><button class="btn sm" data-x="' + esc(r.ip) + '">Xóa</button></td></tr>'; }).join('') : '<tr><td colspan="6" class="empty">Chưa có IP văn phòng. Mở trang Mã QR chấm công trên một thiết bị ở văn phòng, hoặc bấm nút dưới khi máy này đang dùng Wi-Fi văn phòng.</td></tr>') +
-    '</tbody></table></div><div class="row" style="margin-top:12px"><button class="btn pri" id="ip-me">Thêm IP của máy này (' + esc(d.ip_loai) + ')</button><input id="ip-v" type="text" placeholder="hoặc nhập IP" style="max-width:260px"><button class="btn" id="ip-add">Thêm</button></div>' +
-    '<p class="hint">Mẹo test: khởi động lại router để xem IP có đổi không, rồi mở lại trang Mã QR chấm công – IP mới sẽ tự được thêm.</p></div>' +
-    '<div class="card"><h3 style="font-size:16px">Mã QR chấm công</h3><p class="muted small">Mở trên một thiết bị đặt cố định ở văn phòng (điện thoại cũ, máy tính bảng, máy tính) đang dùng Wi‑Fi văn phòng. Lần đầu nhập PIN quản lý để kích hoạt. Dùng khi: <b>điện thoại nhân viên không bắt được Wi‑Fi văn phòng</b> (Wi‑Fi lỗi, quá tải, đứng xa bộ phát, đang ở khu vực khác của công ty) → mở camera quét mã để chấm; đồng thời thiết bị này <b>tự báo IP Wi‑Fi văn phòng</b> cho máy chủ mỗi khi router đổi IP.</p><a class="btn" href="/tram">Mở trang Mã QR chấm công trên máy này</a></div>';
+  var d = QL.d, names = [], grp = {}, KO = '(Chưa đặt tên địa điểm)';
+  d.ip_vp.forEach(function (r) { var k = r.dd || ''; if (k && names.indexOf(k) < 0) names.push(k); (grp[k] = grp[k] || []).push(r); });
+  names.sort(); var keys = names.concat(grp[''] ? [''] : []);
+  var dl = '<datalist id="dd-list">' + names.map(function (n) { return '<option value="' + esc(n) + '">'; }).join('') + '</datalist>';
+  var row = function (r) { return '<tr><td class="ipbox">' + esc(r.ip) + '</td><td>' + (r.ip.indexOf(':') >= 0 ? 'IPv6' : 'IPv4') + '</td><td>' + (r.nguon === 'tay' ? 'Nhập tay' : 'Trang Mã QR') + '</td><td class="num small">' + fTime(r.last) + ' ' + fDate(r.last) + '</td><td>' + (r.hieu_luc ? '<span class="badge ok">Còn</span>' : '<span class="badge">Hết</span>') + '</td><td><input class="dd-in" type="text" list="dd-list" data-sua="' + esc(r.ip) + '" value="' + esc(r.dd || '') + '" placeholder="Chọn / nhập địa điểm" style="min-width:150px" aria-label="Địa điểm của IP ' + esc(r.ip) + '"></td><td><button class="btn sm" data-x="' + esc(r.ip) + '">Xóa</button></td></tr>'; };
+  var h = '<div class="card"><h3 style="font-size:16px">IP văn phòng theo chi nhánh, địa điểm</h3><p class="muted small">Lượt bấm của nhân viên được chấp nhận khi IP trùng một IP còn hiệu lực dưới đây. Mỗi chi nhánh, địa điểm có thể có nhiều IP (nhiều mạng Wi‑Fi, đổi nhà mạng). IPv4 so trùng hoàn toàn; IPv6 so theo dải mạng (4 nhóm đầu). IP do trang Mã QR chấm công báo còn hiệu lực ' + esc(d.cfg.ip_gio) + ' giờ kể từ lần báo cuối; IP nhập tay luôn hiệu lực đến khi xóa.</p>' + dl +
+    '<div class="ipadd"><div><label class="lbl">Chi nhánh, địa điểm</label><input id="dd-v" type="text" list="dd-list" placeholder="VD: Trụ sở Hà Nội, Kho Long Biên" maxlength="60"></div><div><label class="lbl">IP</label><input id="ip-v" type="text" placeholder="Để trống = IP của máy này (' + esc(d.ip_loai) + ')" style="max-width:260px"></div><div class="ipadd-b"><button class="btn pri" id="ip-add">Thêm IP</button></div></div>' +
+    '<p class="hint" style="margin-top:6px">Gõ tên mới hoặc chọn tên đã có trong danh sách. Để trống ô IP thì thêm IP của máy đang mở trang này.</p>' +
+    (keys.length ? keys.map(function (k) { var L = grp[k], on = L.filter(function (r) { return r.hieu_luc; }).length;
+      return '<div class="ipgrp"><div class="row" style="justify-content:space-between"><h4 style="margin:0">' + esc(k || KO) + ' <span class="muted small">· ' + L.length + ' IP, ' + on + ' còn hiệu lực</span></h4>' + (k ? '<button class="btn sm" data-ren="' + esc(k) + '">Đổi tên</button>' : '') + '</div>' +
+        '<div class="tblw"><table><thead><tr><th>IP</th><th>Loại</th><th>Nguồn</th><th>Lần cuối</th><th>Hiệu lực</th><th>Địa điểm</th><th></th></tr></thead><tbody>' + L.map(row).join('') + '</tbody></table></div></div>'; }).join('')
+      : '<div class="empty" style="margin-top:10px">Chưa có IP văn phòng. Mở trang Mã QR chấm công trên một thiết bị ở văn phòng, hoặc nhập tên địa điểm rồi bấm Thêm IP khi máy này đang dùng Wi-Fi văn phòng.</div>') +
+    '<p class="hint">Mẹo test: khởi động lại router để xem IP có đổi không, rồi mở lại trang Mã QR chấm công – IP mới sẽ tự được thêm (gắn đúng địa điểm đã đặt trên trang đó).</p></div>' +
+    '<div class="card"><h3 style="font-size:16px">Mã QR chấm công</h3><p class="muted small">Mở trên một thiết bị đặt cố định ở văn phòng (điện thoại cũ, máy tính bảng, máy tính) đang dùng Wi‑Fi văn phòng. Lần đầu nhập PIN quản lý để kích hoạt, rồi đặt tên địa điểm cho thiết bị đó. Dùng khi: <b>điện thoại nhân viên không bắt được Wi‑Fi văn phòng</b> (Wi‑Fi lỗi, quá tải, đứng xa bộ phát, đang ở khu vực khác của công ty) → mở camera quét mã để chấm; đồng thời thiết bị này <b>tự báo IP Wi‑Fi văn phòng</b> cho máy chủ mỗi khi router đổi IP.</p><a class="btn" href="/tram">Mở trang Mã QR chấm công trên máy này</a></div>';
   $('#body').innerHTML = h;
-  $('#ip-me').onclick = function () { api('/api/ql/ip', {}).then(function (j) { after(j, 'Đã thêm IP của máy này.'); }); };
-  $('#ip-add').onclick = function () { api('/api/ql/ip', { ip: $('#ip-v').value }).then(function (j) { after(j, 'Đã thêm IP.'); }); };
+  $('#ip-add').onclick = function () { var v = $('#ip-v').value.trim(), dd = $('#dd-v').value.trim(); var b = { dd: dd }; if (v) b.ip = v; api('/api/ql/ip', b).then(function (j) { after(j, v ? 'Đã thêm IP' + (dd ? ' cho ' + dd : '') + '.' : 'Đã thêm IP của máy này' + (dd ? ' cho ' + dd : '') + '.'); }); };
+  $('#body').querySelectorAll('[data-sua]').forEach(function (el) { el.onchange = function () { api('/api/ql/ip', { sua: el.getAttribute('data-sua'), dd: el.value.trim() }).then(function (j) { after(j, el.value.trim() ? 'Đã gắn IP vào ' + el.value.trim() + '.' : 'Đã bỏ tên địa điểm của IP.'); }); }; });
+  $('#body').querySelectorAll('[data-ren]').forEach(function (b) { b.onclick = function () { var o = b.getAttribute('data-ren'), box = b.closest('.ipgrp').querySelector('h4'); box.innerHTML = '<input id="ren-v" value="' + esc(o) + '" maxlength="60" style="max-width:260px"> <button class="btn sm pri" id="ren-ok">Lưu</button>'; b.remove(); $('#ren-v').focus(); $('#ren-ok').onclick = function () { var n = $('#ren-v').value.trim(); if (!n || n === o) return tabIp(); api('/api/ql/ip', { doi_ten: o, dd: n }).then(function (j) { after(j, 'Đã đổi tên ' + o + ' thành ' + n + '.'); }); }; }; });
   $('#body').querySelectorAll('[data-x]').forEach(function (b) { b.onclick = function () { api('/api/ql/ip', { xoa: b.getAttribute('data-x') }).then(function (j) { after(j, 'Đã xóa IP.'); }); }; });
 }
 function tabTc() {

@@ -14,7 +14,7 @@ import { TAY_LATIN, TAY_VI } from './font-tay.js'; // 12/11: phông viết tay c
 import { OG_QL_B64, OG_NV_B64 } from './og-anh.js'; // 08/11: ảnh chia sẻ Facebook/Zalo cho bản chạy thử
 import HRM_HTML from './phan-mem.html'; // 08/11: Phần mềm quản lý nhân sự toàn diện bản xem trước (build/index.html chép sang khi node build.js)
 
-const VER = '1.0.3';  // 13/11/2026 18:30 (bản 0.8.1 phần mềm): một tài khoản chung – tài khoản có quyền quản trị dùng mật khẩu, trang /quan-tri, dữ liệu phần mềm quản trị lưu trên máy chủ, mã cài đặt lần đầu. Trước: '0.4.6';  // 13/11/2026 14:55: nhiều người có quyền duyệt đơn (ai duyệt trước thì đơn chuyển trạng thái, ghi tên người duyệt) + màn Bộ phận của tôi. Trước: '0.4.5';  // 12/11/2026 22:54: ca có yêu cầu có mặt sớm (som, som_ngay) hiện trên app. Trước: '0.4.4';  // 12/11/2026: hành trình hội nhập trên app nhân viên (đi cùng phần mềm 0.6.1)
+const VER = '1.0.4';  // 13/11/2026 18:30 (bản 0.8.1 phần mềm): một tài khoản chung – tài khoản có quyền quản trị dùng mật khẩu, trang /quan-tri, dữ liệu phần mềm quản trị lưu trên máy chủ, mã cài đặt lần đầu. Trước: '0.4.6';  // 13/11/2026 14:55: nhiều người có quyền duyệt đơn (ai duyệt trước thì đơn chuyển trạng thái, ghi tên người duyệt) + màn Bộ phận của tôi. Trước: '0.4.5';  // 12/11/2026 22:54: ca có yêu cầu có mặt sớm (som, som_ngay) hiện trên app. Trước: '0.4.4';  // 12/11/2026: hành trình hội nhập trên app nhân viên (đi cùng phần mềm 0.6.1)
 // trước: VER '0.4.1'  // 07/11/2026: nối Phần mềm quản lý nhân sự toàn diện (đồng bộ nhân viên, lượt chấm, đơn nghỉ, xác nhận công)
 /* 07/11/2026 17:42 – CHẾ ĐỘ BẢN THỬ (để mọi người trải nghiệm, góp ý): bật khi chạy ở tên miền chamcong-thu.* hoặc biến môi trường DEMO=1.
    Không cần mật khẩu trang Quản lý và trang Mã QR chấm công; có sẵn tài khoản nhân viên mẫu (PIN chung DEMO_PIN); khóa các thao tác làm hỏng dữ liệu dùng chung;
@@ -280,6 +280,8 @@ async function tdTrang(db, url) { // GET /tuyen-dung[/<slug>[/<vị trí>|/ve-ch
   if (m[2] && m[2] !== 've-chung-toi' && JSON.parse(r.jobs || '[]').indexOf(m[2]) < 0) return tdPage('Vị trí đã đóng', '<h1>Vị trí này không còn nhận hồ sơ</h1><p><a href="/tuyen-dung/' + htmlEsc(m[1]) + '">Xem các vị trí đang tuyển →</a></p>', 404);
   return new Response(r.html, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'referrer-policy': 'strict-origin-when-cross-origin' } });
 }
+function tdCvType(b) { const h = (i, v) => v.every((x, j) => b[i + j] === x); if (b.length > 4 && h(0, [0x25, 0x50, 0x44, 0x46])) return 'application/pdf'; if (b.length > 3 && h(0, [0xFF, 0xD8, 0xFF])) return 'image/jpeg'; if (b.length > 8 && h(0, [0x89, 0x50, 0x4E, 0x47])) return 'image/png'; if (b.length > 12 && h(0, [0x52, 0x49, 0x46, 0x46]) && h(8, [0x57, 0x45, 0x42, 0x50])) return 'image/webp'; return ''; }
+const TD_CV_SAFE = /^(application\/pdf|image\/(jpeg|png|webp))$/;
 async function tdNop(db, req) { // ứng viên nộp hồ sơ (multipart, CV ≤ 5 MB chia phần ≤ 1,5 MB vì D1 giới hạn 2 MB mỗi dòng)
   const ip = req.headers.get('CF-Connecting-IP') || '';
   if (tdTooMany(ip)) return tdJ({ ok: false, msg: 'Bạn gửi quá nhiều lần, vui lòng thử lại sau ít phút.' }, 429);
@@ -295,8 +297,9 @@ async function tdNop(db, req) { // ứng viên nộp hồ sơ (multipart, CV ≤
   const cv = f.get('cv'); if (!cv || typeof cv === 'string' || !cv.size) return tdJ({ ok: false, msg: 'Vui lòng đính kèm CV.' }, 400);
   if (cv.size > TD_CV_MAX || !(/^image\/|application\/pdf/.test(cv.type) || /\.(pdf|jpe?g|png|webp)$/i.test(cv.name))) return tdJ({ ok: false, msg: 'CV cần là PDF hoặc ảnh, tối đa 5 MB.' }, 400);
   const ma = 'HS' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(), buf = new Uint8Array(await cv.arrayBuffer()), parts = Math.ceil(buf.length / TD_PART) || 1;
+  const cvT = tdCvType(buf); if (!cvT) return tdJ({ ok: false, msg: 'CV cần là file PDF hoặc ảnh JPG, PNG, WebP.' }, 400); // 22/11/2026 1.0.4: kiểm tra nội dung file, không tin kiểu file do trình duyệt gửi
   const d = { job, name, phone, email, exp: String(f.get('exp') || '').slice(0, 1000), src: String(f.get('src') || 'Cổng tuyển dụng').slice(0, 60), consentText: String(f.get('consentText') || '').slice(0, 1200), consentAt: new Date().toISOString() };
-  const st = [db.prepare('INSERT INTO td_ho_so (ma, tok, job, du_lieu, cv_ten, cv_loai, cv_size, cv_parts, ip, tao) VALUES (?,?,?,?,?,?,?,?,?,?)').bind(ma, tok, job, JSON.stringify(d), String(cv.name).slice(0, 120), cv.type || 'application/pdf', buf.length, parts, ip, Date.now())];
+  const st = [db.prepare('INSERT INTO td_ho_so (ma, tok, job, du_lieu, cv_ten, cv_loai, cv_size, cv_parts, ip, tao) VALUES (?,?,?,?,?,?,?,?,?,?)').bind(ma, tok, job, JSON.stringify(d), String(cv.name).slice(0, 120), cvT, buf.length, parts, ip, Date.now())];
   for (let i = 0; i < parts; i++) st.push(db.prepare('INSERT INTO td_cv_part (ma, i, data) VALUES (?,?,?)').bind(ma, i, buf.slice(i * TD_PART, (i + 1) * TD_PART).buffer));
   await db.batch(st); return tdJ({ ok: true, code: ma });
 }
@@ -326,7 +329,7 @@ async function tdCongApi(db, req, url, p) { // phần mềm: đưa trang lên, l
     const h = await db.prepare('SELECT cv_loai FROM td_ho_so WHERE ma = ? AND tok = ?').bind(url.searchParams.get('ma'), c.tok).first(); if (!h) return tdJ({ ok: false, msg: 'Không còn CV' }, 404);
     const ps = await db.prepare('SELECT data FROM td_cv_part WHERE ma = ? ORDER BY i').bind(url.searchParams.get('ma')).all();
     const bufs = (ps.results || []).map(r => new Uint8Array(r.data)), out = new Uint8Array(bufs.reduce((s, x) => s + x.length, 0)); let o = 0; bufs.forEach(x => { out.set(x, o); o += x.length; });
-    return new Response(out, { headers: { 'content-type': h.cv_loai || 'application/octet-stream', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' } });
+    return new Response(out, { headers: { 'content-type': TD_CV_SAFE.test(h.cv_loai || '') ? h.cv_loai : 'application/octet-stream', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; img-src 'self' data: blob:; style-src 'unsafe-inline'; sandbox" } }); // 22/11/2026 1.0.4
   }
   if (req.method === 'POST' && (p === '/api/cong/da-lay' || p === '/api/cong/tat')) {
     const b = await req.json().catch(() => ({})), c = await tdAuth(db, b.tok, b.key); if (!c) return tdJ({ ok: false }, 403);
@@ -644,6 +647,7 @@ const MIGRATE_V3 = ['ALTER TABLE nv ADD COLUMN pb TEXT', 'ALTER TABLE nv ADD COL
 const MIGRATE_V5 = ['ALTER TABLE nv ADD COLUMN login_at INTEGER', 'ALTER TABLE nv ADD COLUMN pin_doi INTEGER']; // 12/11/2026: trang Ứng dụng nhân viên – đăng nhập lần cuối, nhân viên đã tự đổi PIN
 const MIGRATE_V4 = ['ALTER TABLE don ADD COLUMN duyet_ma TEXT', 'ALTER TABLE don ADD COLUMN ban_giao TEXT']; // 11/11 15:32: đơn – quản lý trực tiếp duyệt trên app, người nhận bàn giao
 const MIGRATE_V6 = ['ALTER TABLE nv ADD COLUMN qt TEXT', 'ALTER TABLE nv ADD COLUMN mk TEXT', 'ALTER TABLE nv ADD COLUMN mk_salt TEXT', 'ALTER TABLE nv ADD COLUMN mk_doi INTEGER']; // 13/11/2026: một tài khoản – quyền quản trị (qt = {r, t, sys}), mật khẩu, bắt đổi mật khẩu lần đầu
+const MIGRATE_V8 = ['ALTER TABLE ip_vp ADD COLUMN dd TEXT']; // 22/11/2026 (1.0.4): IP văn phòng gắn tên chi nhánh / địa điểm
 const MIGRATE_V7 = ['ALTER TABLE nv ADD COLUMN cty TEXT']; // 17/11/2026: nhiều công ty dùng chung một máy chủ – mỗi nhân viên thuộc công ty nào (trang quản lý lọc theo công ty)
 let schemaOk = false;
 async function ensureSchema(db) {
@@ -658,6 +662,10 @@ async function ensureSchema(db) {
   if ((v ? Number(v.v) : 0) < 7) {
     for (const sql of MIGRATE_V7) { try { await db.prepare(sql).run(); } catch (e) { if (!/duplicate column/i.test(String(e && e.message))) throw e; } }
     await db.prepare("INSERT INTO cfg (k, v) VALUES ('schema_v', '7') ON CONFLICT(k) DO UPDATE SET v = '7'").run();
+  }
+  if ((v ? Number(v.v) : 0) < 8) {
+    for (const sql of MIGRATE_V8) { try { await db.prepare(sql).run(); } catch (e) { if (!/duplicate column/i.test(String(e && e.message))) throw e; } }
+    await db.prepare("INSERT INTO cfg (k, v) VALUES ('schema_v', '8') ON CONFLICT(k) DO UPDATE SET v = '8'").run();
   }
   schemaOk = true;
 }
@@ -737,7 +745,7 @@ function sameNet(a, b) {
 }
 async function officeIPs(db, cfg, now) {
   const hours = Math.max(1, Number(cfg.ip_gio) || 72);
-  const { results } = await db.prepare('SELECT ip, nguon, first, last FROM ip_vp ORDER BY last DESC').all();
+  const { results } = await db.prepare('SELECT ip, nguon, first, last, dd FROM ip_vp ORDER BY last DESC').all();
   return results.map(r => ({ ...r, hieu_luc: r.nguon === 'tay' || r.last > now - hours * 3600e3 }));
 }
 function matchOffice(ip, list) { return list.some(r => r.hieu_luc && sameNet(ip, r.ip)); }
@@ -1371,7 +1379,7 @@ async function api(req, env, url) {
   if (p === '/api/tb-anh') {
     const s = await session(db, req, 'nv'); if (!s) return bad('Phiên đăng nhập đã hết.', 401);
     const t = await db.prepare('SELECT anh FROM tb WHERE id = ?').bind(String(url.searchParams.get('id') || '')).first(); if (!t || !t.anh) return bad('Không có ảnh', 404);
-    const m = /^data:(image\/[\w+.-]+);base64,(.*)$/.exec(t.anh); return new Response(b64ToBytes(m[2]), { headers: { 'content-type': m[1], 'cache-control': 'private, max-age=86400', 'x-content-type-options': 'nosniff' } });
+    const m = /^data:(image\/[\w+.-]+);base64,(.*)$/.exec(t.anh); if (!m) return bad('Không có ảnh', 404); return new Response(b64ToBytes(m[2]), { headers: { 'content-type': /^image\/(png|jpeg|webp|gif)$/.test(m[1]) ? m[1] : 'application/octet-stream', 'content-security-policy': "default-src 'none'; sandbox", 'cache-control': 'private, max-age=86400', 'x-content-type-options': 'nosniff' } });
   }
   if (p === '/api/bc') { // 16/11: nội dung báo cáo định kỳ – chỉ người nhận
     const s = await session(db, req, 'nv'); if (!s) return bad('Phiên đăng nhập đã hết. Đăng nhập lại.', 401);
@@ -1737,9 +1745,9 @@ async function api(req, env, url) {
     const s = await sess('tram');
     if (!s) return bad('Trang Mã QR chấm công chưa kích hoạt trên thiết bị này.', 401);
     if (ip) {
-      const row = await db.prepare('SELECT last FROM ip_vp WHERE ip = ?').bind(ip).first();
-      if (!row) await db.prepare("INSERT INTO ip_vp (ip, nguon, first, last) VALUES (?, 'tram', ?, ?)").bind(ip, now, now).run();
-      else if (now - row.last > 60e3) await db.prepare('UPDATE ip_vp SET last = ? WHERE ip = ?').bind(now, ip).run();
+      const row = await db.prepare('SELECT last, dd FROM ip_vp WHERE ip = ?').bind(ip).first(), tdd = String(url.searchParams.get('dd') || '').replace(/\s+/g, ' ').trim().slice(0, 60); // 22/11: trang Mã QR đặt tên địa điểm
+      if (!row) await db.prepare("INSERT INTO ip_vp (ip, nguon, first, last, dd) VALUES (?, 'tram', ?, ?, ?)").bind(ip, now, now, tdd || null).run();
+      else if (now - row.last > 60e3 || (tdd && tdd !== row.dd)) await db.prepare('UPDATE ip_vp SET last = ?, dd = COALESCE(?, dd) WHERE ip = ?').bind(now, tdd || null, ip).run();
       if (now - Number(cfg.tram_last || 0) > 60e3) await setCfg(db, { tram_last: now, tram_ip: ip });
     }
     const w = Math.floor(now / QR_STEP);
@@ -1750,7 +1758,8 @@ async function api(req, env, url) {
     list.forEach(r => { const o = byNv[r.ma] || (byNv[r.ma] = { ma: r.ma, ten: r.ten || r.ma, luot: [] }); o.luot.push({ t: r.t, loai: r.loai, cach: r.cach }); });
     const vuaCham = list.filter(r => now - r.t < 90e3 && r.t <= now).slice(-3).reverse().map(r => ({ ten: r.ten || r.ma, t: r.t, loai: r.loai, cach: r.cach }));
     const nvCount = (await db.prepare('SELECT COUNT(*) AS n FROM nv WHERE active = 1').first()).n;
-    return json({ ok: true, demo, ten_cty: cfg.ten_cty, che_do: cfg.che_do, ip, ip_loai: ipKind(ip), now, het_han: (w + 1) * QR_STEP, qr: cfg.che_do === 'chi_wifi' ? null : qrSvg(link), hom_nay: Object.values(byNv).sort((a, b) => b.luot[b.luot.length - 1].t - a.luot[a.luot.length - 1].t), vua_cham: vuaCham, so_nv: nvCount, ...(env.DEV === '1' ? { _link: link } : {}) });
+    const ddL = (await db.prepare("SELECT DISTINCT dd FROM ip_vp WHERE dd IS NOT NULL AND dd != '' ORDER BY dd").all()).results.map(x => x.dd), myDd = ip ? (((await db.prepare('SELECT dd FROM ip_vp WHERE ip = ?').bind(ip).first()) || {}).dd || '') : ''; // 22/11: tên địa điểm
+    return json({ ok: true, demo, dd: myDd, dds: ddL, ten_cty: cfg.ten_cty, che_do: cfg.che_do, ip, ip_loai: ipKind(ip), now, het_han: (w + 1) * QR_STEP, qr: cfg.che_do === 'chi_wifi' ? null : qrSvg(link), hom_nay: Object.values(byNv).sort((a, b) => b.luot[b.luot.length - 1].t - a.luot[a.luot.length - 1].t), vua_cham: vuaCham, so_nv: nvCount, ...(env.DEV === '1' ? { _link: link } : {}) });
   }
 
   /* ----- quản lý ----- */
@@ -1796,9 +1805,12 @@ async function api(req, env, url) {
     }
     if (r === 'ip' && req.method === 'POST') {
       if (body.xoa) { await db.prepare('DELETE FROM ip_vp WHERE ip = ?').bind(String(body.xoa)).run(); return json({ ok: true }); }
+      const dd = String(body.dd || '').replace(/\s+/g, ' ').trim().slice(0, 60); // 22/11/2026: tên chi nhánh / địa điểm
+      if (body.sua) { await db.prepare('UPDATE ip_vp SET dd = ? WHERE ip = ?').bind(dd || null, String(body.sua)).run(); return json({ ok: true }); }
+      if (body.doi_ten) { await db.prepare('UPDATE ip_vp SET dd = ? WHERE dd = ?').bind(dd || null, String(body.doi_ten)).run(); return json({ ok: true }); }
       const v = String(body.ip || ip).trim();
       if (!/^[0-9a-fA-F:.]{2,45}$/.test(v)) return bad('IP không hợp lệ.');
-      await db.prepare("INSERT INTO ip_vp (ip, nguon, first, last) VALUES (?, 'tay', ?, ?) ON CONFLICT(ip) DO UPDATE SET nguon = 'tay', last = excluded.last").bind(v, now, now).run();
+      await db.prepare("INSERT INTO ip_vp (ip, nguon, first, last, dd) VALUES (?, 'tay', ?, ?, ?) ON CONFLICT(ip) DO UPDATE SET nguon = 'tay', last = excluded.last, dd = COALESCE(excluded.dd, ip_vp.dd)").bind(v, now, now, dd || null).run();
       return json({ ok: true });
     }
     if (r === 'cfg' && req.method === 'POST') {
